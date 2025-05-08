@@ -9,6 +9,7 @@ body:
     attributes:
       value: |
         ## 📌 기능 개요
+
   - type: textarea
     id: summary
     attributes:
@@ -27,5 +28,5 @@ body:
         - [ ] DTO/도메인
         - [ ] Mapper
         - [ ] 테스트 코드 작성
-      validations:
-        required: false
+    validations:
+      required: false
