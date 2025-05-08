@@ -21,4 +21,11 @@ body:
     id: checklist
     attributes:
       label: 작업 체크리스트
-      placeholder: "- [ ] 컨트롤러\n- [ ] 서비스\n- [ ] 테스트 작성"
+      value: |
+        - [ ] 컨트롤러
+        - [ ] 서비스
+        - [ ] DTO/도메인
+        - [ ] Mapper
+        - [ ] 테스트 코드 작성
+      validations:
+        required: false
