@@ -1,0 +1,24 @@
+name: 기능 요청
+description: 새로운 기능 개발 이슈 등록
+title: "[feat] "
+labels: ["feature", "backend"]
+assignees: []
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## 📌 기능 개요
+  - type: textarea
+    id: summary
+    attributes:
+      label: 기능 설명
+      placeholder: 이 기능은 어떤 기능인가요?
+    validations:
+      required: true
+
+  - type: textarea
+    id: checklist
+    attributes:
+      label: 작업 체크리스트
+      placeholder: "- [ ] 컨트롤러\n- [ ] 서비스\n- [ ] 테스트 작성"
