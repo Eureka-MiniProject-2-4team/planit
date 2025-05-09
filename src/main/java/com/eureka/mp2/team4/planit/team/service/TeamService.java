@@ -17,5 +17,5 @@ public interface TeamService {
     ApiResponse updateTeam(TeamRequestDto teamRequestDto);
 
     // Delete
-    ApiResponse deleteTeam(UUID teamId);
+    ApiResponse deleteTeam(String teamId);
 }

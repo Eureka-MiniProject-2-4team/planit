@@ -12,7 +12,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @Builder
 public class TeamDto {
-    private UUID id;
+    private String id;
     private String teamName;
     private String description;
     private Timestamp createdAt;

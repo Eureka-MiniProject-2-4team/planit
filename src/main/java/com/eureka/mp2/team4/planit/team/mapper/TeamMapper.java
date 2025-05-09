@@ -14,5 +14,5 @@ public interface TeamMapper {
     void updateTeam(TeamDto teamDto);
 
     // Delete
-    void deleteTeam(UUID id);
+    void deleteTeam(String id);
 }
