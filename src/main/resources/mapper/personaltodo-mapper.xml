@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.eureka.mp2.team4.planit.todo.personal.mapper.PersonalTodoMapper">
+
+    <insert id="insert">
+        INSERT INTO personal_todo (id, user_id, title, content, target_date, is_completed)
+        VALUES (#{id}, #{userId}, #{title}, #{content}, #{targetDate}, false)
+    </insert>
+
+    <update id="update">
+        UPDATE personal_todo
+        SET
+            title = #{request.title},
+            content = #{request.content},
+            target_date = #{request.targetDate},
+            is_completed = #{request.isCompleted},
+            updated_at = CURRENT_TIMESTAMP
+        WHERE id = #{id}
+    </update>
+
+    <delete id="delete">
+        DELETE FROM personal_todo
+        WHERE id = #{id}
+    </delete>
+
+    <select id="findById" resultType="com.eureka.mp2.team4.planit.todo.personal.dto.response.PersonalTodoResponseDto">
+        SELECT *
+        FROM personal_todo
+        WHERE id = #{id}
+    </select>
+
+    <select id="findAllByUserId" resultType="com.eureka.mp2.team4.planit.todo.personal.dto.response.PersonalTodoResponseDto">
+        SELECT *
+        FROM personal_todo
+        WHERE user_id = #{userId}
+        ORDER BY target_date ASC
+    </select>
+
+</mapper>
