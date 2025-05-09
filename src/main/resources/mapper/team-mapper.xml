@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.eureka.mp2.team4.planit.team.mapper.TeamMapper">
+    <insert id="registerTeam" parameterType="com.eureka.mp2.team4.planit.team.dto.TeamDto">
+        insert into team (id, teamname, description, created_at, updated_at)
+        values (#{id}, #{teamName}, #{description}, now(), now());
+    </insert>
+
+    <update id="updateTeam" parameterType="com.eureka.mp2.team4.planit.team.dto.TeamDto">
+        UPDATE team
+        SET teamname = #{teamName}, description = #{description}
+        WHERE id = #{id}
+    </update>
+
+    <delete id="deleteTeam" parameterType="java.util.UUID">
+        DELETE FROM team
+        WHERE id = #{id}
+    </delete>
+</mapper>
