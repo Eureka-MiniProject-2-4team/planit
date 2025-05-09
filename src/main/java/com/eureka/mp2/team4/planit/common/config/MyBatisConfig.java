@@ -6,7 +6,8 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 @MapperScan(basePackages = {
     "com.eureka.mp2.team4.planit.user.mapper",
-    "com.eureka.mp2.team4.planit.todo.mapper",
+    "com.eureka.mp2.team4.planit.todo.personal.mapper",
+    "com.eureka.mp2.team4.planit.todo.team.mapper",
     "com.eureka.mp2.team4.planit.team.mapper",
     "com.eureka.mp2.team4.planit.friend.mapper"
 })
