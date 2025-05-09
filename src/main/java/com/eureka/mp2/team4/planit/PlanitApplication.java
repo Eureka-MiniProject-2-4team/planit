@@ -5,7 +5,6 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-@MapperScan(basePackages = "com.eureka.mp2.team4.planit")
 public class PlanitApplication {
 
     public static void main(String[] args) {
