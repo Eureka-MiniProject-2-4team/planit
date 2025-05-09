@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.eureka.mp2.team4.planit.user.mapper.UserMapper">
+
+    <insert id="register" parameterType="com.eureka.mp2.team4.planit.auth.dto.request.UserRegisterRequestDto">
+        INSERT INTO users (
+            id, email, password, username, nickname, phone_number, role, created_at
+        ) VALUES (
+                     #{id}, #{email}, #{password}, #{username}, #{nickname}, #{phoneNumber}, #{role}, NOW()
+                 )
+    </insert>
+
+    <select id="isExistEmail" parameterType="string" resultType="boolean">
+        SELECT EXISTS (
+            SELECT 1 FROM users WHERE email = #{email}
+        )
+    </select>
+
+    <select id="isExistPhoneNumber" parameterType="string" resultType="boolean">
+        SELECT EXISTS (
+            SELECT 1 FROM users WHERE phone_number = #{phone}
+        )
+    </select>
+
+    <select id="isExistNickName" parameterType="string" resultType="boolean">
+        SELECT EXISTS (
+            SELECT 1 FROM users WHERE nickname = #{nickname}
+        )
+    </select>
+</mapper>
