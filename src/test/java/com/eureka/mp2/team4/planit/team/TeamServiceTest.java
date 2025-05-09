@@ -33,7 +33,7 @@ public class TeamServiceTest {
     @BeforeEach
     void setUp() {
         teamRequestDto = new TeamRequestDto();
-        teamRequestDto.setId(UUID.randomUUID());
+        teamRequestDto.setId(UUID.randomUUID().toString());
         teamRequestDto.setTeamName("테스트 팀");
         teamRequestDto.setDescription("테스트 팀 설명");
     }
@@ -97,8 +97,8 @@ public class TeamServiceTest {
     @Test
     void testDeleteTeamFail() {
         // Given
-        UUID teamId = UUID.randomUUID();
-        doThrow(new RuntimeException("DB 에러")).when(teamMapper).deleteTeam(any(UUID.class));
+        String teamId = UUID.randomUUID().toString();
+        doThrow(new RuntimeException("DB 에러")).when(teamMapper).deleteTeam(any(String.class));
 
         // When
         ApiResponse response = teamService.deleteTeam(teamId);
@@ -106,14 +106,14 @@ public class TeamServiceTest {
         // Then
         assertEquals(Result.FAIL, response.getResult());
         assertTrue(response.getMessage().contains("팀 삭제가 실패"));
-        verify(teamMapper, times(1)).deleteTeam(any(UUID.class));
+        verify(teamMapper, times(1)).deleteTeam(any(String.class));
     }
 
     @Test
     void testDeleteTeamSuccess() {
         // Given
-        UUID teamId = UUID.randomUUID();
-        doNothing().when(teamMapper).deleteTeam(any(UUID.class));
+        String teamId = UUID.randomUUID().toString();
+        doNothing().when(teamMapper).deleteTeam(any(String.class));
 
         // When
         ApiResponse response = teamService.deleteTeam(teamId);
@@ -121,6 +121,6 @@ public class TeamServiceTest {
         // Then
         assertEquals(Result.SUCCESS, response.getResult());
         assertTrue(response.getMessage().contains("성공적으로 삭제"));
-        verify(teamMapper, times(1)).deleteTeam(any(UUID.class));
+        verify(teamMapper, times(1)).deleteTeam(any(String.class));
     }
 }

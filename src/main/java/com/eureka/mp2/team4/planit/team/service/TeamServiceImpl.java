@@ -24,7 +24,7 @@ public class TeamServiceImpl implements TeamService{
             Timestamp currentTime = new Timestamp(System.currentTimeMillis());
 
             TeamDto teamDto = TeamDto.builder()
-                    .id(UUID.randomUUID())
+                    .id(UUID.randomUUID().toString())
                     .teamName(teamRequestDto.getTeamName())
                     .description(teamRequestDto.getDescription())
                     .createdAt(currentTime)
@@ -77,7 +77,7 @@ public class TeamServiceImpl implements TeamService{
     }
 
     @Override
-    public ApiResponse deleteTeam(UUID teamId) {
+    public ApiResponse deleteTeam(String teamId) {
         try{
             teamMapper.deleteTeam(teamId);
 

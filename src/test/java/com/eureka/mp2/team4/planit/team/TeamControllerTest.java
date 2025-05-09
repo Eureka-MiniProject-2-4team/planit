@@ -52,7 +52,7 @@ public class TeamControllerTest {
 
         // 테스트용 TeamRequestDto 생성
         teamRequestDto = new TeamRequestDto();
-        teamRequestDto.setId(UUID.randomUUID());
+        teamRequestDto.setId(UUID.randomUUID().toString());
         teamRequestDto.setTeamName("테스트 팀");
         teamRequestDto.setDescription("테스트 팀 설명");
     }
@@ -153,7 +153,7 @@ public class TeamControllerTest {
     @Test
     void testDeleteTeamFail() throws Exception {
         // Given
-        UUID teamId = teamRequestDto.getId();
+        String teamId = teamRequestDto.getId();
         String errorMessage = "팀 삭제에 실패했습니다: 해당 ID의 팀이 존재하지 않습니다.";
         when(teamService.deleteTeam(eq(teamId))).thenReturn(
                 ApiResponse.builder()
@@ -175,7 +175,7 @@ public class TeamControllerTest {
     @Test
     void testDeleteTeamSuccess() throws Exception {
         // Given
-        UUID teamId = teamRequestDto.getId();
+        String teamId = teamRequestDto.getId();
         when(teamService.deleteTeam(eq(teamId))).thenReturn(
                 ApiResponse.builder()
                         .result(Result.SUCCESS)

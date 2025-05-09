@@ -23,13 +23,13 @@ public class TeamController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ApiResponse> updateTeam(@PathVariable("id") UUID id, @RequestBody TeamRequestDto teamRequestDto) {
+    public ResponseEntity<ApiResponse> updateTeam(@PathVariable("id") String id, @RequestBody TeamRequestDto teamRequestDto) {
         teamRequestDto.setId(id);
         return ResponseEntity.ok(teamService.updateTeam(teamRequestDto));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<ApiResponse> deleteTeam(@PathVariable("id") UUID id) {
+    public ResponseEntity<ApiResponse> deleteTeam(@PathVariable("id") String id) {
         return ResponseEntity.ok(teamService.deleteTeam(id));
     }
 }

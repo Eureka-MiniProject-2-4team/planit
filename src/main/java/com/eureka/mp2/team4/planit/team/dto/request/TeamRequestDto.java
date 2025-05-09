@@ -10,7 +10,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 public class TeamRequestDto{
-    private UUID id;
+    private String id;
     private String teamName;
     private String description;
 }

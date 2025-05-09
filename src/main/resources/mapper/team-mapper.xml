@@ -15,7 +15,7 @@
         WHERE id = #{id}
     </update>
 
-    <delete id="deleteTeam" parameterType="java.util.UUID">
+    <delete id="deleteTeam" parameterType="java.lang.String">
         DELETE FROM team
         WHERE id = #{id}
     </delete>
