@@ -5,7 +5,7 @@ import lombok.Getter;
 
 @Getter
 @Builder
-public class ApiResponse<T extends ResponseDto> {
+public class ApiResponse<T> {
     private Result result;
     private String message;
     private T data;
