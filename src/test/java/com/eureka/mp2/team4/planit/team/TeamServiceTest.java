@@ -5,8 +5,10 @@ import static org.mockito.Mockito.*;
 
 import java.util.UUID;
 
+import com.eureka.mp2.team4.planit.common.ApiResponse;
+import com.eureka.mp2.team4.planit.common.Result;
 import com.eureka.mp2.team4.planit.team.dto.TeamDto;
-import com.eureka.mp2.team4.planit.team.dto.response.TeamResponseDto;
+import com.eureka.mp2.team4.planit.team.dto.request.TeamRequestDto;
 import com.eureka.mp2.team4.planit.team.mapper.TeamMapper;
 import com.eureka.mp2.team4.planit.team.service.TeamServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
@@ -15,9 +17,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.transaction.annotation.Transactional;
 
-@Transactional
 @ExtendWith(MockitoExtension.class)
 public class TeamServiceTest {
 
@@ -28,53 +28,99 @@ public class TeamServiceTest {
     private TeamServiceImpl teamService;
 
     private TeamDto teamDto;
-    private UUID teamId;
-//    private TeamResponseDto responseDto;
+    private TeamRequestDto teamRequestDto;
 
     @BeforeEach
     void setUp() {
-        teamId = UUID.randomUUID();
-
-        teamDto = new TeamDto();
-        teamDto.setTeamName("테스트 팀");
-        teamDto.setDescription("테스트 팀 설명");
-
-//        responseDto = new TeamResponseDto();
-//        responseDto.setId(teamId);
-//        responseDto.setTeamname("테스트 팀");
-//        responseDto.setDescription("테스트 팀 설명");
+        teamRequestDto = new TeamRequestDto();
+        teamRequestDto.setId(UUID.randomUUID());
+        teamRequestDto.setTeamName("테스트 팀");
+        teamRequestDto.setDescription("테스트 팀 설명");
     }
 
     @Test
-    void testRegisterFail() {
+    void testRegisterTeamFail() {
         // Given
-        when(teamMapper.registerTeam(any(TeamDto.class));).thenReturn(0);
+        doThrow(new RuntimeException("DB 에러")).when(teamMapper).registerTeam(any(TeamDto.class));
 
         // When
-        TeamDto result = teamService.registerTeam(teamDto);
+        ApiResponse response = teamService.registerTeam(teamRequestDto);
 
         // Then
-        assertNull(result);
+        assertEquals(Result.FAIL, response.getResult());
+        assertTrue(response.getMessage().contains("팀 등록에 실패"));
         verify(teamMapper, times(1)).registerTeam(any(TeamDto.class));
-        verify(teamMapper, never()).getTeamById(any(UUID.class));
     }
 
     @Test
-    void testRegisterSuccess() {
+    void testRegisterTeamSuccess() {
         // Given
-        when(teamMapper.insertTeam(any(TeamDto.class))).thenReturn(1);
-        when(teamMapper.getTeamById(any(UUID.class))).thenReturn(teamDto);
+        doNothing().when(teamMapper).registerTeam(any(TeamDto.class));
 
         // When
-        TeamDto result = teamService.registerTeam(teamDto);
+        ApiResponse response = teamService.registerTeam(teamRequestDto);
 
         // Then
-        assertNotNull(result);
-        assertEquals(teamDto.getTeamname(), result.getTeamname());
-        assertEquals(teamDto.getDescription(), result.getDescription());
-
-        verify(teamMapper, times(1)).insertTeam(any(TeamDto.class));
-        verify(teamMapper, times(1)).getTeamById(any(UUID.class));
+        assertEquals(Result.SUCCESS, response.getResult());
+        assertTrue(response.getMessage().contains("성공적으로 등록"));
+        verify(teamMapper, times(1)).registerTeam(any(TeamDto.class));
     }
 
+    @Test
+    void testUpdateTeamFail() {
+        // Given
+        doThrow(new RuntimeException("DB 에러")).when(teamMapper).updateTeam(any(TeamDto.class));
+
+        // When
+        ApiResponse response = teamService.updateTeam(teamRequestDto);
+
+        // Then
+        assertEquals(Result.FAIL, response.getResult());
+        assertTrue(response.getMessage().contains("팀 수정에 실패"));
+        verify(teamMapper, times(1)).updateTeam(any(TeamDto.class));
+    }
+
+    @Test
+    void testUpdateTeamSuccess() {
+        // Given
+        doNothing().when(teamMapper).updateTeam(any(TeamDto.class));
+
+        // When
+        ApiResponse response = teamService.updateTeam(teamRequestDto);
+
+        // Then
+        assertEquals(Result.SUCCESS, response.getResult());
+        assertTrue(response.getMessage().contains("성공적으로 수정"));
+        verify(teamMapper, times(1)).updateTeam(any(TeamDto.class));
+    }
+
+    @Test
+    void testDeleteTeamFail() {
+        // Given
+        UUID teamId = UUID.randomUUID();
+        doThrow(new RuntimeException("DB 에러")).when(teamMapper).deleteTeam(any(UUID.class));
+
+        // When
+        ApiResponse response = teamService.deleteTeam(teamId);
+
+        // Then
+        assertEquals(Result.FAIL, response.getResult());
+        assertTrue(response.getMessage().contains("팀 삭제가 실패"));
+        verify(teamMapper, times(1)).deleteTeam(any(UUID.class));
+    }
+
+    @Test
+    void testDeleteTeamSuccess() {
+        // Given
+        UUID teamId = UUID.randomUUID();
+        doNothing().when(teamMapper).deleteTeam(any(UUID.class));
+
+        // When
+        ApiResponse response = teamService.deleteTeam(teamId);
+
+        // Then
+        assertEquals(Result.SUCCESS, response.getResult());
+        assertTrue(response.getMessage().contains("성공적으로 삭제"));
+        verify(teamMapper, times(1)).deleteTeam(any(UUID.class));
+    }
 }

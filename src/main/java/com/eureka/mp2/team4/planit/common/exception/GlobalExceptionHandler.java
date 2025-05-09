@@ -2,7 +2,7 @@ package com.eureka.mp2.team4.planit.common.exception;
 
 import com.eureka.mp2.team4.planit.common.ApiResponse;
 import com.eureka.mp2.team4.planit.common.Result;
-import com.eureka.mp2.team4.planit.user.enums.UserRole;
+//import com.eureka.mp2.team4.planit.user.enums.UserRole;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
