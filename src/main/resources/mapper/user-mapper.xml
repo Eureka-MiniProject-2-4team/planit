@@ -3,12 +3,31 @@
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="com.eureka.mp2.team4.planit.user.UserMapper">
+<mapper namespace="com.eureka.mp2.team4.planit.user.mapper.UserMapper">
 
-    <select id="findByEmail" resultType="com.eureka.mp2.team4.planit.user.dto.UserDto">
-        SELECT id, email, username, password, nickname, role, created_at
-        FROM users
-        WHERE email = #{email}
+    <insert id="register" parameterType="com.eureka.mp2.team4.planit.auth.dto.request.UserRegisterRequestDto">
+        INSERT INTO users (
+            id, email, password, username, nickname, phone_number, role, created_at
+        ) VALUES (
+                     #{id}, #{email}, #{password}, #{username}, #{nickname}, #{phoneNumber}, #{role}, NOW()
+                 )
+    </insert>
+
+    <select id="isExistEmail" parameterType="string" resultType="boolean">
+        SELECT EXISTS (
+            SELECT 1 FROM users WHERE email = #{email}
+        )
     </select>
 
+    <select id="isExistPhoneNumber" parameterType="string" resultType="boolean">
+        SELECT EXISTS (
+            SELECT 1 FROM users WHERE phone_number = #{phone}
+        )
+    </select>
+
+    <select id="isExistNickName" parameterType="string" resultType="boolean">
+        SELECT EXISTS (
+            SELECT 1 FROM users WHERE nickname = #{nickname}
+        )
+    </select>
 </mapper>
