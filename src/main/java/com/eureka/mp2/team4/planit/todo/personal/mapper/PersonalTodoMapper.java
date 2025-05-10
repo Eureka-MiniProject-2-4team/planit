@@ -2,10 +2,12 @@ package com.eureka.mp2.team4.planit.todo.personal.mapper;
 
 import com.eureka.mp2.team4.planit.todo.personal.dto.request.PersonalTodoRequestDto;
 import com.eureka.mp2.team4.planit.todo.personal.dto.response.PersonalTodoResponseDto;
+import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
+@Mapper
 public interface PersonalTodoMapper {
     void insert(PersonalTodoRequestDto request);
 
