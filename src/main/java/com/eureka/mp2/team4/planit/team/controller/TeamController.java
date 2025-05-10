@@ -1,15 +1,11 @@
 package com.eureka.mp2.team4.planit.team.controller;
 
 import com.eureka.mp2.team4.planit.common.ApiResponse;
-import com.eureka.mp2.team4.planit.common.Result;
-import com.eureka.mp2.team4.planit.team.dto.TeamDto;
 import com.eureka.mp2.team4.planit.team.dto.request.TeamRequestDto;
 import com.eureka.mp2.team4.planit.team.service.TeamService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.UUID;
 
 @RestController
 @RequiredArgsConstructor
@@ -20,6 +16,11 @@ public class TeamController {
     @PostMapping("")
     public ResponseEntity<ApiResponse> registerTeam(@RequestBody TeamRequestDto teamRequestDto) {
         return ResponseEntity.ok(teamService.registerTeam(teamRequestDto));
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<ApiResponse> getTeam(@PathVariable("id") String id) {
+        return ResponseEntity.ok(teamService.getTeamById(id));
     }
 
     @PutMapping("/{id}")

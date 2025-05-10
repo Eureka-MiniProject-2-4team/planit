@@ -3,7 +3,6 @@ package com.eureka.mp2.team4.planit.team.dto;
 import lombok.*;
 
 import java.sql.Timestamp;
-import java.util.UUID;
 
 // UUID 중복 체크 로직 필요
 @Getter

@@ -4,19 +4,32 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.eureka.mp2.team4.planit.team.mapper.TeamMapper">
+    <!--CREATE-->
     <insert id="registerTeam" parameterType="com.eureka.mp2.team4.planit.team.dto.TeamDto">
-        insert into team (id, teamname, description, created_at, updated_at)
-        values (#{id}, #{teamName}, #{description}, now(), now());
+        INSERT INTO team (id, teamname, description, created_at, updated_at)
+        VALUES (#{id}, #{teamName}, #{description}, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
     </insert>
 
+    <!--READ-->
+    <select id="findTeamById" parameterType="java.lang.String" resultType="com.eureka.mp2.team4.planit.team.dto.TeamDto">
+        SELECT *
+        FROM team
+        WHERE id = #{id}
+    </select>
+
+    <!--UPDATE-->
     <update id="updateTeam" parameterType="com.eureka.mp2.team4.planit.team.dto.TeamDto">
         UPDATE team
-        SET teamname = #{teamName}, description = #{description}
+        SET teamname    = #{teamName},
+            description = #{description},
+            update_at = CURRENT_TIMESTAMP
         WHERE id = #{id}
     </update>
 
+    <!--DELETE-->
     <delete id="deleteTeam" parameterType="java.lang.String">
-        DELETE FROM team
+        DELETE
+        FROM team
         WHERE id = #{id}
     </delete>
 </mapper>
