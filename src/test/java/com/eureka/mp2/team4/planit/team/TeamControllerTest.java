@@ -1,15 +1,12 @@
 package com.eureka.mp2.team4.planit.team;
 
-import static org.mockito.Mockito.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-
 import com.eureka.mp2.team4.planit.common.ApiResponse;
 import com.eureka.mp2.team4.planit.common.Result;
 import com.eureka.mp2.team4.planit.team.controller.TeamController;
 import com.eureka.mp2.team4.planit.team.dto.TeamDto;
 import com.eureka.mp2.team4.planit.team.dto.request.TeamRequestDto;
 import com.eureka.mp2.team4.planit.team.service.TeamService;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -20,9 +17,13 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import java.util.UUID;
+
+import static com.eureka.mp2.team4.planit.team.constants.TeamMessages.*;
+import static org.mockito.Mockito.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ExtendWith(MockitoExtension.class)
 public class TeamControllerTest {
@@ -38,34 +39,37 @@ public class TeamControllerTest {
 
     private TeamDto teamDto;
     private TeamRequestDto teamRequestDto;  // TeamRequestDto 추가
+    private String teamId;
 
     @BeforeEach
     void setUp() {
         mockMvc = MockMvcBuilders.standaloneSetup(teamController).build();
         objectMapper = new ObjectMapper();
+        teamId = UUID.randomUUID().toString();
 
         // 테스트용 TeamDto 생성
         teamDto = new TeamDto();
-//        teamDto.setId(UUID.randomUUID());
+        teamDto.setId(teamId);
         teamDto.setTeamName("테스트 팀");
         teamDto.setDescription("테스트 팀 설명");
 
         // 테스트용 TeamRequestDto 생성
         teamRequestDto = new TeamRequestDto();
-        teamRequestDto.setId(UUID.randomUUID().toString());
+        teamRequestDto.setId(teamId);
         teamRequestDto.setTeamName("테스트 팀");
         teamRequestDto.setDescription("테스트 팀 설명");
     }
 
+    // TODO : CREATE
     @Test
     void testRegisterTeamFail() throws Exception {
         // Given
-        String errorMessage = "팀 등록에 실패했습니다: 중복된 팀 이름입니다.";
+
         // TeamRequestDto 타입으로 변경
         when(teamService.registerTeam(any(TeamRequestDto.class))).thenReturn(
                 ApiResponse.builder()
                         .result(Result.FAIL)
-                        .message(errorMessage)
+                        .message(REGISTER_TEAM_FAIL)
                         .build()
         );
 
@@ -75,7 +79,7 @@ public class TeamControllerTest {
                         .content(objectMapper.writeValueAsString(teamRequestDto)))  // teamRequestDto 사용
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.result").value("FAIL"))
-                .andExpect(jsonPath("$.message").value(errorMessage));
+                .andExpect(jsonPath("$.message").value(REGISTER_TEAM_FAIL));
 
         // 서비스 메서드 호출 확인
         verify(teamService, times(1)).registerTeam(any(TeamRequestDto.class));  // TeamRequestDto 타입으로 변경
@@ -88,7 +92,7 @@ public class TeamControllerTest {
         when(teamService.registerTeam(any(TeamRequestDto.class))).thenReturn(
                 ApiResponse.builder()
                         .result(Result.SUCCESS)
-                        .message("팀이 성공적으로 등록되었습니다.")
+                        .message(REGISTER_TEAM_SUCCESS)
                         .build()
         );
 
@@ -98,21 +102,93 @@ public class TeamControllerTest {
                         .content(objectMapper.writeValueAsString(teamRequestDto)))  // teamRequestDto 사용
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.result").value("SUCCESS"))
-                .andExpect(jsonPath("$.message").value("팀이 성공적으로 등록되었습니다."));
+                .andExpect(jsonPath("$.message").value(REGISTER_TEAM_SUCCESS));
 
         // 서비스 메서드 호출 확인
         verify(teamService, times(1)).registerTeam(any(TeamRequestDto.class));  // TeamRequestDto 타입으로 변경
     }
 
+    // TODO : READ
+    @Test
+    void testGetTeamFail() throws Exception {
+        // Given
+        when(teamService.getTeamById(eq(teamId))).thenReturn(
+                ApiResponse.builder()
+                        .result(Result.FAIL)
+                        .message(GET_TEAM_FAIL)
+                        .build()
+        );
+
+        // When & Then
+        mockMvc.perform(get("/api/team/{id}", teamId)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.result").value("FAIL"))
+                .andExpect(jsonPath("$.message").value(GET_TEAM_FAIL))
+                .andExpect(jsonPath("$.data").doesNotExist());
+
+        // 서비스 메서드 호출 검증
+        verify(teamService, times(1)).getTeamById(eq(teamId));
+    }
+
+    @Test
+    void testGetTeamWithInvalidId() throws Exception {
+        // Given: 잘못된 형식의 ID를 사용하는 경우
+        String invalidId = "invalid-uuid-format";
+        when(teamService.getTeamById(eq(invalidId))).thenReturn(
+                ApiResponse.builder()
+                        .result(Result.FAIL)
+                        .message(NOT_FOUND_ID)
+                        .build()
+        );
+
+        // When & Then
+        mockMvc.perform(get("/api/team/{id}", invalidId)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.result").value("FAIL"))
+                .andExpect(jsonPath("$.message").value(NOT_FOUND_ID));
+
+        // 서비스 메서드 호출 검증
+        verify(teamService, times(1)).getTeamById(eq(invalidId));
+    }
+
+    @Test
+    void testGetTeamSuccess() throws Exception {
+        // Given
+        when(teamService.getTeamById(eq(teamId))).thenReturn(
+                ApiResponse.builder()
+                        .result(Result.SUCCESS)
+                        .message(GET_TEAM_SUCCESS)
+                        .data(teamDto)
+                        .build()
+        );
+
+        // When & Then
+        mockMvc.perform(get("/api/team/{id}", teamId)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.result").value("SUCCESS"))
+                .andExpect(jsonPath("$.message").value(GET_TEAM_SUCCESS))
+                .andExpect(jsonPath("$.data").exists())
+                .andExpect(jsonPath("$.data.id").value(teamId))
+                .andExpect(jsonPath("$.data.teamName").value("테스트 팀"))
+                .andExpect(jsonPath("$.data.description").value("테스트 팀 설명"));
+
+        // 서비스 메서드 호출 검증
+        verify(teamService, times(1)).getTeamById(eq(teamId));
+    }
+
+    // TODO : UPDATE
     @Test
     void testUpdateTeamFail() throws Exception {
         // Given
-        String errorMessage = "팀 수정에 실패했습니다: ";
+
         // TeamRequestDto 타입으로 변경
         when(teamService.updateTeam(any(TeamRequestDto.class))).thenReturn(
                 ApiResponse.builder()
                         .result(Result.FAIL)
-                        .message(errorMessage)
+                        .message(UPDATE_TEAM_FAIL)
                         .build()
         );
 
@@ -122,7 +198,7 @@ public class TeamControllerTest {
                         .content(objectMapper.writeValueAsString(teamRequestDto)))  // teamRequestDto 사용
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.result").value("FAIL"))
-                .andExpect(jsonPath("$.message").value(errorMessage));
+                .andExpect(jsonPath("$.message").value(UPDATE_TEAM_FAIL));
 
         // 서비스 메서드 호출 확인
         verify(teamService, times(1)).updateTeam(any(TeamRequestDto.class));  // TeamRequestDto 타입으로 변경
@@ -134,7 +210,7 @@ public class TeamControllerTest {
         when(teamService.updateTeam(any(TeamRequestDto.class))).thenReturn(
                 ApiResponse.builder()
                         .result(Result.SUCCESS)
-                        .message("팀이 성공적으로 수정되었습니다.")
+                        .message(UPDATE_TEAM_SUCCESS)
                         .build()
         );
 
@@ -144,21 +220,22 @@ public class TeamControllerTest {
                         .content(objectMapper.writeValueAsString(teamRequestDto)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.result").value("SUCCESS"))
-                .andExpect(jsonPath("$.message").value("팀이 성공적으로 수정되었습니다."));
+                .andExpect(jsonPath("$.message").value(UPDATE_TEAM_SUCCESS));
 
         // 서비스 메서드 호출 확인
         verify(teamService, times(1)).updateTeam(any(TeamRequestDto.class));
     }
 
+    // TODO : DELETE
     @Test
     void testDeleteTeamFail() throws Exception {
         // Given
         String teamId = teamRequestDto.getId();
-        String errorMessage = "팀 삭제에 실패했습니다: 해당 ID의 팀이 존재하지 않습니다.";
+
         when(teamService.deleteTeam(eq(teamId))).thenReturn(
                 ApiResponse.builder()
                         .result(Result.FAIL)
-                        .message(errorMessage)
+                        .message(DELETE_TEAM_FAIL)
                         .build()
         );
 
@@ -166,7 +243,7 @@ public class TeamControllerTest {
         mockMvc.perform(delete("/api/team/{id}", teamId))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.result").value("FAIL"))
-                .andExpect(jsonPath("$.message").value(errorMessage));
+                .andExpect(jsonPath("$.message").value(DELETE_TEAM_FAIL));
 
         // 서비스 메서드 호출 확인
         verify(teamService, times(1)).deleteTeam(eq(teamId));
@@ -179,7 +256,7 @@ public class TeamControllerTest {
         when(teamService.deleteTeam(eq(teamId))).thenReturn(
                 ApiResponse.builder()
                         .result(Result.SUCCESS)
-                        .message("팀이 성공적으로 삭제되었습니다.")
+                        .message(DELETE_TEAM_SUCCESS)
                         .build()
         );
 
@@ -187,7 +264,7 @@ public class TeamControllerTest {
         mockMvc.perform(delete("/api/team/{id}", teamId))  // POST → DELETE로 변경, 본문 제거
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.result").value("SUCCESS"))
-                .andExpect(jsonPath("$.message").value("팀이 성공적으로 삭제되었습니다."));
+                .andExpect(jsonPath("$.message").value(DELETE_TEAM_SUCCESS));
 
         // 서비스 메서드 호출 확인
         verify(teamService, times(1)).deleteTeam(eq(teamId));

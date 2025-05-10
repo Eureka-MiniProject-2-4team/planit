@@ -8,6 +8,6 @@ import java.util.List;
 
 @Data
 @Builder
-public class TeamResponseDto  {
+public class TeamListResponseDto {
     private List<TeamDto> teams;
 }
