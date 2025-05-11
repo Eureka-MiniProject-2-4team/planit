@@ -21,4 +21,10 @@ public class Messages {
     public static final String INVALID_PASSWORD = "비밀번호는 특수문자를 하나 이상 포함해야 합니다.";
     public static final String INVALID_NICKNAME = "닉네임은 소문자, 한글, 숫자 조합만 가능합니다.";
     public static final String INVALID_PHONE = "휴대폰 번호는 010으로 시작하는 10~11자리 숫자만 허용됩니다.";
+    public static final String INVALID_CREDENTIALS = "이메일 또는 비밀번호가 일치하지 않습니다";
+    public static final String BAD_LOGIN_REQUEST = "잘못된 로그인 요청입니다";
+    public static final String LOGIN_SUCCESS = "로그인에 성공하였습니다";
+    public static final String INVALID_TOKEN = "유효하지 않은 토큰입니다";
+    public static final String NEED_LOGIN = "로그인 후 이용해주세요";
+    public static final String ACCESS_DENIED = "접근 권한이 없습니다";
 }

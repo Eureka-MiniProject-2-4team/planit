@@ -26,7 +26,7 @@ public class AuthServiceImpl implements AuthService {
     public ApiResponse register(UserRegisterRequestDto requestDto) {
         validateRegisterData(requestDto);
         requestDto.setId(UUID.randomUUID().toString());
-        requestDto.setRole(UserRole.USER);
+        requestDto.setRole(UserRole.ROLE_USER);
         requestDto.setPassword(passwordEncoder.encode(requestDto.getPassword()));
         saveRegisterData(requestDto);
 

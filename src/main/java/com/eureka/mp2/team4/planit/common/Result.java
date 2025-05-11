@@ -8,5 +8,6 @@ public enum Result {
     UNAUTHORIZED,
     INVALIDATED,
     DUPLICATED,
+    NEED_LOGIN,
     SERVER_ERROR
 }
