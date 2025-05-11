@@ -22,7 +22,7 @@
         UPDATE team
         SET teamname    = #{teamName},
             description = #{description},
-            update_at = CURRENT_TIMESTAMP
+            updated_at = CURRENT_TIMESTAMP
         WHERE id = #{id}
     </update>
 
