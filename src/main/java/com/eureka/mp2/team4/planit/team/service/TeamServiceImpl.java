@@ -17,7 +17,7 @@ import static com.eureka.mp2.team4.planit.team.constants.TeamMessages.*;
 @Service
 public class TeamServiceImpl implements TeamService {
 
-    private TeamMapper teamMapper;
+    private final TeamMapper teamMapper;
 
     @Override
     public ApiResponse registerTeam(TeamRequestDto teamRequestDto) {
@@ -39,6 +39,7 @@ public class TeamServiceImpl implements TeamService {
 
         } catch (Exception e) {
             // 실패 응답
+            System.out.println(e.getMessage());
             return ApiResponse.builder()
                     .result(Result.FAIL)
                     .message(REGISTER_TEAM_FAIL)
@@ -62,6 +63,7 @@ public class TeamServiceImpl implements TeamService {
                     .build();
 
         } catch (Exception e) {
+            System.out.println(e.getMessage());
             return ApiResponse.builder()
                     .result(Result.FAIL)
                     .message(GET_TEAM_FAIL)
@@ -92,6 +94,7 @@ public class TeamServiceImpl implements TeamService {
                     .build();
 
         } catch (Exception e) {
+            System.out.println(e.getMessage());
             return ApiResponse.builder()
                     .result(Result.FAIL)
                     .message(UPDATE_TEAM_FAIL)
@@ -114,6 +117,7 @@ public class TeamServiceImpl implements TeamService {
                     .build();
 
         } catch (Exception e) {
+            System.out.println(e.getMessage());
             return ApiResponse.builder()
                     .result(Result.FAIL)
                     .message(DELETE_TEAM_FAIL)

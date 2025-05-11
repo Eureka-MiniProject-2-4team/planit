@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.eureka.mp2.team4.planit.todo.team.mapper.TeamTodoMapper">
+    <!--CREATE-->
+    <insert id="createTeamTodo" parameterType="com.eureka.mp2.team4.planit.todo.team.dto.TeamTodoDto">
+        INSERT INTO team_todo (id, team_id, title, content, is_completed, created_at, updated_at)
+        VALUES (#{id}, #{teamId}, #{title}, #{content}, #{isCompleted}, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+    </insert>
+
+    <!--READ-->
+    <select id="getTeamTodoList" parameterType="java.lang.String" resultType="com.eureka.mp2.team4.planit.todo.team.dto.TeamTodoDto">
+        SELECT *
+        FROM team_todo
+        WHERE team_id = #{teamId}
+    </select>
+
+    <select id="getTeamTodoById" parameterType="java.lang.String" resultType="com.eureka.mp2.team4.planit.todo.team.dto.TeamTodoDto">
+        SELECT *
+        FROM team_todo
+        WHERE id=#{id};
+    </select>
+
+    <!--UPDATE-->
+    <update id="updateTeamTodo" parameterType="com.eureka.mp2.team4.planit.todo.team.dto.TeamTodoDto">
+        UPDATE team_todo
+        SET title = #{title},
+            content = #{content},
+            is_completed = #{isCompleted},
+            updated_at = CURRENT_TIMESTAMP
+        WHERE id=#{id}
+    </update>
+
+    <!--DELETE-->
+   <delete id="deleteTeamTodo" parameterType="java.lang.String">
+        DELETE
+        FROM team_todo
+        WHERE id = #{id}
+   </delete>
+
+</mapper>

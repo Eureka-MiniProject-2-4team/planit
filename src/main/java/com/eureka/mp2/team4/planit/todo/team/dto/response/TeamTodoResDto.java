@@ -1,4 +1,4 @@
-package com.eureka.mp2.team4.planit.todo.team.dto;
+package com.eureka.mp2.team4.planit.todo.team.dto.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -11,9 +11,7 @@ import java.sql.Timestamp;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class TeamTodoDto {
-    private String id;
-    private String teamId;
+public class TeamTodoResDto {
     private String title;
     private String content;
     private boolean isCompleted;
