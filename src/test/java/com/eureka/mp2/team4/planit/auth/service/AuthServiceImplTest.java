@@ -9,12 +9,12 @@ import com.eureka.mp2.team4.planit.user.enums.UserRole;
 import com.eureka.mp2.team4.planit.user.mapper.UserMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.dao.DataAccessException;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.junit.jupiter.api.extension.ExtendWith;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -42,7 +42,7 @@ public class AuthServiceImplTest {
                 .password("secure1234!")
                 .nickname("nickname")
                 .phoneNumber("01012345678")
-                .role(UserRole.USER)
+                .role(UserRole.ROLE_USER)
                 .build();
     }
 
@@ -130,26 +130,30 @@ public class AuthServiceImplTest {
         when(userMapper.isExistPhoneNumber(anyString())).thenReturn(false);
         when(userMapper.isExistNickName(anyString())).thenReturn(false);
         when(passwordEncoder.encode(anyString())).thenReturn("encoded");
-        doThrow(new DataAccessException("DB 오류") {}).when(userMapper).register(any());
+        doThrow(new DataAccessException("DB 오류") {
+        }).when(userMapper).register(any());
 
         assertThrows(DatabaseException.class, () -> authService.register(validDto));
     }
 
     @Test
     void checkDuplicateEmail_databaseException() {
-        when(userMapper.isExistEmail(anyString())).thenThrow(new DataAccessException("DB 오류") {});
+        when(userMapper.isExistEmail(anyString())).thenThrow(new DataAccessException("DB 오류") {
+        });
         assertThrows(DatabaseException.class, () -> authService.checkEmailIsExist("test@planit.com"));
     }
 
     @Test
     void checkDuplicatePhone_databaseException() {
-        when(userMapper.isExistPhoneNumber(anyString())).thenThrow(new DataAccessException("DB 오류") {});
+        when(userMapper.isExistPhoneNumber(anyString())).thenThrow(new DataAccessException("DB 오류") {
+        });
         assertThrows(DatabaseException.class, () -> authService.checkPhoneNumberIsExist("01012345678"));
     }
 
     @Test
     void checkDuplicateNick_databaseException() {
-        when(userMapper.isExistNickName(anyString())).thenThrow(new DataAccessException("DB 오류") {});
+        when(userMapper.isExistNickName(anyString())).thenThrow(new DataAccessException("DB 오류") {
+        });
         assertThrows(DatabaseException.class, () -> authService.checkNickNameIsExist("nickname"));
     }
 }
