@@ -6,6 +6,6 @@ import lombok.Data;
 import java.util.List;
 
 @Data
-public class TeamTodoListResDto {
+public class TeamTodoListResponseDto {
     List<TeamTodoDto> teamTodoDtoList;
 }

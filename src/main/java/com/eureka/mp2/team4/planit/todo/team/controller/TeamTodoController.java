@@ -1,7 +1,7 @@
 package com.eureka.mp2.team4.planit.todo.team.controller;
 
 import com.eureka.mp2.team4.planit.common.ApiResponse;
-import com.eureka.mp2.team4.planit.todo.team.dto.request.TeamTodoReqDto;
+import com.eureka.mp2.team4.planit.todo.team.dto.request.TeamTodoRequestDto;
 import com.eureka.mp2.team4.planit.todo.team.service.TeamTodoService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -18,7 +18,7 @@ public class TeamTodoController {
 
     @Operation(summary = "팀 투두 생성", description = "팀장만 팀 투두 등록 가능, 아직 권한 미적용")
     @PostMapping("")
-    public ResponseEntity<ApiResponse> createTeamTodo(@RequestBody TeamTodoReqDto teamTodoRequestDto){
+    public ResponseEntity<ApiResponse> createTeamTodo(@RequestBody TeamTodoRequestDto teamTodoRequestDto){
         return ResponseEntity.ok(teamTodoService.createTeamTodo(teamTodoRequestDto));
     }
 
@@ -38,9 +38,9 @@ public class TeamTodoController {
 
     @Operation(summary = "팀 투두 수정", description = "팀장만 팀 투두 수정 가능, 아직 권한 미적용")
     @PutMapping("/{teamTodoId}")
-    public ResponseEntity<ApiResponse> updateTeamTodo(@PathVariable String teamTodoId, @RequestBody TeamTodoReqDto teamTodoReqDto){
-        teamTodoReqDto.setId(teamTodoId);
-        return ResponseEntity.ok(teamTodoService.updateTeamTodo(teamTodoReqDto));
+    public ResponseEntity<ApiResponse> updateTeamTodo(@PathVariable String teamTodoId, @RequestBody TeamTodoRequestDto teamTodoRequestDto){
+        teamTodoRequestDto.setId(teamTodoId);
+        return ResponseEntity.ok(teamTodoService.updateTeamTodo(teamTodoRequestDto));
     }
 
     @Operation(summary = "팀 투두 삭제", description = "팀장만 팀 투두 삭제 가능, 아직 권한 미적용")

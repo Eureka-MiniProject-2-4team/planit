@@ -5,7 +5,7 @@ import lombok.Data;
 import java.sql.Timestamp;
 
 @Data
-public class TeamTodoReqDto {
+public class TeamTodoRequestDto {
     private String id;
     private String teamId;
     private String title;

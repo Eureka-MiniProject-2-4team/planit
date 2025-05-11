@@ -4,9 +4,9 @@ import com.eureka.mp2.team4.planit.common.ApiResponse;
 import com.eureka.mp2.team4.planit.common.Result;
 import com.eureka.mp2.team4.planit.common.exception.NotFoundException;
 import com.eureka.mp2.team4.planit.todo.team.dto.TeamTodoDto;
-import com.eureka.mp2.team4.planit.todo.team.dto.request.TeamTodoReqDto;
-import com.eureka.mp2.team4.planit.todo.team.dto.response.TeamTodoListResDto;
-import com.eureka.mp2.team4.planit.todo.team.dto.response.TeamTodoResDto;
+import com.eureka.mp2.team4.planit.todo.team.dto.request.TeamTodoRequestDto;
+import com.eureka.mp2.team4.planit.todo.team.dto.response.TeamTodoListResponseDto;
+import com.eureka.mp2.team4.planit.todo.team.dto.response.TeamTodoResponseDto;
 import com.eureka.mp2.team4.planit.todo.team.mapper.TeamTodoMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -22,13 +22,13 @@ public class TeamTodoServiceImpl implements TeamTodoService {
     private final TeamTodoMapper teamTodoMapper;
 
     @Override
-    public ApiResponse createTeamTodo(TeamTodoReqDto teamTodoReqDto) {
+    public ApiResponse createTeamTodo(TeamTodoRequestDto teamTodoRequestDto) {
         try{
             TeamTodoDto teamTodoDto = TeamTodoDto.builder()
                     .id(UUID.randomUUID().toString())
-                    .teamId(teamTodoReqDto.getTeamId())
-                    .title(teamTodoReqDto.getTitle())
-                    .content(teamTodoReqDto.getContent())
+                    .teamId(teamTodoRequestDto.getTeamId())
+                    .title(teamTodoRequestDto.getTitle())
+                    .content(teamTodoRequestDto.getContent())
                     .isCompleted(false)
                     .build();
 
@@ -57,7 +57,7 @@ public class TeamTodoServiceImpl implements TeamTodoService {
             List<TeamTodoDto> teamTodoDtoList = teamTodoMapper.getTeamTodoList(teamId);
 
             // TODO : TeamTodoResDto 로 다시 감싸서 id, teamId 값 빼고 줘야 맞나?
-            TeamTodoListResDto response = new TeamTodoListResDto();
+            TeamTodoListResponseDto response = new TeamTodoListResponseDto();
             response.setTeamTodoDtoList(teamTodoDtoList);
 
             return ApiResponse.builder()
@@ -83,7 +83,7 @@ public class TeamTodoServiceImpl implements TeamTodoService {
             }
 
             TeamTodoDto teamTodoDto = teamTodoMapper.getTeamTodoById(teamTodoId);
-            TeamTodoResDto response = TeamTodoResDto.builder()
+            TeamTodoResponseDto response = TeamTodoResponseDto.builder()
                     .title(teamTodoDto.getTitle())
                     .content(teamTodoDto.getContent())
                     .isCompleted(teamTodoDto.isCompleted())
@@ -107,18 +107,18 @@ public class TeamTodoServiceImpl implements TeamTodoService {
     }
 
     @Override
-    public ApiResponse updateTeamTodo(TeamTodoReqDto teamTodoReqDto) {
+    public ApiResponse updateTeamTodo(TeamTodoRequestDto teamTodoRequestDto) {
         try{
-            if(teamTodoMapper.getTeamTodoById(teamTodoReqDto.getId()) == null){
+            if(teamTodoMapper.getTeamTodoById(teamTodoRequestDto.getId()) == null){
                 throw new NotFoundException(NOT_FOUND_TEAMTODO_ID);
             }
 
             TeamTodoDto teamTodoDto = TeamTodoDto.builder()
-                    .id(teamTodoReqDto.getId())
+                    .id(teamTodoRequestDto.getId())
 //                    .teamId(teamTodoReqDto.getTeamId()) // 필요없을듯
-                    .title(teamTodoReqDto.getTitle())
-                    .content(teamTodoReqDto.getContent())
-                    .isCompleted(teamTodoReqDto.isCompleted())
+                    .title(teamTodoRequestDto.getTitle())
+                    .content(teamTodoRequestDto.getContent())
+                    .isCompleted(teamTodoRequestDto.isCompleted())
                     .build();
 
             teamTodoMapper.updateTeamTodo(teamTodoDto);

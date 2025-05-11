@@ -1,9 +1,9 @@
 package com.eureka.mp2.team4.planit.todo.team.controller;
 
 import com.eureka.mp2.team4.planit.todo.team.dto.TeamTodoDto;
-import com.eureka.mp2.team4.planit.todo.team.dto.request.TeamTodoReqDto;
-import com.eureka.mp2.team4.planit.todo.team.dto.response.TeamTodoResDto;
-import com.eureka.mp2.team4.planit.todo.team.dto.response.TeamTodoListResDto;
+import com.eureka.mp2.team4.planit.todo.team.dto.request.TeamTodoRequestDto;
+import com.eureka.mp2.team4.planit.todo.team.dto.response.TeamTodoResponseDto;
+import com.eureka.mp2.team4.planit.todo.team.dto.response.TeamTodoListResponseDto;
 import com.eureka.mp2.team4.planit.todo.team.service.TeamTodoService;
 import com.eureka.mp2.team4.planit.common.ApiResponse;
 import com.eureka.mp2.team4.planit.common.Result;
@@ -25,7 +25,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -49,10 +48,10 @@ public class TeamTodoControllerTest {
 
     private String teamId;
     private String todoId;
-    private TeamTodoReqDto teamTodoReqDto;
+    private TeamTodoRequestDto teamTodoRequestDto;
     private TeamTodoDto teamTodoDto;
-    private TeamTodoResDto teamTodoResDto;
-    private TeamTodoListResDto teamTodoListResDto;
+    private TeamTodoResponseDto teamTodoResponseDto;
+    private TeamTodoListResponseDto teamTodoListResponseDto;
     private Timestamp currentTime;
 
     @BeforeEach
@@ -65,11 +64,11 @@ public class TeamTodoControllerTest {
         currentTime = Timestamp.from(Instant.now());
 
         // 요청 DTO 세팅
-        teamTodoReqDto = new TeamTodoReqDto();
-        teamTodoReqDto.setTeamId(teamId);
-        teamTodoReqDto.setTitle("팀 미팅 준비하기");
-        teamTodoReqDto.setContent("회의록 및 발표자료 준비");
-        teamTodoReqDto.setCompleted(false);
+        teamTodoRequestDto = new TeamTodoRequestDto();
+        teamTodoRequestDto.setTeamId(teamId);
+        teamTodoRequestDto.setTitle("팀 미팅 준비하기");
+        teamTodoRequestDto.setContent("회의록 및 발표자료 준비");
+        teamTodoRequestDto.setCompleted(false);
 
         // 응답용 DTO 세팅
         teamTodoDto = new TeamTodoDto();
@@ -82,12 +81,12 @@ public class TeamTodoControllerTest {
         teamTodoDto.setUpdatedAt(currentTime);
 
         // 상세 조회 응답 DTO 세팅
-        teamTodoResDto = new TeamTodoResDto();
-        teamTodoResDto.setTitle("팀 미팅 준비하기");
-        teamTodoResDto.setContent("회의록 및 발표자료 준비");
-        teamTodoResDto.setCompleted(false);
-        teamTodoResDto.setCreatedAt(currentTime);
-        teamTodoResDto.setUpdatedAt(currentTime);
+        teamTodoResponseDto = new TeamTodoResponseDto();
+        teamTodoResponseDto.setTitle("팀 미팅 준비하기");
+        teamTodoResponseDto.setContent("회의록 및 발표자료 준비");
+        teamTodoResponseDto.setCompleted(false);
+        teamTodoResponseDto.setCreatedAt(currentTime);
+        teamTodoResponseDto.setUpdatedAt(currentTime);
 
         // 목록 조회 응답 DTO 세팅
         List<TeamTodoDto> todoList = Arrays.asList(
@@ -95,8 +94,8 @@ public class TeamTodoControllerTest {
                 createAnotherTeamTodoDto()
         );
 
-        teamTodoListResDto = new TeamTodoListResDto();
-        teamTodoListResDto.setTeamTodoDtoList(todoList);
+        teamTodoListResponseDto = new TeamTodoListResponseDto();
+        teamTodoListResponseDto.setTeamTodoDtoList(todoList);
     }
 
     // 추가 테스트용 DTO 생성 메서드
@@ -117,7 +116,7 @@ public class TeamTodoControllerTest {
     @DisplayName("팀 투두 생성 성공 테스트")
     void testCreateTeamTodoSuccess() throws Exception {
         // Given
-        when(teamTodoService.createTeamTodo(any(TeamTodoReqDto.class))).thenReturn(
+        when(teamTodoService.createTeamTodo(any(TeamTodoRequestDto.class))).thenReturn(
                 ApiResponse.builder()
                         .result(Result.SUCCESS)
                         .message(REGISTER_TEAMTODO_SUCCESS)
@@ -127,20 +126,20 @@ public class TeamTodoControllerTest {
         // When & Then
         mockMvc.perform(post("/api/teamtodo")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(teamTodoReqDto)))
+                        .content(objectMapper.writeValueAsString(teamTodoRequestDto)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.result").value("SUCCESS"))
                 .andExpect(jsonPath("$.message").value(REGISTER_TEAMTODO_SUCCESS));
 
         // 서비스 메서드 호출 검증
-        verify(teamTodoService, times(1)).createTeamTodo(any(TeamTodoReqDto.class));
+        verify(teamTodoService, times(1)).createTeamTodo(any(TeamTodoRequestDto.class));
     }
 
     @Test
     @DisplayName("팀 투두 생성 실패 테스트")
     void testCreateTeamTodoFail() throws Exception {
         // Given
-        when(teamTodoService.createTeamTodo(any(TeamTodoReqDto.class))).thenReturn(
+        when(teamTodoService.createTeamTodo(any(TeamTodoRequestDto.class))).thenReturn(
                 ApiResponse.builder()
                         .result(Result.FAIL)
                         .message(REGISTER_TEAMTODO_FAIL)
@@ -150,13 +149,13 @@ public class TeamTodoControllerTest {
         // When & Then
         mockMvc.perform(post("/api/teamtodo")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(teamTodoReqDto)))
+                        .content(objectMapper.writeValueAsString(teamTodoRequestDto)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.result").value("FAIL"))
                 .andExpect(jsonPath("$.message").value(REGISTER_TEAMTODO_FAIL));
 
         // 서비스 메서드 호출 검증
-        verify(teamTodoService, times(1)).createTeamTodo(any(TeamTodoReqDto.class));
+        verify(teamTodoService, times(1)).createTeamTodo(any(TeamTodoRequestDto.class));
     }
 
     // READ - List
@@ -168,7 +167,7 @@ public class TeamTodoControllerTest {
                 ApiResponse.builder()
                         .result(Result.SUCCESS)
                         .message(GET_TEAMTODO_LIST_SUCCESS)
-                        .data(teamTodoListResDto)
+                        .data(teamTodoListResponseDto)
                         .build()
         );
 
@@ -219,7 +218,7 @@ public class TeamTodoControllerTest {
                 ApiResponse.builder()
                         .result(Result.SUCCESS)
                         .message(GET_TEAMTODO_SUCCESS)
-                        .data(teamTodoResDto)
+                        .data(teamTodoResponseDto)
                         .build()
         );
 
@@ -263,13 +262,13 @@ public class TeamTodoControllerTest {
     @DisplayName("팀 투두 수정 성공 테스트")
     void testUpdateTeamTodoSuccess() throws Exception {
         // Given
-        TeamTodoReqDto updateRequest = new TeamTodoReqDto();
+        TeamTodoRequestDto updateRequest = new TeamTodoRequestDto();
         updateRequest.setTeamId(teamId);
         updateRequest.setTitle("수정된 할일");
         updateRequest.setContent("수정된 내용");
         updateRequest.setCompleted(true);
 
-        when(teamTodoService.updateTeamTodo(any(TeamTodoReqDto.class))).thenReturn(
+        when(teamTodoService.updateTeamTodo(any(TeamTodoRequestDto.class))).thenReturn(
                 ApiResponse.builder()
                         .result(Result.SUCCESS)
                         .message(UPDATE_TEAMTODO_SUCCESS)
@@ -285,20 +284,20 @@ public class TeamTodoControllerTest {
                 .andExpect(jsonPath("$.message").value(UPDATE_TEAMTODO_SUCCESS));
 
         // 서비스 메서드 호출 검증
-        verify(teamTodoService, times(1)).updateTeamTodo(any(TeamTodoReqDto.class));
+        verify(teamTodoService, times(1)).updateTeamTodo(any(TeamTodoRequestDto.class));
     }
 
     @Test
     @DisplayName("팀 투두 수정 실패 테스트")
     void testUpdateTeamTodoFail() throws Exception {
         // Given
-        TeamTodoReqDto updateRequest = new TeamTodoReqDto();
+        TeamTodoRequestDto updateRequest = new TeamTodoRequestDto();
         updateRequest.setTeamId(teamId);
         updateRequest.setTitle("수정된 할일");
         updateRequest.setContent("수정된 내용");
         updateRequest.setCompleted(true);
 
-        when(teamTodoService.updateTeamTodo(any(TeamTodoReqDto.class))).thenReturn(
+        when(teamTodoService.updateTeamTodo(any(TeamTodoRequestDto.class))).thenReturn(
                 ApiResponse.builder()
                         .result(Result.FAIL)
                         .message(UPDATE_TEAMTODO_FAIL)
@@ -314,7 +313,7 @@ public class TeamTodoControllerTest {
                 .andExpect(jsonPath("$.message").value(UPDATE_TEAMTODO_FAIL));
 
         // 서비스 메서드 호출 검증
-        verify(teamTodoService, times(1)).updateTeamTodo(any(TeamTodoReqDto.class));
+        verify(teamTodoService, times(1)).updateTeamTodo(any(TeamTodoRequestDto.class));
     }
 
     // DELETE

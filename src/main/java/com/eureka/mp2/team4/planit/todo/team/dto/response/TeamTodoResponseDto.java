@@ -11,7 +11,7 @@ import java.sql.Timestamp;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class TeamTodoResDto {
+public class TeamTodoResponseDto {
     private String title;
     private String content;
     private boolean isCompleted;

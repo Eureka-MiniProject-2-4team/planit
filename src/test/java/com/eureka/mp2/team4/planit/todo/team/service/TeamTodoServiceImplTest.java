@@ -12,9 +12,9 @@ import java.util.UUID;
 import com.eureka.mp2.team4.planit.common.ApiResponse;
 import com.eureka.mp2.team4.planit.common.Result;
 import com.eureka.mp2.team4.planit.todo.team.dto.TeamTodoDto;
-import com.eureka.mp2.team4.planit.todo.team.dto.request.TeamTodoReqDto;
-import com.eureka.mp2.team4.planit.todo.team.dto.response.TeamTodoListResDto;
-import com.eureka.mp2.team4.planit.todo.team.dto.response.TeamTodoResDto;
+import com.eureka.mp2.team4.planit.todo.team.dto.request.TeamTodoRequestDto;
+import com.eureka.mp2.team4.planit.todo.team.dto.response.TeamTodoListResponseDto;
+import com.eureka.mp2.team4.planit.todo.team.dto.response.TeamTodoResponseDto;
 import com.eureka.mp2.team4.planit.todo.team.mapper.TeamTodoMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -35,7 +35,7 @@ public class TeamTodoServiceImplTest {
     private String teamId;
     private String teamTodoId;
     private TeamTodoDto teamTodoDto;
-    private TeamTodoReqDto teamTodoReqDto;
+    private TeamTodoRequestDto teamTodoRequestDto;
     private List<TeamTodoDto> teamTodoDtoList;
 
     @BeforeEach
@@ -56,12 +56,12 @@ public class TeamTodoServiceImplTest {
                 .build();
 
         // TeamTodoReqDto 설정
-        teamTodoReqDto = new TeamTodoReqDto();
-        teamTodoReqDto.setId(teamTodoId);
-        teamTodoReqDto.setTeamId(teamId);
-        teamTodoReqDto.setTitle("테스트 할 일");
-        teamTodoReqDto.setContent("테스트 내용");
-        teamTodoReqDto.setCompleted(false);
+        teamTodoRequestDto = new TeamTodoRequestDto();
+        teamTodoRequestDto.setId(teamTodoId);
+        teamTodoRequestDto.setTeamId(teamId);
+        teamTodoRequestDto.setTitle("테스트 할 일");
+        teamTodoRequestDto.setContent("테스트 내용");
+        teamTodoRequestDto.setCompleted(false);
 
         // TeamTodoDto 리스트 설정
         teamTodoDtoList = Arrays.asList(
@@ -85,7 +85,7 @@ public class TeamTodoServiceImplTest {
         doThrow(new RuntimeException("DB 에러")).when(teamTodoMapper).createTeamTodo(any(TeamTodoDto.class));
 
         // When
-        ApiResponse response = teamTodoService.createTeamTodo(teamTodoReqDto);
+        ApiResponse response = teamTodoService.createTeamTodo(teamTodoRequestDto);
 
         // Then
         assertEquals(Result.FAIL, response.getResult());
@@ -101,7 +101,7 @@ public class TeamTodoServiceImplTest {
         doNothing().when(teamTodoMapper).createTeamTodo(any(TeamTodoDto.class));
 
         // When
-        ApiResponse response = teamTodoService.createTeamTodo(teamTodoReqDto);
+        ApiResponse response = teamTodoService.createTeamTodo(teamTodoRequestDto);
 
         // Then
         assertEquals(Result.SUCCESS, response.getResult());
@@ -155,8 +155,8 @@ public class TeamTodoServiceImplTest {
         assertEquals(Result.SUCCESS, response.getResult());
         assertEquals(GET_TEAMTODO_LIST_SUCCESS, response.getMessage());
         assertNotNull(response.getData());
-        assertTrue(response.getData() instanceof TeamTodoListResDto);
-        TeamTodoListResDto resDto = (TeamTodoListResDto) response.getData();
+        assertTrue(response.getData() instanceof TeamTodoListResponseDto);
+        TeamTodoListResponseDto resDto = (TeamTodoListResponseDto) response.getData();
         assertEquals(2, resDto.getTeamTodoDtoList().size());
         verify(teamTodoMapper, times(2)).getTeamTodoList(eq(teamId));
     }
@@ -206,8 +206,8 @@ public class TeamTodoServiceImplTest {
         assertEquals(Result.SUCCESS, response.getResult());
         assertEquals(GET_TEAMTODO_SUCCESS, response.getMessage());
         assertNotNull(response.getData());
-        assertTrue(response.getData() instanceof TeamTodoResDto);
-        TeamTodoResDto resDto = (TeamTodoResDto) response.getData();
+        assertTrue(response.getData() instanceof TeamTodoResponseDto);
+        TeamTodoResponseDto resDto = (TeamTodoResponseDto) response.getData();
         assertEquals("테스트 할 일", resDto.getTitle());
         assertEquals("테스트 내용", resDto.getContent());
         assertEquals(false, resDto.isCompleted());
@@ -221,7 +221,7 @@ public class TeamTodoServiceImplTest {
         when(teamTodoMapper.getTeamTodoById(eq(teamTodoId))).thenReturn(null);
 
         // When
-        ApiResponse response = teamTodoService.updateTeamTodo(teamTodoReqDto);
+        ApiResponse response = teamTodoService.updateTeamTodo(teamTodoRequestDto);
 
         // Then
         assertEquals(Result.FAIL, response.getResult());
@@ -239,7 +239,7 @@ public class TeamTodoServiceImplTest {
         doThrow(new RuntimeException("DB 에러")).when(teamTodoMapper).updateTeamTodo(any(TeamTodoDto.class));
 
         // When
-        ApiResponse response = teamTodoService.updateTeamTodo(teamTodoReqDto);
+        ApiResponse response = teamTodoService.updateTeamTodo(teamTodoRequestDto);
 
         // Then
         assertEquals(Result.FAIL, response.getResult());
@@ -257,7 +257,7 @@ public class TeamTodoServiceImplTest {
         doNothing().when(teamTodoMapper).updateTeamTodo(any(TeamTodoDto.class));
 
         // When
-        ApiResponse response = teamTodoService.updateTeamTodo(teamTodoReqDto);
+        ApiResponse response = teamTodoService.updateTeamTodo(teamTodoRequestDto);
 
         // Then
         assertEquals(Result.SUCCESS, response.getResult());
