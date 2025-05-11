@@ -29,7 +29,7 @@ class JwtServiceTest {
                 null, null, true, "01012345678"
         );
 
-        String token = jwtService.createToken(userDto);
+        String token = jwtService.createToken(userDto.getId(),userDto.getRole().name());
 
         assertThat(jwtService.validateToken(token)).isTrue();
         assertThat(jwtService.getUserId(token)).isEqualTo("uuid-1234");
@@ -57,7 +57,7 @@ class JwtServiceTest {
                 null, null, true, "01000000000"
         );
 
-        String token = jwtService.createToken(userDto);
+        String token = jwtService.createToken(userDto.getUsername(),userDto.getRole().name());
         Thread.sleep(10); // 유효 시간 지나도록 대기
 
         boolean result = jwtService.validateToken(token);

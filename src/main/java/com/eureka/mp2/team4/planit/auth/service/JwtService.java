@@ -27,11 +27,11 @@ public class JwtService {
         return Keys.hmacShaKeyFor(secretKey.getBytes(StandardCharsets.UTF_8));
     }
 
-    public String createToken(UserDto userDto) {
+    public String createToken(String id, String role) {
         long now = System.currentTimeMillis();
         return Jwts.builder()
-                .claim(JWT_ID_FIELD, userDto.getId())
-                .claim(JWT_ROLE_FILED, userDto.getRole().name())
+                .claim(JWT_ID_FIELD, id)
+                .claim(JWT_ROLE_FILED, role)
                 .issuedAt(new Date(now))
                 .expiration(new Date(now + expiration))
                 .signWith(getSigningKey())

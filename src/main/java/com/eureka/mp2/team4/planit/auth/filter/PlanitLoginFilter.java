@@ -43,7 +43,10 @@ public class PlanitLoginFilter extends UsernamePasswordAuthenticationFilter {
     @Override
     protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authResult) throws IOException {
         PlanitUserDetails userDetails = (PlanitUserDetails) authResult.getPrincipal();
-        String token = jwtService.createToken(userDetails.getUserDto());
+        String id = userDetails.getUsername();
+        String role = userDetails.getRole();
+
+        String token = jwtService.createToken(id,role);
         LoginResponseDto loginResponseDto = new LoginResponseDto(token);
         ApiResponse<?> successResponse = ApiResponse.builder()
                 .result(Result.SUCCESS)

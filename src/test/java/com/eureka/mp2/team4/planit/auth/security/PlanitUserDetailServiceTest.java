@@ -38,7 +38,7 @@ class PlanitUserDetailServiceTest {
         UserDetails result = service.loadUserByUsername("user@example.com");
 
         assertThat(result).isInstanceOf(PlanitUserDetails.class);
-        assertThat(result.getUsername()).isEqualTo("user@example.com");
+        assertThat(result.getUsername()).isEqualTo("uuid-123");
     }
 
     @Test

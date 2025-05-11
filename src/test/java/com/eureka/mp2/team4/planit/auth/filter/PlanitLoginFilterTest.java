@@ -5,6 +5,7 @@ import com.eureka.mp2.team4.planit.auth.handler.LoginFailureHandler;
 import com.eureka.mp2.team4.planit.auth.security.PlanitUserDetails;
 import com.eureka.mp2.team4.planit.auth.service.JwtService;
 import com.eureka.mp2.team4.planit.user.dto.UserDto;
+import com.eureka.mp2.team4.planit.user.enums.UserRole;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.http.HttpServletResponse;
@@ -47,8 +48,9 @@ class PlanitLoginFilterTest {
         PlanitUserDetails userDetails = new PlanitUserDetails(userDto);
         Authentication authResult = mock(Authentication.class);
         when(authResult.getPrincipal()).thenReturn(userDetails);
+        when(userDto.getRole()).thenReturn(UserRole.ROLE_USER);
         when(authenticationManager.authenticate(any())).thenReturn(authResult);
-        when(jwtService.createToken(any())).thenReturn(token);
+        when(jwtService.createToken(anyString(),anyString())).thenReturn(token);
 
         loginFilter.successfulAuthentication(request, response, chain, authResult);
 

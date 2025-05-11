@@ -28,7 +28,7 @@ class PlanitUserDetailsTest {
 
         PlanitUserDetails userDetails = new PlanitUserDetails(userDto);
 
-        assertThat(userDetails.getUsername()).isEqualTo("user@example.com");
+        assertThat(userDetails.getUsername()).isEqualTo("uuid-123");
         assertThat(userDetails.getPassword()).isEqualTo("hashedPassword");
 
         Collection<?> authorities = userDetails.getAuthorities();

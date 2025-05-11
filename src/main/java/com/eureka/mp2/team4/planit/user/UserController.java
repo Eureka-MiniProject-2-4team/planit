@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/users")
 public class UserController {
     @GetMapping("/me")
-    public UserDto getUserInfo(@AuthenticationPrincipal PlanitUserDetails userDetails) {
-        return userDetails.getUserDto();
+    public String getUserInfo(@AuthenticationPrincipal PlanitUserDetails userDetails) {
+        return userDetails.getUsername();// username == user의 id(UUID)
     }
 }
