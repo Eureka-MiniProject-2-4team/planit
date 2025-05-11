@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.eureka.mp2.team4.planit.friend.mapper.FriendMapper">
+
+    <!-- 친구 요청 보내기 -->
+    <insert id="insert">
+        INSERT INTO friend (id, requester_id, receiver_id, status)
+        VALUES (#{id}, #{requesterId}, #{receiverId}, 'PENDING')
+    </insert>
+
+    <!-- 내 친구 목록 조회 -->
+    <select id="findAllByUserId" resultType="com.eureka.mp2.team4.planit.friend.dto.response.FriendResponseDto">
+        SELECT id, requester_id, receiver_id, status, created_at, accepted_at
+        FROM friend
+        WHERE (requester_id = #{userId} OR receiver_id = #{userId})
+          AND status = 'ACCEPTED'
+    </select>
+
+    <!-- 보낸 친구 요청 목록 -->
+    <select id="findAskedByRequesterId" resultType="com.eureka.mp2.team4.planit.friend.dto.response.FriendResponseDto">
+        SELECT id, requester_id, receiver_id, status, created_at, accepted_at
+        FROM friend
+        WHERE requester_id = #{userId}
+    </select>
+
+    <!-- 받은 친구 요청 목록 (대기 중) -->
+    <select id="findPendingByReceiverId" resultType="com.eureka.mp2.team4.planit.friend.dto.response.FriendResponseDto">
+        SELECT id, requester_id, receiver_id, status, created_at, accepted_at
+        FROM friend
+        WHERE receiver_id = #{userId}
+          AND status = 'PENDING'
+    </select>
+
+    <!-- 친구 요청 상태 변경 -->
+    <update id="updateStatus">
+        UPDATE friend
+        SET status = #{status},
+            accepted_at = CASE
+                              WHEN #{status} = 'ACCEPTED' THEN NOW()
+                              ELSE NULL
+                END
+        WHERE id = #{friendId}
+    </update>
+
+    <update id="autoCancelOppositePending">
+        UPDATE friend
+        SET status = 'AUTO_CANCELLED'
+        WHERE requester_id = #{oppositeRequesterId}
+          AND receiver_id = #{oppositeReceiverId}
+          AND status = 'PENDING'
+    </update>
+
+
+    <!-- ID로 친구 요청 조회 -->
+    <select id="findById" resultType="com.eureka.mp2.team4.planit.friend.dto.response.FriendResponseDto">
+        SELECT id, requester_id, receiver_id, status, created_at, accepted_at
+        FROM friend
+        WHERE id = #{friendId}
+    </select>
+
+    <!-- 친구 삭제 -->
+    <delete id="delete">
+        DELETE FROM friend
+        WHERE id = #{friendId}
+    </delete>
+
+
+</mapper>
