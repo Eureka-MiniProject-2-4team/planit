@@ -4,8 +4,10 @@ import com.eureka.mp2.team4.planit.common.ApiResponse;
 import com.eureka.mp2.team4.planit.common.Result;
 import com.eureka.mp2.team4.planit.common.exception.NotFoundException;
 import com.eureka.mp2.team4.planit.team.dto.TeamDto;
+import com.eureka.mp2.team4.planit.team.dto.UserTeamDto;
 import com.eureka.mp2.team4.planit.team.dto.request.TeamRequestDto;
 import com.eureka.mp2.team4.planit.team.mapper.TeamMapper;
+import com.eureka.mp2.team4.planit.team.mapper.UserTeamMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -18,9 +20,10 @@ import static com.eureka.mp2.team4.planit.team.constants.TeamMessages.*;
 public class TeamServiceImpl implements TeamService {
 
     private final TeamMapper teamMapper;
+    private final UserTeamMapper userTeamMapper;
 
     @Override
-    public ApiResponse registerTeam(TeamRequestDto teamRequestDto) {
+    public ApiResponse registerTeam(String userId, TeamRequestDto teamRequestDto) {
         try {
             TeamDto teamDto = TeamDto.builder()
                     .id(UUID.randomUUID().toString())
@@ -28,8 +31,17 @@ public class TeamServiceImpl implements TeamService {
                     .description(teamRequestDto.getDescription())
                     .build();
 
+            UserTeamDto userTeamDto = UserTeamDto.builder()
+                    .id(UUID.randomUUID().toString())
+                    .userId(userId)
+                    .teamId(teamDto.getId())
+                    .status("가입")
+                    .role("팀장")
+                    .build();
+
             // 팀 등록
             teamMapper.registerTeam(teamDto);
+            userTeamMapper.registerTeamMember(userTeamDto);
 
             // 성공 응답
             return ApiResponse.builder()

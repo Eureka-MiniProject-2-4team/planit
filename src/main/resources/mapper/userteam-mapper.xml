@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.eureka.mp2.team4.planit.team.mapper.UserTeamMapper">
+    <!--CREATE-->
+    <insert id="registerTeamMember" parameterType="com.eureka.mp2.team4.planit.team.dto.UserTeamDto">
+        INSERT INTO user_team (id, user_id, team_id, joined_at, status, role)
+        VALUES (#{id}, #{userId}, #{teamId}, CURRENT_TIMESTAMP, #{status}, #{role})
+    </insert>
+
+    <!--READ-->
+    <select id="getMyTeamList" parameterType="java.lang.String" resultType="com.eureka.mp2.team4.planit.team.dto.UserTeamDto">
+        SELECT *
+        FROM user_team
+        WHERE user_id = #{userId}
+          AND status = '가입';
+    </select>
+
+    <select id="getMyInvitedList" parameterType="java.lang.String" resultType="com.eureka.mp2.team4.planit.team.dto.UserTeamDto">
+        SELECT *
+        FROM user_team
+        WHERE user_id = #{userId}
+        AND status = '대기';
+    </select>
+
+    <select id="findByTeamIdAndUserId" resultType="com.eureka.mp2.team4.planit.team.dto.UserTeamDto">
+        SELECT *
+        FROM user_team
+        WHERE team_id = #{teamId}
+          AND user_id = #{userId}
+    </select>
+
+    <!--UPDATE-->
+    <update id="acceptTeamJoin">
+        UPDATE user_team
+        SET status = '가입'
+        WHERE team_id = #{teamId}
+          AND user_id = #{userId}
+    </update>
+
+    <!--DELETE-->
+    <delete id="deleteTeamMember">
+        DELETE FROM user_team
+        WHERE team_id = #{teamId}
+        AND user_id = #{userId}
+    </delete>
+</mapper>
