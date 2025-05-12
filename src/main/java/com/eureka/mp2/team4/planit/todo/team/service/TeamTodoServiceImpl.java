@@ -115,7 +115,7 @@ public class TeamTodoServiceImpl implements TeamTodoService {
 
             TeamTodoDto teamTodoDto = TeamTodoDto.builder()
                     .id(teamTodoRequestDto.getId())
-//                    .teamId(teamTodoReqDto.getTeamId()) // 필요없을듯
+//                    .teamId(teamTodoRequestDto.getTeamId()) // 필요없을듯
                     .title(teamTodoRequestDto.getTitle())
                     .content(teamTodoRequestDto.getContent())
                     .isCompleted(teamTodoRequestDto.isCompleted())
