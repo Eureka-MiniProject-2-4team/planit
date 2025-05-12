@@ -124,7 +124,7 @@ public class TeamTodoControllerTest {
         );
 
         // When & Then
-        mockMvc.perform(post("/api/teamtodo")
+        mockMvc.perform(post("/api/team/{teamId}/todo",teamId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(teamTodoRequestDto)))
                 .andExpect(status().isOk())
@@ -147,7 +147,7 @@ public class TeamTodoControllerTest {
         );
 
         // When & Then
-        mockMvc.perform(post("/api/teamtodo")
+        mockMvc.perform(post("/api/team/{teamId}/todo",teamId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(teamTodoRequestDto)))
                 .andExpect(status().isOk())
@@ -172,7 +172,7 @@ public class TeamTodoControllerTest {
         );
 
         // When & Then
-        mockMvc.perform(get("/api/teamtodo")
+        mockMvc.perform(get("/api/team/{teamId}/todo/list",teamId)
                         .param("teamId", teamId))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.result").value("SUCCESS"))
@@ -198,7 +198,7 @@ public class TeamTodoControllerTest {
         );
 
         // When & Then
-        mockMvc.perform(get("/api/teamtodo")
+        mockMvc.perform(get("/api/team/{teamId}/todo/list",teamId)
                         .param("teamId", teamId))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.result").value("FAIL"))
@@ -223,7 +223,7 @@ public class TeamTodoControllerTest {
         );
 
         // When & Then
-        mockMvc.perform(get("/api/teamtodo/{teamTodoId}", todoId))
+        mockMvc.perform(get("/api/team/todo/{teamTodoId}", todoId))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.result").value("SUCCESS"))
                 .andExpect(jsonPath("$.message").value(GET_TEAMTODO_SUCCESS))
@@ -247,7 +247,7 @@ public class TeamTodoControllerTest {
         );
 
         // When & Then
-        mockMvc.perform(get("/api/teamtodo/{teamTodoId}", todoId))
+        mockMvc.perform(get("/api/team/todo/{teamTodoId}", todoId))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.result").value("FAIL"))
                 .andExpect(jsonPath("$.message").value(GET_TEAMTODO_FAIL))
@@ -276,7 +276,7 @@ public class TeamTodoControllerTest {
         );
 
         // When & Then
-        mockMvc.perform(put("/api/teamtodo/{teamTodoId}", todoId)
+        mockMvc.perform(put("/api/team/{teamId}/todo/{teamTodoId}", teamId, todoId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(updateRequest)))
                 .andExpect(status().isOk())
@@ -305,7 +305,7 @@ public class TeamTodoControllerTest {
         );
 
         // When & Then
-        mockMvc.perform(put("/api/teamtodo/{teamTodoId}", todoId)
+        mockMvc.perform(put("/api/team/{teamId}/todo/{teamTodoId}", teamId, todoId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(updateRequest)))
                 .andExpect(status().isOk())
@@ -329,7 +329,7 @@ public class TeamTodoControllerTest {
         );
 
         // When & Then
-        mockMvc.perform(delete("/api/teamtodo/{teamTodoId}", todoId))
+        mockMvc.perform(delete("/api/team/{teamId}/todo/{teamTodoId}", teamId, todoId))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.result").value("SUCCESS"))
                 .andExpect(jsonPath("$.message").value(DELETE_TEAMTODO_SUCCESS));
@@ -350,7 +350,7 @@ public class TeamTodoControllerTest {
         );
 
         // When & Then
-        mockMvc.perform(delete("/api/teamtodo/{teamTodoId}", todoId))
+        mockMvc.perform(delete("/api/team/{teamId}/todo/{teamTodoId}", teamId, todoId))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.result").value("FAIL"))
                 .andExpect(jsonPath("$.message").value(DELETE_TEAMTODO_FAIL));
