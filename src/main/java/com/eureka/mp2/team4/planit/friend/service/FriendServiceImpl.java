@@ -10,6 +10,7 @@ import com.eureka.mp2.team4.planit.friend.dto.request.FriendUpdateStatusDto;
 import com.eureka.mp2.team4.planit.friend.dto.response.FriendResponseDto;
 import com.eureka.mp2.team4.planit.friend.mapper.FriendMapper;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataAccessException;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 
@@ -43,7 +44,7 @@ public class FriendServiceImpl implements FriendService {
                     .message(FriendMessages.REQUEST_ALREADY_EXISTS)
                     .build();
 
-        }catch (Exception e) {
+        }catch (DataAccessException e) {
             return ApiResponse.builder()
                     .result(Result.FAIL)
                     .message(FriendMessages.REQUEST_FAIL)
@@ -62,7 +63,7 @@ public class FriendServiceImpl implements FriendService {
                     .message(FriendMessages.GET_FRIENDS_SUCCESS)
                     .data(list)
                     .build();
-        } catch (Exception e) {
+        } catch (DataAccessException e) {
             return ApiResponse.<FriendsDto>builder()
                     .result(Result.FAIL)
                     .message(FriendMessages.GET_FRIENDS_FAIL)
@@ -81,7 +82,7 @@ public class FriendServiceImpl implements FriendService {
                     .message(FriendMessages.GET_PENDING_SUCCESS)
                     .data(list)
                     .build();
-        } catch (Exception e) {
+        } catch (DataAccessException e) {
             return ApiResponse.<FriendsDto>builder()
                     .result(Result.FAIL)
                     .message(FriendMessages.GET_PENDING_FAIL)
@@ -100,7 +101,7 @@ public class FriendServiceImpl implements FriendService {
                     .message(FriendMessages.GET_SENT_SUCCESS)
                     .data(list)
                     .build();
-        } catch (Exception e) {
+        } catch (DataAccessException e) {
             return ApiResponse.<FriendsDto>builder()
                     .result(Result.FAIL)
                     .message(FriendMessages.GET_SENT_FAIL)
@@ -126,7 +127,7 @@ public class FriendServiceImpl implements FriendService {
                     .result(Result.SUCCESS)
                     .message(FriendMessages.UPDATE_STATUS_SUCCESS)
                     .build();
-        } catch (Exception e) {
+        } catch (DataAccessException e) {
             return ApiResponse.builder()
                     .result(Result.FAIL)
                     .message(FriendMessages.UPDATE_STATUS_FAIL)
@@ -142,7 +143,7 @@ public class FriendServiceImpl implements FriendService {
                     .result(Result.SUCCESS)
                     .message(FriendMessages.DELETE_SUCCESS)
                     .build();
-        } catch (Exception e) {
+        } catch (DataAccessException e) {
             return ApiResponse.builder()
                     .result(Result.FAIL)
                     .message(FriendMessages.DELETE_FAIL)
