@@ -2,7 +2,6 @@ package com.eureka.mp2.team4.planit.friend;
 
 import com.eureka.mp2.team4.planit.common.ApiResponse;
 import com.eureka.mp2.team4.planit.common.Result;
-import com.eureka.mp2.team4.planit.friend.FriendStatus;
 import com.eureka.mp2.team4.planit.friend.constants.FriendMessages;
 import com.eureka.mp2.team4.planit.friend.dto.FriendsDto;
 import com.eureka.mp2.team4.planit.friend.dto.request.FriendAskDto;
@@ -37,6 +36,7 @@ class FriendServiceIntegrationTest {
 
         ApiResponse sendResponse = friendService.sendRequest(askDto);
         assertEquals(Result.SUCCESS, sendResponse.getResult());
+        assertEquals(FriendMessages.REQUEST_SUCCESS, sendResponse.getMessage());
 
         // 수락 대기 목록에서 ID 가져오기
         FriendsDto pending = friendService.getReceivedRequests(receiverId).getData();
@@ -53,6 +53,7 @@ class FriendServiceIntegrationTest {
 
         ApiResponse updateResponse = friendService.updateStatus(friendId, updateDto);
         assertEquals(Result.SUCCESS, updateResponse.getResult());
+        assertEquals(FriendMessages.UPDATE_STATUS_SUCCESS, updateResponse.getMessage());
 
         // 친구 목록 조회
         FriendsDto friends = friendService.getFriends(receiverId).getData();
@@ -61,6 +62,7 @@ class FriendServiceIntegrationTest {
         // 삭제
         ApiResponse deleteResponse = friendService.delete(friendId);
         assertEquals(Result.SUCCESS, deleteResponse.getResult());
+        assertEquals(FriendMessages.DELETE_SUCCESS, deleteResponse.getMessage());
     }
 
     @DisplayName("친구 요청 중복 전송 실패")
@@ -77,6 +79,7 @@ class FriendServiceIntegrationTest {
         // 첫 요청 성공
         ApiResponse first = friendService.sendRequest(dto);
         assertEquals(Result.SUCCESS, first.getResult());
+        assertEquals(FriendMessages.REQUEST_SUCCESS, first.getMessage());
 
         // 중복 요청 실패
         ApiResponse second = friendService.sendRequest(dto);
