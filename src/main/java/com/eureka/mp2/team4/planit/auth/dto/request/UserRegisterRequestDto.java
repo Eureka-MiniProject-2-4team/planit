@@ -21,7 +21,7 @@ public class UserRegisterRequestDto {
     @NotBlank
     @Size(min = Constraints.USERNAME_MIN, max = Constraints.USERNAME_MAX)
     @Pattern(regexp = Constraints.USERNAME_REGEX, message = Messages.INVALID_USERNAME)
-    private String username;
+    private String userName;
 
     @NotBlank
     @Size(min = Constraints.PASSWORD_MIN)
@@ -31,7 +31,7 @@ public class UserRegisterRequestDto {
     @NotBlank
     @Size(min = Constraints.NICKNAME_MIN, max = Constraints.NICKNAME_MAX)
     @Pattern(regexp = Constraints.NICKNAME_REGEX, message = Messages.INVALID_NICKNAME)
-    private String nickname;
+    private String nickName;
 
     @NotBlank
     @Pattern(regexp = Constraints.PHONE_REGEX, message = Messages.INVALID_PHONE)

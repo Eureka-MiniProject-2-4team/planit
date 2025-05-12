@@ -39,7 +39,7 @@ public class AuthController {
         return ResponseEntity.ok().body(response);
     }
 
-    @GetMapping("/check-nickname")
+    @GetMapping("/check-nickName")
     public ResponseEntity<?> checkNickname(@RequestParam("value") String nickName) {
         ApiResponse response = authService.checkNickNameIsExist(nickName);
         return ResponseEntity.ok().body(response);

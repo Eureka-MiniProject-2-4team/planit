@@ -38,9 +38,9 @@ class AuthControllerTest {
     void register_success() throws Exception {
         UserRegisterRequestDto dto = UserRegisterRequestDto.builder()
                 .email("test@planit.com")
-                .username("testuser")
+                .userName("testuser")
                 .password("test1234!")
-                .nickname("nickname")
+                .nickName("nickname")
                 .phoneNumber("01012345678")
                 .build();
 
@@ -61,9 +61,9 @@ class AuthControllerTest {
     void register_fail() throws Exception {
         UserRegisterRequestDto dto = UserRegisterRequestDto.builder()
                 .email("Test@planit.com")
-                .username("testuser")
+                .userName("testuser")
                 .password("test1234!")
-                .nickname("nickname")
+                .nickName("nickname")
                 .phoneNumber("01012345678")
                 .build();
 
@@ -105,13 +105,13 @@ class AuthControllerTest {
     @Test
     @DisplayName("닉네임 중복 확인 성공")
     void checkNickname_success() throws Exception {
-        Mockito.when(authService.checkNickNameIsExist(eq("nickname"))).thenReturn(ApiResponse.builder()
+        Mockito.when(authService.checkNickNameIsExist(eq("nickName"))).thenReturn(ApiResponse.builder()
                 .result(Result.SUCCESS)
                 .message("사용 가능한 닉네임입니다.")
                 .build());
 
-        mockMvc.perform(get("/auth/check-nickname")
-                        .param("value", "nickname"))
+        mockMvc.perform(get("/auth/check-nickName")
+                        .param("value", "nickName"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.result").value(Result.SUCCESS.name()));
     }

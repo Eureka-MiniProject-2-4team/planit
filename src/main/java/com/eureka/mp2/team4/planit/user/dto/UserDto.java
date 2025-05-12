@@ -14,12 +14,12 @@ import java.time.LocalDateTime;
 public class UserDto {
     private final String id;
     private final String email;
-    private final String username;
+    private final String userName;
     private final String password;
-    private final String nickname;
+    private final String nickName;
     private final UserRole role;
     private final LocalDateTime createdAt;
     private final LocalDateTime updatedAt;
     private final Boolean isActive;
-    private final String phone;
+    private final String phoneNumber;
 }
