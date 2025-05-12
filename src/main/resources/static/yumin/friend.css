@@ -1,0 +1,39 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f8f9fa;
+    padding: 20px;
+}
+
+.container {
+    max-width: 700px;
+    margin: auto;
+    background: #fff;
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+
+section {
+    margin-bottom: 30px;
+}
+
+input[type="text"] {
+    margin-right: 10px;
+    padding: 5px;
+    width: 200px;
+}
+
+button {
+    padding: 6px 12px;
+    margin-left: 5px;
+    cursor: pointer;
+}
+
+ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+li {
+    margin-top: 8px;
+}

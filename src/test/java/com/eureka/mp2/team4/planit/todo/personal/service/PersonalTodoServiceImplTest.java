@@ -3,9 +3,9 @@ package com.eureka.mp2.team4.planit.todo.personal.service;
 import com.eureka.mp2.team4.planit.common.ApiResponse;
 import com.eureka.mp2.team4.planit.common.Result;
 import com.eureka.mp2.team4.planit.common.exception.NotFoundException;
-import com.eureka.mp2.team4.planit.todo.personal.dto.PersonalTodosDto;
+import com.eureka.mp2.team4.planit.todo.personal.dto.response.PersonalTodoListResponseDto;
 import com.eureka.mp2.team4.planit.todo.personal.dto.request.PersonalTodoRequestDto;
-import com.eureka.mp2.team4.planit.todo.personal.dto.response.PersonalTodoResponseDto;
+import com.eureka.mp2.team4.planit.todo.personal.dto.PersonalTodoDto;
 import com.eureka.mp2.team4.planit.todo.personal.mapper.PersonalTodoMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -59,7 +59,7 @@ class PersonalTodoServiceImplTest {
                 .isCompleted(true)
                 .build();
 
-        when(mapper.findById(id)).thenReturn(new PersonalTodoResponseDto());
+        when(mapper.findById(id)).thenReturn(new PersonalTodoDto());
 
         ApiResponse response = service.update(id, request);
 
@@ -83,7 +83,7 @@ class PersonalTodoServiceImplTest {
     @Test
     void deleteTest_success() {
         String id = "todo-1";
-        when(mapper.findById(id)).thenReturn(new PersonalTodoResponseDto());
+        when(mapper.findById(id)).thenReturn(new PersonalTodoDto());
 
         ApiResponse response = service.delete(id);
 
@@ -106,7 +106,7 @@ class PersonalTodoServiceImplTest {
     @Test
     void getByIdTest_success() {
         String id = "todo-1";
-        PersonalTodoResponseDto dummyDto = new PersonalTodoResponseDto();
+        PersonalTodoDto dummyDto = new PersonalTodoDto();
 
         when(mapper.findById(id)).thenReturn(dummyDto);
 
@@ -132,7 +132,7 @@ class PersonalTodoServiceImplTest {
     @Test
     void getAllByUserTest() {
         String userId = "user-1";
-        List<PersonalTodoResponseDto> list = List.of(new PersonalTodoResponseDto());
+        List<PersonalTodoDto> list = List.of(new PersonalTodoDto());
 
         when(mapper.findAllByUserId(userId)).thenReturn(list);
 
@@ -142,7 +142,7 @@ class PersonalTodoServiceImplTest {
         assertEquals(Result.SUCCESS, response.getResult());
         assertEquals("개인 투두 전체 조회 완료", response.getMessage());
 
-        PersonalTodosDto responseData = (PersonalTodosDto) response.getData();
+        PersonalTodoListResponseDto responseData = (PersonalTodoListResponseDto) response.getData();
         assertEquals(list.size(), responseData.getPersonalTodosDto().size());
     }
 }

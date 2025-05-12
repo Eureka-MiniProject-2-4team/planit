@@ -1,7 +1,7 @@
 package com.eureka.mp2.team4.planit.todo.personal.mapper;
 
 import com.eureka.mp2.team4.planit.todo.personal.dto.request.PersonalTodoRequestDto;
-import com.eureka.mp2.team4.planit.todo.personal.dto.response.PersonalTodoResponseDto;
+import com.eureka.mp2.team4.planit.todo.personal.dto.PersonalTodoDto;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -15,7 +15,7 @@ public interface PersonalTodoMapper {
 
     void delete(@Param("id") String id);
 
-    PersonalTodoResponseDto findById(@Param("id") String id);
+    PersonalTodoDto findById(@Param("id") String id);
 
-    List<PersonalTodoResponseDto> findAllByUserId(@Param("userId") String userId);
+    List<PersonalTodoDto> findAllByUserId(@Param("userId") String userId);
 }
