@@ -1,4 +1,4 @@
-package com.eureka.mp2.team4.planit.todo.personal.dto.response;
+package com.eureka.mp2.team4.planit.todo.personal.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class PersonalTodoResponseDto {
+public class PersonalTodoDto {
     private String id;
     private String userId;
     private String title;

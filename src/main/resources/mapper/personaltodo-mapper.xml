@@ -26,13 +26,13 @@
         WHERE id = #{id}
     </delete>
 
-    <select id="findById" resultType="com.eureka.mp2.team4.planit.todo.personal.dto.response.PersonalTodoResponseDto">
+    <select id="findById" resultType="com.eureka.mp2.team4.planit.todo.personal.dto.PersonalTodoDto">
         SELECT *
         FROM personal_todo
         WHERE id = #{id}
     </select>
 
-    <select id="findAllByUserId" resultType="com.eureka.mp2.team4.planit.todo.personal.dto.response.PersonalTodoResponseDto">
+    <select id="findAllByUserId" resultType="com.eureka.mp2.team4.planit.todo.personal.dto.PersonalTodoDto">
         SELECT *
         FROM personal_todo
         WHERE user_id = #{userId}
