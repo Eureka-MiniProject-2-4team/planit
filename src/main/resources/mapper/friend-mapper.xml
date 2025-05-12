@@ -12,7 +12,7 @@
     </insert>
 
     <!-- 내 친구 목록 조회 -->
-    <select id="findAllByUserId" resultType="com.eureka.mp2.team4.planit.friend.dto.response.FriendResponseDto">
+    <select id="findAllByUserId" resultType="com.eureka.mp2.team4.planit.friend.dto.FriendDto">
         SELECT id, requester_id, receiver_id, status, created_at, accepted_at
         FROM friend
         WHERE (requester_id = #{userId} OR receiver_id = #{userId})
@@ -20,14 +20,14 @@
     </select>
 
     <!-- 보낸 친구 요청 목록 -->
-    <select id="findAskedByRequesterId" resultType="com.eureka.mp2.team4.planit.friend.dto.response.FriendResponseDto">
+    <select id="findAskedByRequesterId" resultType="com.eureka.mp2.team4.planit.friend.dto.FriendDto">
         SELECT id, requester_id, receiver_id, status, created_at, accepted_at
         FROM friend
         WHERE requester_id = #{userId}
     </select>
 
     <!-- 받은 친구 요청 목록 (대기 중) -->
-    <select id="findPendingByReceiverId" resultType="com.eureka.mp2.team4.planit.friend.dto.response.FriendResponseDto">
+    <select id="findPendingByReceiverId" resultType="com.eureka.mp2.team4.planit.friend.dto.FriendDto">
         SELECT id, requester_id, receiver_id, status, created_at, accepted_at
         FROM friend
         WHERE receiver_id = #{userId}
@@ -55,7 +55,7 @@
 
 
     <!-- ID로 친구 요청 조회 -->
-    <select id="findById" resultType="com.eureka.mp2.team4.planit.friend.dto.response.FriendResponseDto">
+    <select id="findById" resultType="com.eureka.mp2.team4.planit.friend.dto.FriendDto">
         SELECT id, requester_id, receiver_id, status, created_at, accepted_at
         FROM friend
         WHERE id = #{friendId}

@@ -4,10 +4,10 @@ import com.eureka.mp2.team4.planit.common.ApiResponse;
 import com.eureka.mp2.team4.planit.common.Result;
 import com.eureka.mp2.team4.planit.friend.FriendStatus;
 import com.eureka.mp2.team4.planit.friend.constants.FriendMessages;
-import com.eureka.mp2.team4.planit.friend.dto.FriendsDto;
+import com.eureka.mp2.team4.planit.friend.dto.response.FriendListResponseDto;
 import com.eureka.mp2.team4.planit.friend.dto.request.FriendAskDto;
 import com.eureka.mp2.team4.planit.friend.dto.request.FriendUpdateStatusDto;
-import com.eureka.mp2.team4.planit.friend.dto.response.FriendResponseDto;
+import com.eureka.mp2.team4.planit.friend.dto.FriendDto;
 import com.eureka.mp2.team4.planit.friend.mapper.FriendMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataAccessException;
@@ -53,18 +53,18 @@ public class FriendServiceImpl implements FriendService {
     }
 
     @Override
-    public ApiResponse<FriendsDto> getFriends(String userId) {
+    public ApiResponse<FriendListResponseDto> getFriends(String userId) {
         try {
-            List<FriendResponseDto> friends = mapper.findAllByUserId(userId);
-            FriendsDto list = FriendsDto.builder().friends(friends).build();
+            List<FriendDto> friends = mapper.findAllByUserId(userId);
+            FriendListResponseDto list = FriendListResponseDto.builder().friends(friends).build();
 
-            return ApiResponse.<FriendsDto>builder()
+            return ApiResponse.<FriendListResponseDto>builder()
                     .result(Result.SUCCESS)
                     .message(FriendMessages.GET_FRIENDS_SUCCESS)
                     .data(list)
                     .build();
         } catch (DataAccessException e) {
-            return ApiResponse.<FriendsDto>builder()
+            return ApiResponse.<FriendListResponseDto>builder()
                     .result(Result.FAIL)
                     .message(FriendMessages.GET_FRIENDS_FAIL)
                     .build();
@@ -72,18 +72,18 @@ public class FriendServiceImpl implements FriendService {
     }
 
     @Override
-    public ApiResponse<FriendsDto> getReceivedRequests(String userId) {
+    public ApiResponse<FriendListResponseDto> getReceivedRequests(String userId) {
         try {
-            List<FriendResponseDto> pending = mapper.findPendingByReceiverId(userId);
-            FriendsDto list = FriendsDto.builder().friends(pending).build();
+            List<FriendDto> pending = mapper.findPendingByReceiverId(userId);
+            FriendListResponseDto list = FriendListResponseDto.builder().friends(pending).build();
 
-            return ApiResponse.<FriendsDto>builder()
+            return ApiResponse.<FriendListResponseDto>builder()
                     .result(Result.SUCCESS)
                     .message(FriendMessages.GET_PENDING_SUCCESS)
                     .data(list)
                     .build();
         } catch (DataAccessException e) {
-            return ApiResponse.<FriendsDto>builder()
+            return ApiResponse.<FriendListResponseDto>builder()
                     .result(Result.FAIL)
                     .message(FriendMessages.GET_PENDING_FAIL)
                     .build();
@@ -91,18 +91,18 @@ public class FriendServiceImpl implements FriendService {
     }
 
     @Override
-    public ApiResponse<FriendsDto> getSentRequests(String userId) {
+    public ApiResponse<FriendListResponseDto> getSentRequests(String userId) {
         try {
-            List<FriendResponseDto> sent = mapper.findAskedByRequesterId(userId);
-            FriendsDto list = FriendsDto.builder().friends(sent).build();
+            List<FriendDto> sent = mapper.findAskedByRequesterId(userId);
+            FriendListResponseDto list = FriendListResponseDto.builder().friends(sent).build();
 
-            return ApiResponse.<FriendsDto>builder()
+            return ApiResponse.<FriendListResponseDto>builder()
                     .result(Result.SUCCESS)
                     .message(FriendMessages.GET_SENT_SUCCESS)
                     .data(list)
                     .build();
         } catch (DataAccessException e) {
-            return ApiResponse.<FriendsDto>builder()
+            return ApiResponse.<FriendListResponseDto>builder()
                     .result(Result.FAIL)
                     .message(FriendMessages.GET_SENT_FAIL)
                     .build();
@@ -115,7 +115,7 @@ public class FriendServiceImpl implements FriendService {
             mapper.updateStatus(friendId, dto.getStatus().name());
 
             if (dto.getStatus() == FriendStatus.ACCEPTED) {
-                FriendResponseDto acceptedRequest = mapper.findById(friendId);
+                FriendDto acceptedRequest = mapper.findById(friendId);
 
                 String oppositeRequesterId = acceptedRequest.getReceiverId();
                 String oppositeReceiverId = acceptedRequest.getRequesterId();
