@@ -87,7 +87,7 @@ public class AuthServiceImpl implements AuthService {
     private void validateRegisterData(UserRegisterRequestDto requestDto) {
         checkDuplicateEmail(requestDto.getEmail());
         checkDuplicatePhoneNumber(requestDto.getPhoneNumber());
-        checkDuplicateNickName(requestDto.getNickname());
+        checkDuplicateNickName(requestDto.getNickName());
     }
 
     private void saveRegisterData(UserRegisterRequestDto requestDto) {
