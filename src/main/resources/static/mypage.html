@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>마이페이지</title>
+</head>
+<body>
+<h1>마이페이지</h1>
+
+<div id="user-info">
+  <p><strong>이메일:</strong> <span id="email"></span></p>
+  <p><strong>이름:</strong> <span id="userName"></span></p>
+
+  <p><strong>닉네임:</strong> <span id="nickname"></span>
+    <button onclick="toggleNicknameEdit()">수정</button>
+  </p>
+
+  <div id="nickname-edit" style="display: none;">
+    <input type="text" id="new-nickname" placeholder="새 닉네임">
+    <button onclick="checkDuplicate()">중복 확인</button>
+    <button onclick="updateNickname()" id="save-nickname-btn" disabled>저장</button>
+    <p id="nickname-message" style="color: red;"></p>
+  </div>
+
+  <p><strong>전화번호:</strong> <span id="phoneNumber"></span></p>
+
+  <p>
+    <button onclick="window.location.href='/change-password.html'">비밀번호 변경</button>
+  </p>
+
+</div>
+
+<script>
+  async function loadUserData() {
+    const token = localStorage.getItem('accessToken');
+    if (!token) {
+      alert('로그인이 필요합니다.');
+      window.location.href = '/login.html';
+      return;
+    }
+
+    try {
+      const response = await fetch('/api/users/me', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': token
+        }
+      });
+
+      const result = await response.json();
+
+      if (response.ok && result.result === "SUCCESS") {
+        const data = result.data;
+        document.getElementById('email').textContent = data.email;
+        document.getElementById('userName').textContent = data.userName;
+        document.getElementById('nickname').textContent = data.nickname;
+        document.getElementById('phoneNumber').textContent = data.phoneNumber;
+      } else {
+        alert(result.message || "사용자 정보를 불러오지 못했습니다.");
+      }
+    } catch (error) {
+      console.error("에러 발생:", error);
+      alert("서버 오류");
+    }
+  }
+
+  function toggleNicknameEdit() {
+    document.getElementById('nickname-edit').style.display = 'block';
+    document.getElementById('new-nickname').value = '';
+    document.getElementById('nickname-message').textContent = '';
+    document.getElementById('save-nickname-btn').disabled = true;
+  }
+
+  async function checkDuplicate() {
+    const nickname = document.getElementById('new-nickname').value;
+    const msg = document.getElementById('nickname-message');
+    msg.textContent = '';
+
+    if (!nickname.trim()) {
+      msg.textContent = '닉네임을 입력해주세요.';
+      return;
+    }
+
+    try {
+      const response = await fetch(`/api/users/check-nickname?nickname=${encodeURIComponent(nickname)}`);
+      const result = await response.json();
+
+      if (response.ok && result.result === 'SUCCESS') {
+        msg.style.color = 'green';
+        msg.textContent = '사용 가능한 닉네임입니다.';
+        document.getElementById('save-nickname-btn').disabled = false;
+      } else {
+        msg.style.color = 'red';
+        msg.textContent = result.message || '이미 사용 중인 닉네임입니다.';
+        document.getElementById('save-nickname-btn').disabled = true;
+      }
+    } catch (err) {
+      console.error(err);
+      msg.textContent = '중복 확인 중 오류가 발생했습니다.';
+    }
+  }
+
+  async function updateNickname() {
+    const nickname = document.getElementById('new-nickname').value;
+
+    try {
+      const token = localStorage.getItem('accessToken');
+      const response = await fetch('/api/users/me/nickname', {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': token
+        },
+        body: JSON.stringify({ nickname })
+      });
+
+      const result = await response.json();
+
+      if (response.ok && result.result === 'SUCCESS') {
+        alert('닉네임이 변경되었습니다.');
+        document.getElementById('nickname').textContent = nickname;
+        document.getElementById('nickname-edit').style.display = 'none';
+      } else {
+        alert(result.message || '닉네임 변경 실패');
+      }
+    } catch (err) {
+      console.error(err);
+      alert('닉네임 변경 중 오류 발생');
+    }
+  }
+
+  window.onload = loadUserData;
+</script>
+</body>
+</html>
