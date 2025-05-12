@@ -1,5 +1,6 @@
 package com.eureka.mp2.team4.planit.friend.service;
 
+import com.eureka.mp2.team4.planit.friend.dto.FriendDto;
 import com.eureka.mp2.team4.planit.friend.dto.response.FriendListResponseDto;
 import com.eureka.mp2.team4.planit.friend.dto.request.FriendAskDto;
 import com.eureka.mp2.team4.planit.friend.dto.request.FriendUpdateStatusDto;
@@ -18,4 +19,8 @@ public interface FriendService {
     ApiResponse updateStatus(String friendId, FriendUpdateStatusDto dto);
 
     ApiResponse delete(String friendId);
+
+    FriendDto findByFriendId(String friendId);
+
+    FriendDto findByBothUserId(String userId, String targetUserId);
 }
