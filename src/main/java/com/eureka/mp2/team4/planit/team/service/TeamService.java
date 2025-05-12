@@ -16,4 +16,8 @@ public interface TeamService {
 
     // Delete
     ApiResponse deleteTeam(String teamId);
+
+    boolean isTeamMember(String userId, String teamId);
+
+    boolean isTeamLeader(String userId, String teamId);
 }
