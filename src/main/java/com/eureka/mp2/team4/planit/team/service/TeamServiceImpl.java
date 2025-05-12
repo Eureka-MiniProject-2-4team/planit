@@ -124,4 +124,16 @@ public class TeamServiceImpl implements TeamService {
                     .build();
         }
     }
+
+    @Override
+    public boolean isTeamMember(String userId, String teamId) {
+        // todo : userId가 teamId의 멤버인지 체크
+        return true;
+    }
+
+    @Override
+    public boolean isTeamLeader(String userId, String teamId) {
+       // todo : userId가 teamId의 팀 리터인지 체크
+        return false;
+    }
 }
