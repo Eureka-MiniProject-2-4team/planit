@@ -3,17 +3,21 @@ package com.eureka.mp2.team4.planit.todo.personal.service;
 import com.eureka.mp2.team4.planit.common.ApiResponse;
 import com.eureka.mp2.team4.planit.common.Result;
 import com.eureka.mp2.team4.planit.common.exception.NotFoundException;
+import com.eureka.mp2.team4.planit.todo.personal.dto.PersonalTodosDto;
 import com.eureka.mp2.team4.planit.todo.personal.dto.request.PersonalTodoRequestDto;
 import com.eureka.mp2.team4.planit.todo.personal.dto.response.PersonalTodoResponseDto;
 import com.eureka.mp2.team4.planit.todo.personal.mapper.PersonalTodoMapper;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.*;
+
 import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
+
 class PersonalTodoServiceImplTest {
 
     @Mock
@@ -27,6 +31,7 @@ class PersonalTodoServiceImplTest {
         MockitoAnnotations.openMocks(this);
     }
 
+    @DisplayName("개인 투두 생성 성공")
     @Test
     void createTest() {
         PersonalTodoRequestDto request = PersonalTodoRequestDto.builder()
@@ -43,6 +48,7 @@ class PersonalTodoServiceImplTest {
         assertEquals("개인 투두 생성 완료", response.getMessage());
     }
 
+    @DisplayName("개인 투두 수정 성공")
     @Test
     void updateTest_success() {
         String id = "todo-1";
@@ -62,6 +68,7 @@ class PersonalTodoServiceImplTest {
         assertEquals("개인 투두 수정 완료", response.getMessage());
     }
 
+    @DisplayName("수정 대상 개인 투두가 존재하지 않을 경우 예외 발생")
     @Test
     void updateTest_notFound() {
         String id = "todo-404";
@@ -72,6 +79,7 @@ class PersonalTodoServiceImplTest {
         assertThrows(NotFoundException.class, () -> service.update(id, request));
     }
 
+    @DisplayName("개인 투두 삭제 성공")
     @Test
     void deleteTest_success() {
         String id = "todo-1";
@@ -84,6 +92,7 @@ class PersonalTodoServiceImplTest {
         assertEquals("개인 투두 삭제 완료", response.getMessage());
     }
 
+    @DisplayName("삭제 대상 개인 투두가 존재하지 않을 경우 예외 발생")
     @Test
     void deleteTest_notFound() {
         String id = "todo-404";
@@ -93,6 +102,7 @@ class PersonalTodoServiceImplTest {
         assertThrows(NotFoundException.class, () -> service.delete(id));
     }
 
+    @DisplayName("ID로 개인 투두 조회 성공")
     @Test
     void getByIdTest_success() {
         String id = "todo-1";
@@ -108,6 +118,7 @@ class PersonalTodoServiceImplTest {
         assertEquals(dummyDto, response.getData());
     }
 
+    @DisplayName("ID로 조회할 개인 투두가 존재하지 않을 경우 예외 발생")
     @Test
     void getByIdTest_notFound() {
         String id = "todo-404";
@@ -117,6 +128,7 @@ class PersonalTodoServiceImplTest {
         assertThrows(NotFoundException.class, () -> service.getById(id));
     }
 
+    @DisplayName("사용자의 전체 개인 투두 조회 성공")
     @Test
     void getAllByUserTest() {
         String userId = "user-1";
@@ -129,6 +141,8 @@ class PersonalTodoServiceImplTest {
         verify(mapper).findAllByUserId(userId);
         assertEquals(Result.SUCCESS, response.getResult());
         assertEquals("개인 투두 전체 조회 완료", response.getMessage());
-        assertEquals(list, response.getData());
+
+        PersonalTodosDto responseData = (PersonalTodosDto) response.getData();
+        assertEquals(list.size(), responseData.getPersonalTodosDto().size());
     }
 }

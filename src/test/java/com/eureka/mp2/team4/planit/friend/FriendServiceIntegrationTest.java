@@ -7,10 +7,12 @@ import com.eureka.mp2.team4.planit.friend.dto.FriendsDto;
 import com.eureka.mp2.team4.planit.friend.dto.request.FriendAskDto;
 import com.eureka.mp2.team4.planit.friend.dto.request.FriendUpdateStatusDto;
 import com.eureka.mp2.team4.planit.friend.service.FriendService;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.transaction.annotation.Transactional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -21,6 +23,20 @@ class FriendServiceIntegrationTest {
 
     @Autowired
     private FriendService friendService;
+
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
+
+    @BeforeEach
+    void setUpUsers() {
+        jdbcTemplate.update("INSERT IGNORE INTO users (id, email, username, password, nickname, role, created_at, updated_at, is_active, phone_number) " +
+                        "VALUES (?, ?, ?, ?, ?, ?, NOW(), NOW(), ?, ?)",
+                "user-123", "testuser@example.com", "testuser", "encoded-password", "테스트유저", "USER", 1, "010-1234-5678");
+
+        jdbcTemplate.update("INSERT IGNORE INTO users (id, email, username, password, nickname, role, created_at, updated_at, is_active, phone_number) " +
+                        "VALUES (?, ?, ?, ?, ?, ?, NOW(), NOW(), ?, ?)",
+                "user-456", "receiver@example.com", "receiver", "encoded-password2", "리시버유저", "USER", 1, "010-5678-1234");
+    }
 
     @DisplayName("친구 요청부터 수락, 삭제까지 통합 흐름")
     @Test
