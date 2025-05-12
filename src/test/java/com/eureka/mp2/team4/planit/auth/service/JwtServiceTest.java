@@ -57,7 +57,7 @@ class JwtServiceTest {
                 null, null, true, "01000000000"
         );
 
-        String token = jwtService.createToken(userDto.getUsername(),userDto.getRole().name());
+        String token = jwtService.createToken(userDto.getUserName(),userDto.getRole().name());
         Thread.sleep(10); // 유효 시간 지나도록 대기
 
         boolean result = jwtService.validateToken(token);

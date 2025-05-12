@@ -2,10 +2,10 @@ package com.eureka.mp2.team4.planit.friend.controller;
 
 import com.eureka.mp2.team4.planit.common.ApiResponse;
 import com.eureka.mp2.team4.planit.common.Result;
-import com.eureka.mp2.team4.planit.friend.dto.FriendsDto;
+import com.eureka.mp2.team4.planit.friend.dto.response.FriendListResponseDto;
 import com.eureka.mp2.team4.planit.friend.dto.request.FriendAskDto;
 import com.eureka.mp2.team4.planit.friend.dto.request.FriendUpdateStatusDto;
-import com.eureka.mp2.team4.planit.friend.dto.response.FriendResponseDto;
+import com.eureka.mp2.team4.planit.friend.dto.FriendDto;
 import com.eureka.mp2.team4.planit.friend.service.FriendService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.DisplayName;
@@ -61,14 +61,14 @@ class FriendControllerTest {
     @DisplayName("친구 목록 조회 성공")
     @Test
     void getFriendList_success() throws Exception {
-        List<FriendResponseDto> list = List.of(
-                FriendResponseDto.builder().id("f1").requesterId("user-a").receiverId("user-b").build()
+        List<FriendDto> list = List.of(
+                FriendDto.builder().id("f1").requesterId("user-a").receiverId("user-b").build()
         );
 
-        FriendsDto dto = FriendsDto.builder().friends(list).build();
+        FriendListResponseDto dto = FriendListResponseDto.builder().friends(list).build();
 
         when(friendService.getFriends("user-a"))
-                .thenReturn(ApiResponse.<FriendsDto>builder()
+                .thenReturn(ApiResponse.<FriendListResponseDto>builder()
                         .result(Result.SUCCESS)
                         .data(dto)
                         .build());
@@ -82,14 +82,14 @@ class FriendControllerTest {
     @DisplayName("받은 친구 요청 조회 성공")
     @Test
     void getReceivedRequests_success() throws Exception {
-        List<FriendResponseDto> list = List.of(
-                FriendResponseDto.builder().id("f2").requesterId("user-x").receiverId("user-a").build()
+        List<FriendDto> list = List.of(
+                FriendDto.builder().id("f2").requesterId("user-x").receiverId("user-a").build()
         );
 
-        FriendsDto dto = FriendsDto.builder().friends(list).build();
+        FriendListResponseDto dto = FriendListResponseDto.builder().friends(list).build();
 
         when(friendService.getReceivedRequests("user-a"))
-                .thenReturn(ApiResponse.<FriendsDto>builder()
+                .thenReturn(ApiResponse.<FriendListResponseDto>builder()
                         .result(Result.SUCCESS)
                         .data(dto)
                         .build());
@@ -103,14 +103,14 @@ class FriendControllerTest {
     @DisplayName("보낸 친구 요청 조회 성공")
     @Test
     void getSentRequests_success() throws Exception {
-        List<FriendResponseDto> list = List.of(
-                FriendResponseDto.builder().id("f3").requesterId("user-a").receiverId("user-y").build()
+        List<FriendDto> list = List.of(
+                FriendDto.builder().id("f3").requesterId("user-a").receiverId("user-y").build()
         );
 
-        FriendsDto dto = FriendsDto.builder().friends(list).build();
+        FriendListResponseDto dto = FriendListResponseDto.builder().friends(list).build();
 
         when(friendService.getSentRequests("user-a"))
-                .thenReturn(ApiResponse.<FriendsDto>builder()
+                .thenReturn(ApiResponse.<FriendListResponseDto>builder()
                         .result(Result.SUCCESS)
                         .data(dto)
                         .build());

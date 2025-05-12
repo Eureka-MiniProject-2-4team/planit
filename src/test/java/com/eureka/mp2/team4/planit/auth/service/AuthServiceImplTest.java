@@ -38,9 +38,9 @@ public class AuthServiceImplTest {
     void setUpDto() {
         validDto = UserRegisterRequestDto.builder()
                 .email("test@planit.com")
-                .username("testuser")
+                .userName("testuser")
                 .password("secure1234!")
-                .nickname("nickname")
+                .nickName("nickname")
                 .phoneNumber("01012345678")
                 .role(UserRole.ROLE_USER)
                 .build();

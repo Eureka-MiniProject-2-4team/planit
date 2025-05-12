@@ -4,9 +4,9 @@ import com.eureka.mp2.team4.planit.common.ApiResponse;
 import com.eureka.mp2.team4.planit.common.Result;
 import com.eureka.mp2.team4.planit.common.exception.DatabaseException;
 import com.eureka.mp2.team4.planit.common.exception.NotFoundException;
-import com.eureka.mp2.team4.planit.todo.personal.dto.PersonalTodosDto;
+import com.eureka.mp2.team4.planit.todo.personal.dto.response.PersonalTodoListResponseDto;
 import com.eureka.mp2.team4.planit.todo.personal.dto.request.PersonalTodoRequestDto;
-import com.eureka.mp2.team4.planit.todo.personal.dto.response.PersonalTodoResponseDto;
+import com.eureka.mp2.team4.planit.todo.personal.dto.PersonalTodoDto;
 import com.eureka.mp2.team4.planit.todo.personal.mapper.PersonalTodoMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataAccessException;
@@ -80,12 +80,12 @@ public class PersonalTodoServiceImpl implements PersonalTodoService {
     @Override
     public ApiResponse getById(String id) {
         try {
-            PersonalTodoResponseDto todo = mapper.findById(id);
+            PersonalTodoDto todo = mapper.findById(id);
             if (todo == null) {
                 throw new NotFoundException("해당 ID의 투두가 존재하지 않습니다.");
             }
 
-            return ApiResponse.<PersonalTodoResponseDto>builder()
+            return ApiResponse.<PersonalTodoDto>builder()
                     .result(Result.SUCCESS)
                     .message("개인 투두 조회 완료")
                     .data(todo)
@@ -98,10 +98,10 @@ public class PersonalTodoServiceImpl implements PersonalTodoService {
     @Override
     public ApiResponse getAllByUser(String userId) {
         try {
-            List<PersonalTodoResponseDto> list = mapper.findAllByUserId(userId);
-            PersonalTodosDto build = PersonalTodosDto.builder().personalTodosDto(list).build();
+            List<PersonalTodoDto> list = mapper.findAllByUserId(userId);
+            PersonalTodoListResponseDto build = PersonalTodoListResponseDto.builder().personalTodosDto(list).build();
 
-            return ApiResponse.<PersonalTodosDto>builder()
+            return ApiResponse.<PersonalTodoListResponseDto>builder()
                     .result(Result.SUCCESS)
                     .message("개인 투두 전체 조회 완료")
                     .data(build)

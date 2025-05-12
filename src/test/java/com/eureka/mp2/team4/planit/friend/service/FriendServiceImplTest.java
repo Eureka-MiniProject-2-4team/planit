@@ -4,10 +4,10 @@ import com.eureka.mp2.team4.planit.common.ApiResponse;
 import com.eureka.mp2.team4.planit.common.Result;
 import com.eureka.mp2.team4.planit.friend.FriendStatus;
 import com.eureka.mp2.team4.planit.friend.constants.FriendMessages;
-import com.eureka.mp2.team4.planit.friend.dto.FriendsDto;
+import com.eureka.mp2.team4.planit.friend.dto.response.FriendListResponseDto;
 import com.eureka.mp2.team4.planit.friend.dto.request.FriendAskDto;
 import com.eureka.mp2.team4.planit.friend.dto.request.FriendUpdateStatusDto;
-import com.eureka.mp2.team4.planit.friend.dto.response.FriendResponseDto;
+import com.eureka.mp2.team4.planit.friend.dto.FriendDto;
 import com.eureka.mp2.team4.planit.friend.mapper.FriendMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -80,10 +80,10 @@ class FriendServiceImplTest {
     @Test
     void getFriends_success() {
         when(mapper.findAllByUserId("user1")).thenReturn(List.of(
-                FriendResponseDto.builder().id("f1").requesterId("user1").receiverId("user2").build()
+                FriendDto.builder().id("f1").requesterId("user1").receiverId("user2").build()
         ));
 
-        ApiResponse<FriendsDto> response = service.getFriends("user1");
+        ApiResponse<FriendListResponseDto> response = service.getFriends("user1");
 
         assertEquals(Result.SUCCESS, response.getResult());
         assertEquals(FriendMessages.GET_FRIENDS_SUCCESS, response.getMessage());
@@ -96,7 +96,7 @@ class FriendServiceImplTest {
         when(mapper.findAllByUserId("user1"))
                 .thenThrow(new DataAccessResourceFailureException("DB 오류"));
 
-        ApiResponse<FriendsDto> response = service.getFriends("user1");
+        ApiResponse<FriendListResponseDto> response = service.getFriends("user1");
 
         assertEquals(Result.FAIL, response.getResult());
         assertEquals(FriendMessages.GET_FRIENDS_FAIL, response.getMessage());
@@ -106,10 +106,10 @@ class FriendServiceImplTest {
     @Test
     void getReceivedRequests_success() {
         when(mapper.findPendingByReceiverId("user2")).thenReturn(List.of(
-                FriendResponseDto.builder().id("f1").status(FriendStatus.PENDING).build()
+                FriendDto.builder().id("f1").status(FriendStatus.PENDING).build()
         ));
 
-        ApiResponse<FriendsDto> response = service.getReceivedRequests("user2");
+        ApiResponse<FriendListResponseDto> response = service.getReceivedRequests("user2");
 
         assertEquals(Result.SUCCESS, response.getResult());
         assertEquals(FriendMessages.GET_PENDING_SUCCESS, response.getMessage());
@@ -122,7 +122,7 @@ class FriendServiceImplTest {
         when(mapper.findAskedByRequesterId("user1"))
                 .thenThrow(new DataAccessResourceFailureException("DB 오류"));
 
-        ApiResponse<FriendsDto> response = service.getSentRequests("user1");
+        ApiResponse<FriendListResponseDto> response = service.getSentRequests("user1");
 
         assertEquals(Result.FAIL, response.getResult());
         assertEquals(FriendMessages.GET_SENT_FAIL, response.getMessage());
@@ -135,7 +135,7 @@ class FriendServiceImplTest {
                 .status(FriendStatus.ACCEPTED)
                 .build();
 
-        FriendResponseDto acceptedDto = FriendResponseDto.builder()
+        FriendDto acceptedDto = FriendDto.builder()
                 .requesterId("user1")
                 .receiverId("user2")
                 .build();
