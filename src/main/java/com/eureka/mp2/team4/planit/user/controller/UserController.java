@@ -59,4 +59,13 @@ public class UserController {
         ApiResponse apiResponse = userService.updatePassword(userDetails.getUsername(), requestDto);
         return ResponseEntity.ok(apiResponse);
     }
+
+    @GetMapping("/{value}")
+    public ResponseEntity<ApiResponse<?>> getUserInfo(@AuthenticationPrincipal PlanitUserDetails userDetails,
+                                                      @PathVariable("value") String value,
+                                                      @RequestParam(required = false) String teamId) {
+
+        ApiResponse apiResponse = userService.getUserInfo(userDetails.getUsername(), value, teamId);
+        return ResponseEntity.ok(apiResponse);
+    }
 }

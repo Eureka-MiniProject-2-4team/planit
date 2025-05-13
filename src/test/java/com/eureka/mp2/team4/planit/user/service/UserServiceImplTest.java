@@ -5,8 +5,11 @@ import com.eureka.mp2.team4.planit.common.Result;
 import com.eureka.mp2.team4.planit.common.exception.DatabaseException;
 import com.eureka.mp2.team4.planit.common.exception.InternalServerErrorException;
 import com.eureka.mp2.team4.planit.common.exception.NotFoundException;
+import com.eureka.mp2.team4.planit.friend.FriendStatus;
+import com.eureka.mp2.team4.planit.friend.service.FriendQueryService;
 import com.eureka.mp2.team4.planit.team.service.UserTeamQueryService;
 import com.eureka.mp2.team4.planit.user.dto.UserDto;
+import com.eureka.mp2.team4.planit.user.dto.UserSearchResponseDto;
 import com.eureka.mp2.team4.planit.user.dto.request.UpdatePasswordRequestDto;
 import com.eureka.mp2.team4.planit.user.dto.request.UpdateUserRequestDto;
 import com.eureka.mp2.team4.planit.user.dto.response.UserResponseDto;
@@ -23,8 +26,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 import static com.eureka.mp2.team4.planit.user.constants.Messages.*;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 public class UserServiceImplTest {
@@ -34,6 +36,12 @@ public class UserServiceImplTest {
 
     @Mock
     private PasswordEncoder passwordEncoder;
+
+    @Mock
+    private FriendQueryService friendQueryService;
+
+    @Mock
+    private UserTeamQueryService userTeamQueryService;
 
     @InjectMocks
     private UserServiceImpl userService;
@@ -230,10 +238,6 @@ public class UserServiceImplTest {
         assertEquals(UPDATE_DISACTIVE_FAIL, ex.getMessage());
     }
 
-    @Mock
-    private UserTeamQueryService userTeamQueryService;
-
-
     @Test
     @DisplayName("유저 삭제 성공")
     void deleteUser_success() {
@@ -280,4 +284,179 @@ public class UserServiceImplTest {
         assertEquals(DELETE_USER_FAIL, ex.getMessage());
         verify(userMapper).deleteById(userId);
     }
+
+    @Test
+    @DisplayName("유저 정보 조회 - 친구 상태만 포함")
+    void getUserInfo_friendOnly_success() {
+        // given
+        String currentUserId = "me";
+        String value = "test@planit.com";
+        String teamId = null;
+
+        UserDto foundUser = new UserDto(
+                "target-id", value, "테스트유저", "encoded", "닉네임",
+                UserRole.ROLE_USER, null, null, true, "01012341234"
+        );
+
+        when(userMapper.findByEmail(value)).thenReturn(foundUser);
+        when(friendQueryService.areFriends(currentUserId, foundUser.getId()))
+                .thenReturn(FriendStatus.ACCEPTED);
+
+        // when
+        ApiResponse<?> response = userService.getUserInfo(currentUserId, value, teamId);
+
+        // then
+        assertEquals(Result.SUCCESS, response.getResult());
+
+        UserSearchResponseDto data = (UserSearchResponseDto) response.getData();
+        assertEquals("target-id", data.getId());
+        assertEquals(FriendStatus.ACCEPTED, data.getFriendStatus());
+        assertNull(data.getTeamMembershipStatus());
+    }
+
+    @Test
+    @DisplayName("유저 정보 조회 - 팀 멤버십만 포함")
+    void getUserInfo_teamOnly_success() {
+        // given
+        String currentUserId = "me";
+        String value = "닉네임";
+        String teamId = "team-123";
+
+        UserDto foundUser = new UserDto(
+                "target-id", "nick@a.com", "테스트유저", "encoded", value,
+                UserRole.ROLE_USER, null, null, true, "01011112222"
+        );
+
+        when(userMapper.findByNickName(value)).thenReturn(foundUser);
+        when(userTeamQueryService.getTeamMemberShipStatus(teamId, foundUser.getId()))
+                .thenReturn("MEMBER");
+
+        // when
+        ApiResponse<?> response = userService.getUserInfo(currentUserId, value, teamId);
+
+        // then
+        assertEquals(Result.SUCCESS, response.getResult());
+
+        UserSearchResponseDto data = (UserSearchResponseDto) response.getData();
+        assertEquals("target-id", data.getId());
+        assertEquals("MEMBER", data.getTeamMembershipStatus());
+        assertNull(data.getFriendStatus());
+    }
+
+    @Test
+    @DisplayName("유저 정보 조회 실패 - 존재하지 않는 유저")
+    void getUserInfo_userNotFound() {
+        // given
+        String currentUserId = "me";
+        String value = "없는유저";
+        String teamId = null;
+
+        when(userMapper.findByNickName(value)).thenReturn(null);
+
+        // when
+        ApiResponse<?> response = userService.getUserInfo(currentUserId, value, teamId);
+
+        // then
+        assertEquals(Result.FAIL, response.getResult());
+        assertEquals(NOT_FOUND_USER, response.getMessage());
+    }
+
+    @Test
+    @DisplayName("유저 정보 조회 실패 - DB 오류 발생 시 예외 던짐")
+    void getUserInfo_dataAccessException() {
+        // given
+        String currentUserId = "me";
+        String value = "test@planit.com"; // 이메일 → findByEmail() 호출됨
+        String teamId = null;
+
+        when(userMapper.findByEmail(value))
+                .thenThrow(new DataAccessException("DB 오류") {
+                });
+
+        // when & then
+        DatabaseException ex = assertThrows(DatabaseException.class, () -> {
+            userService.getUserInfo(currentUserId, value, teamId);
+        });
+
+        assertEquals(FOUND_USER_FAIL, ex.getMessage()); // FOUND_USER_FAIL
+    }
+
+    @Test
+    @DisplayName("이메일 입력 시 findByEmail()이 호출된다")
+    void getUserInfo_callsFindByEmail() {
+        // given
+        String currentUserId = "me";
+        String value = "test@planit.com"; // 이메일 형식
+        String teamId = null;
+
+        UserDto mockUser = new UserDto("id", value, "유저", "pw", "닉", UserRole.ROLE_USER, null, null, true, "010");
+        when(userMapper.findByEmail(value)).thenReturn(mockUser);
+        when(friendQueryService.areFriends(currentUserId, "id")).thenReturn(FriendStatus.ACCEPTED);
+
+        // when
+        userService.getUserInfo(currentUserId, value, teamId);
+
+        // then
+        verify(userMapper).findByEmail(value);
+        verify(userMapper, never()).findByNickName(any());
+    }
+
+    @Test
+    @DisplayName("닉네임 입력 시 findByNickName()이 호출된다")
+    void getUserInfo_callsFindByNickName() {
+        // given
+        String currentUserId = "me";
+        String value = "홍길동"; // 이메일 아님
+        String teamId = null;
+
+        UserDto mockUser = new UserDto("id", "email", "유저", "pw", value, UserRole.ROLE_USER, null, null, true, "010");
+        when(userMapper.findByNickName(value)).thenReturn(mockUser);
+        when(friendQueryService.areFriends(currentUserId, "id")).thenReturn(FriendStatus.ACCEPTED);
+
+        // when
+        userService.getUserInfo(currentUserId, value, teamId);
+
+        // then
+        verify(userMapper).findByNickName(value);
+        verify(userMapper, never()).findByEmail(any());
+    }
+
+    @Test
+    @DisplayName("자기 자신 검색 시 isMe=true로 응답한다")
+    void getUserInfo_selfSearch_returnsIsMeTrue() {
+        // given
+        String currentUserId = "test-user-id";
+        String value = "me@planit.com"; // 이메일로 검색
+        String teamId = null;
+
+        UserDto selfUser = new UserDto(
+                currentUserId,
+                value,
+                "홍길동",
+                "encoded-password",
+                "닉네임",
+                UserRole.ROLE_USER,
+                null, null,
+                true,
+                "01012345678"
+        );
+
+        when(userMapper.findByEmail(value)).thenReturn(selfUser);
+
+        // when
+        ApiResponse<?> response = userService.getUserInfo(currentUserId, value, teamId);
+
+        // then
+        assertEquals(Result.SUCCESS, response.getResult());
+
+        UserSearchResponseDto data = (UserSearchResponseDto) response.getData();
+        assertEquals(currentUserId, data.getId());
+        assertTrue(data.getIsMe());
+        assertNull(data.getFriendStatus());
+        assertNull(data.getTeamMembershipStatus());
+
+        verify(userMapper).findByEmail(value);
+        verifyNoInteractions(friendQueryService, userTeamQueryService);
+    }
+
 }
