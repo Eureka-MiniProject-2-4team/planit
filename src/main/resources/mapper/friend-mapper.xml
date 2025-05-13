@@ -61,6 +61,14 @@
         WHERE id = #{friendId}
     </select>
 
+    <!-- 요청자/수신자의 위치가 바뀌어도 동일한 관계 -->
+    <select id="findByBothUserId" resultType="com.eureka.mp2.team4.planit.friend.dto.FriendDto">
+        SELECT id, requester_id, receiver_id, status, created_at, accepted_at
+        FROM friend
+        WHERE (requester_id = #{userId} AND receiver_id = #{targetUserId})
+           OR (requester_id = #{targetUserId} AND receiver_id = #{userId})
+    </select>
+
     <!-- 친구 삭제 -->
     <delete id="delete">
         DELETE FROM friend

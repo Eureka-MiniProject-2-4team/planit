@@ -1,6 +1,10 @@
 package com.eureka.mp2.team4.planit.friend.controller;
 
 import com.eureka.mp2.team4.planit.common.ApiResponse;
+import com.eureka.mp2.team4.planit.common.annotations.FriendCheck;
+import com.eureka.mp2.team4.planit.friend.FriendParamType;
+import com.eureka.mp2.team4.planit.friend.FriendRole;
+import com.eureka.mp2.team4.planit.friend.FriendStatus;
 import com.eureka.mp2.team4.planit.friend.dto.request.FriendAskDto;
 import com.eureka.mp2.team4.planit.friend.dto.request.FriendUpdateStatusDto;
 import com.eureka.mp2.team4.planit.friend.service.FriendService;
@@ -40,6 +44,11 @@ public class FriendController {
     }
 
     // 친구 요청 수락/거절
+    @FriendCheck(
+            paramType = FriendParamType.FRIEND_ID,
+            mustBe = FriendRole.RECEIVER,
+            requiredStatus = FriendStatus.PENDING
+    )
     @PatchMapping("/{friendId}")
     public ResponseEntity<ApiResponse> updateStatus(@PathVariable String friendId,
                                                           @RequestBody FriendUpdateStatusDto dto) {
@@ -47,6 +56,11 @@ public class FriendController {
     }
 
     // 친구 삭제
+    @FriendCheck(
+            paramType = FriendParamType.FRIEND_ID,
+            mustBe = FriendRole.ANY,
+            requiredStatus = FriendStatus.ACCEPTED
+    )
     @DeleteMapping("/{friendId}")
     public ResponseEntity<ApiResponse> delete(@PathVariable String friendId) {
         return ResponseEntity.ok(friendService.delete(friendId));

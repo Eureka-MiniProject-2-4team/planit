@@ -26,4 +26,5 @@ public interface FriendMapper {
 
     void delete(String friendId);
 
+    FriendDto findByBothUserId(String userId, String targetUserId);
 }
