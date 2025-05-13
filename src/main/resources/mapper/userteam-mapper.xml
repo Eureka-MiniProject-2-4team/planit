@@ -32,6 +32,22 @@
           AND user_id = #{userId}
     </select>
 
+    <select id="isTeamMember" parameterType="java.lang.String" resultType="java.lang.Integer">
+        SELECT EXISTS(SELECT 1
+                      FROM user_team
+                      WHERE team_id = #{teamId}
+                        AND user_id = #{userId}
+                        AND role IN ('팀원', '팀장'))
+    </select>
+
+    <select id="isTeamLeader" parameterType="java.lang.String" resultType="java.lang.Integer">
+        SELECT EXISTS(SELECT 1
+                      FROM user_team
+                      WHERE team_id = #{teamId}
+                        AND user_id = #{userId}
+                        AND role = '팀장')
+    </select>
+
     <!--UPDATE-->
     <update id="acceptTeamJoin">
         UPDATE user_team

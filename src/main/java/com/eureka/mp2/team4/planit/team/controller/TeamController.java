@@ -2,6 +2,7 @@ package com.eureka.mp2.team4.planit.team.controller;
 
 import com.eureka.mp2.team4.planit.auth.security.PlanitUserDetails;
 import com.eureka.mp2.team4.planit.common.ApiResponse;
+import com.eureka.mp2.team4.planit.common.annotations.TeamCheck;
 import com.eureka.mp2.team4.planit.team.dto.request.TeamRequestDto;
 import com.eureka.mp2.team4.planit.team.dto.request.UserTeamRequestDto;
 import com.eureka.mp2.team4.planit.team.service.UserTeamService;
@@ -31,6 +32,7 @@ public class TeamController {
 
     // 팀장
     @Operation(summary = "팀원 초대", description = "팀장만 가능, 권한 미적용")
+    @TeamCheck(onlyLeader = true)
     @PostMapping("/{teamId}/member/{userId}")
     public ResponseEntity<ApiResponse> inviteMember(@PathVariable("teamId") String teamId,
                                                     @RequestBody UserTeamRequestDto userTeamRequestDto,
@@ -48,6 +50,7 @@ public class TeamController {
 
     // 팀원 ( 팀장도 팀원이자 팀장이라서 가능 )
     @Operation(summary = "팀원 상세 조회", description = "특정 팀원(타인) 상세 조회")
+    @TeamCheck
     @GetMapping("/{teamId}/member/{userId}")
     public ResponseEntity<ApiResponse> getTeamMember(@PathVariable("teamId") String teamId,
                                                      @PathVariable("userId") String userId) {
@@ -55,6 +58,7 @@ public class TeamController {
     }
 
     @Operation(summary = "팀원 전체 조회", description = "팀의 모든 구성원 리스트 조회")
+    @TeamCheck
     @GetMapping("/{teamId}/member/list")
     public ResponseEntity<ApiResponse> getTeamMemberList(@PathVariable String teamId) {
         return ResponseEntity.ok(userTeamService.getTeamMemberList(teamId));
@@ -75,6 +79,7 @@ public class TeamController {
     }
 
     @Operation(summary = "팀 정보 수정", description = "팀장만 가능한 수정작업, 아직 팀장 권한 확인 미적용")
+    @TeamCheck(onlyLeader = true)
     @PutMapping("/{id}")
     public ResponseEntity<ApiResponse> updateTeam(@PathVariable("id") String id, @RequestBody TeamRequestDto teamRequestDto) {
         teamRequestDto.setId(id);
@@ -91,12 +96,14 @@ public class TeamController {
 
     // 팀장
     @Operation(summary = "팀 삭제", description = "팀장만 가능한 삭제작업, 아직 팀장 권한 확인 미적용")
+    @TeamCheck(onlyLeader = true)
     @DeleteMapping("/{id}")
     public ResponseEntity<ApiResponse> deleteTeam(@PathVariable("id") String id) {
         return ResponseEntity.ok(teamService.deleteTeam(id));
     }
 
     @Operation(summary = "팀원 강퇴", description = "팀장만 가능, 권한 미적용")
+    @TeamCheck(onlyLeader = true)
     @DeleteMapping("/{teamId}/member/{userId}")
     public ResponseEntity<ApiResponse> deleteMember(@PathVariable("teamId") String teamId,
                                                     @PathVariable("userId") String userId) {

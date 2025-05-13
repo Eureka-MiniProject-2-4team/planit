@@ -44,16 +44,18 @@
 
 <script>
     // 하드코딩 테스트
-    teamId = "0044bb22-82f9-403b-bfc4-5d5c11e27e9e";
-    userId = "13017ed6-2d8f-4e49-82d7-2778ac8cfcac"; // 타인 : 행위 대상 ( 본인 userId 아님 )
+    teamId = "aceacd14-9151-4f60-905b-266cf746f8d7";
+    userId = "9efd5129-5c4b-4119-a5fb-cb6411592b48"; // 타인 : 행위 대상 ( 본인 userId 아님 )
 
     function registerTeam() {
         fetch('/api/team', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json',
-                'Authorization': localStorage.getItem('accessToken')},
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': localStorage.getItem('accessToken')
+            },
             body: JSON.stringify({
-                teamName: "테스트 팀",
+                teamName: "테스트 팀3",
                 description: "설명입니다"
             })
         }).then(res => res.json()).then(console.log);
@@ -62,26 +64,50 @@
     function inviteMember() {
         fetch(`/api/team/${teamId}/member/${userId}`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': localStorage.getItem('accessToken')
+            },
             body: JSON.stringify({
-                userId : userId,  // 예시 필드
-                teamId : teamId
+                userId: userId,  // 예시 필드
+                teamId: teamId
             })
         }).then(res => res.json()).then(console.log);
     }
 
     function getTeam() {
-        fetch(`/api/team/${teamId}`)
+        fetch(`/api/team/${teamId}`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': localStorage.getItem('accessToken')
+                }
+            }
+        )
             .then(res => res.json()).then(console.log);
     }
 
     function getTeamMember() {
-        fetch(`/api/team/${teamId}/member/${userId}`)
+        fetch(`/api/team/${teamId}/member/${userId}`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': localStorage.getItem('accessToken')
+                }
+            }
+        )
             .then(res => res.json()).then(console.log);
     }
 
     function getTeamMemberList() {
-        fetch(`/api/team/${teamId}/member/list`)
+        fetch(`/api/team/${teamId}/member/list`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': localStorage.getItem('accessToken')
+                }
+            }
+        )
             .then(res => res.json()).then(console.log);
     }
 
@@ -89,8 +115,10 @@
         console.log('accessToken (raw):', localStorage.getItem('accessToken'));
         fetch('/api/team/myteamlist', {
             method: 'GET',
-            headers: { 'Content-Type': 'application/json',
-                'Authorization': localStorage.getItem('accessToken')}
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': localStorage.getItem('accessToken')
+            }
         }).then(res => res.json()).then(console.log);
     }
 
@@ -98,15 +126,20 @@
         console.log('accessToken (raw):', localStorage.getItem('accessToken'));
         fetch('/api/team/invitelist', {
             method: 'GET',
-            headers: { 'Content-Type': 'application/json',
-                'Authorization': localStorage.getItem('accessToken')}
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': localStorage.getItem('accessToken')
+            }
         }).then(res => res.json()).then(console.log);
     }
 
     function updateTeam() {
         fetch(`/api/team/${teamId}`, {
             method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': localStorage.getItem('accessToken')
+            },
             body: JSON.stringify({
                 id: teamId,
                 teamName: "수정된 이름",
@@ -118,28 +151,40 @@
     function acceptTeamJoin() {
         fetch(`/api/team/${teamId}/member`, {
             method: 'PUT',
-            headers: { 'Content-Type': 'application/json',
-                'Authorization': localStorage.getItem('accessToken')}
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': localStorage.getItem('accessToken')
+            }
         }).then(res => res.json()).then(console.log);
     }
 
     function deleteTeam() {
         fetch(`/api/team/${teamId}`, {
-            method: 'DELETE'
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': localStorage.getItem('accessToken')
+            }
         }).then(res => res.json()).then(console.log);
     }
 
     function deleteMember() {
         fetch(`/api/team/${teamId}/member/${userId}`, {
-            method: 'DELETE'
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': localStorage.getItem('accessToken')
+            }
         }).then(res => res.json()).then(console.log);
     }
 
     function denyTeamJoin() {
         fetch(`/api/team/${teamId}/member`, {
             method: 'DELETE',
-            headers: { 'Content-Type': 'application/json',
-                'Authorization': localStorage.getItem('accessToken')}
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': localStorage.getItem('accessToken')
+            }
         }).then(res => res.json()).then(console.log);
     }
 </script>

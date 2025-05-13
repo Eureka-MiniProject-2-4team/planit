@@ -20,6 +20,8 @@ public interface UserTeamMapper {
     List<UserTeamDto> getMyTeamList(String userId);
     List<UserTeamDto> getMyInvitedList(String userId);
     UserTeamDto findByTeamIdAndUserId(@Param("teamId") String teamId, @Param("userId") String userId);
+    Integer isTeamMember(@Param("teamId") String teamId, @Param("userId") String userId);
+    Integer isTeamLeader(@Param("teamId") String teamId, @Param("userId") String userId);
 
     // UPDATE
     void acceptTeamJoin(@Param("teamId")String teamId, @Param("userId")String userId);
