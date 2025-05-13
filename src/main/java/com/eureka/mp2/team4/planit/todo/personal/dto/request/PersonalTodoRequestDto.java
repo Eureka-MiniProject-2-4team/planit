@@ -8,8 +8,7 @@ import java.time.LocalDateTime;
 @Getter
 @Builder
 public class PersonalTodoRequestDto {
-    private String id;
-    private String userId;
+
     private String title;
     private String content;
     private LocalDateTime targetDate;

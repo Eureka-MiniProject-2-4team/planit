@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>Personal Todo</title>
+  <link rel="stylesheet" href="personal-todo.css">
+</head>
+<body>
+<div class="container">
+  <h2>📌 내 투두 목록</h2>
+  <form id="todo-form">
+    <input type="text" id="title" placeholder="제목" required>
+    <input type="text" id="content" placeholder="내용" required>
+    <input type="datetime-local" id="targetDate" required>
+    <button type="submit">등록</button>
+  </form>
+
+  <ul id="todo-list"></ul>
+
+  <h3>👥 친구 ID로 보기</h3>
+  <input type="text" id="friendId" placeholder="친구 ID">
+  <button id="friend-btn">친구 투두 보기</button>
+
+  <ul id="friend-todo-list"></ul>
+</div>
+
+<script src="personal-todo.js"></script>
+</body>
+</html>
