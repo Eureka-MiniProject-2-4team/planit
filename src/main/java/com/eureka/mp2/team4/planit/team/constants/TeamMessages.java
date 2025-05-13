@@ -46,4 +46,6 @@ public class TeamMessages {
     public static final String NOT_FOUND_TEAM_MEMBER_LIST = "팀원 리스트 데이터 존재하지 않음";
     public static final String NOT_FOUND_MY_TEAMLIST = "나의 팀원 리스트 데이터 존재하지 않음";
     public static final String NOT_FOUND_MY_INVITED = "나를 초대한 팀이 존재하지 않음";
+    // DUPLICATED KEY
+    public static final String DUPLICATED_INVITED = "이미 초대된 대상입니다.";
 }

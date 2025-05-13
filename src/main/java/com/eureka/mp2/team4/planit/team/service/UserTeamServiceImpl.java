@@ -10,6 +10,7 @@ import com.eureka.mp2.team4.planit.team.dto.response.MyTeamResponseDto;
 import com.eureka.mp2.team4.planit.team.mapper.TeamMapper;
 import com.eureka.mp2.team4.planit.team.mapper.UserTeamMapper;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -43,7 +44,13 @@ public class UserTeamServiceImpl implements UserTeamService {
                     .message(REGISTER_TEAM_MEMBER_SUCCESS)
                     .build();
 
-        } catch (Exception e) {
+        } catch (DuplicateKeyException de) {
+            de.printStackTrace();
+            return ApiResponse.builder()
+                    .result(Result.FAIL)
+                    .message(DUPLICATED_INVITED)
+                    .build();
+        } catch (Exception e){
             e.printStackTrace();
             return ApiResponse.builder()
                     .result(Result.FAIL)
