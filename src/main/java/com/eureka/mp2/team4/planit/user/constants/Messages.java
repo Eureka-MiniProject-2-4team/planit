@@ -16,4 +16,6 @@ public class Messages {
     public static final String FOUND_EMAIL_SUCCESS = "이메일 조회에 성공했습니다";
     public static final String FOUND_EMAIL_FAIL = "이메일 조회 중 문제가 발생했습니다";
 
+    public static final String FOUND_USER_SUCCESS = "요청한 유저를 찾았습니다";
+    public static final String FOUND_USER_FAIL = "유저 검색 중 문제가 발생하였습니다";
 }

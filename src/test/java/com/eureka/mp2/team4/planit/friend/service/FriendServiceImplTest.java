@@ -1,21 +1,20 @@
-/*
 package com.eureka.mp2.team4.planit.friend.service;
 
 import com.eureka.mp2.team4.planit.common.ApiResponse;
 import com.eureka.mp2.team4.planit.common.Result;
 import com.eureka.mp2.team4.planit.friend.FriendStatus;
 import com.eureka.mp2.team4.planit.friend.constants.FriendMessages;
-import com.eureka.mp2.team4.planit.friend.dto.response.FriendListResponseDto;
-import com.eureka.mp2.team4.planit.friend.dto.request.FriendAskDto;
-import com.eureka.mp2.team4.planit.friend.dto.request.FriendUpdateStatusDto;
 import com.eureka.mp2.team4.planit.friend.dto.FriendDto;
+import com.eureka.mp2.team4.planit.friend.dto.request.FriendUpdateStatusDto;
+import com.eureka.mp2.team4.planit.friend.dto.response.FriendListResponseDto;
 import com.eureka.mp2.team4.planit.friend.mapper.FriendMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.*;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 import org.springframework.dao.DataAccessResourceFailureException;
-import org.springframework.dao.DuplicateKeyException;
 
 import java.util.List;
 
@@ -38,43 +37,72 @@ class FriendServiceImplTest {
     @DisplayName("친구 요청 전송 성공")
     @Test
     void sendRequest_success() {
-        FriendAskDto dto = FriendAskDto.builder()
-                .requesterId("user1")
-                .receiverId("user2")
-                .build();
+        when(mapper.findByBothUserId("user1", "user2")).thenReturn(null);
 
-        ApiResponse response = service.sendRequest(dto);
+        ApiResponse response = service.sendRequest("user1", "user2");
 
         assertEquals(Result.SUCCESS, response.getResult());
         assertEquals(FriendMessages.REQUEST_SUCCESS, response.getMessage());
-        verify(mapper, times(1)).insert(any(FriendAskDto.class));
+        verify(mapper).insert(any());
     }
 
-    @DisplayName("친구 요청 전송 실패")
+    @DisplayName("친구 요청 실패 - 이미 친구 상태")
     @Test
-    void sendRequest_fail() {
-        doThrow(new DataAccessResourceFailureException("DB 오류")).when(mapper).insert(any());
+    void sendRequest_alreadyFriend() {
+        when(mapper.findByBothUserId("user1", "user2")).thenReturn(
+                FriendDto.builder().status(FriendStatus.ACCEPTED).build()
+        );
 
-        FriendAskDto dto = FriendAskDto.builder().requesterId("x").receiverId("y").build();
-        ApiResponse response = service.sendRequest(dto);
+        ApiResponse response = service.sendRequest("user1", "user2");
+
+        assertEquals(Result.FAIL, response.getResult());
+        assertEquals(FriendMessages.ALREADY_FRIEND, response.getMessage());
+    }
+
+    @DisplayName("친구 요청 실패 - 내가 이미 요청함")
+    @Test
+    void sendRequest_alreadySent() {
+        when(mapper.findByBothUserId("user1", "user2")).thenReturn(
+                FriendDto.builder()
+                        .requesterId("user1")
+                        .receiverId("user2")
+                        .status(FriendStatus.PENDING)
+                        .build()
+        );
+
+        ApiResponse response = service.sendRequest("user1", "user2");
+
+        assertEquals(Result.FAIL, response.getResult());
+        assertEquals(FriendMessages.ALREADY_SENT_REQUEST, response.getMessage());
+    }
+
+    @DisplayName("친구 요청 실패 - 상대가 나에게 요청한 상태")
+    @Test
+    void sendRequest_requestExistsFromReceiver() {
+        when(mapper.findByBothUserId("user1", "user2")).thenReturn(
+                FriendDto.builder()
+                        .requesterId("user2")
+                        .receiverId("user1")
+                        .status(FriendStatus.PENDING)
+                        .build()
+        );
+
+        ApiResponse response = service.sendRequest("user1", "user2");
+
+        assertEquals(Result.FAIL, response.getResult());
+        assertEquals(FriendMessages.REQUEST_EXISTS_FROM_RECEIVER, response.getMessage());
+    }
+
+    @DisplayName("친구 요청 실패 - DB 예외 발생")
+    @Test
+    void sendRequest_dbException() {
+        when(mapper.findByBothUserId("user1", "user2")).thenReturn(null);
+        doThrow(new DataAccessResourceFailureException("DB")).when(mapper).insert(any());
+
+        ApiResponse response = service.sendRequest("user1", "user2");
 
         assertEquals(Result.FAIL, response.getResult());
         assertEquals(FriendMessages.REQUEST_FAIL, response.getMessage());
-    }
-
-    @DisplayName("친구 요청 중복 전송 실패")
-    @Test
-    void sendRequest_duplicate() {
-        FriendAskDto dto = FriendAskDto.builder()
-                .requesterId("user1")
-                .receiverId("user2")
-                .build();
-
-        doThrow(new DuplicateKeyException("중복")).when(mapper).insert(any(FriendAskDto.class));
-        ApiResponse response = service.sendRequest(dto);
-
-        assertEquals(Result.FAIL, response.getResult());
-        assertEquals(FriendMessages.REQUEST_ALREADY_EXISTS, response.getMessage());
     }
 
     @DisplayName("친구 목록 조회 성공")
@@ -187,5 +215,64 @@ class FriendServiceImplTest {
         assertEquals(Result.FAIL, response.getResult());
         assertEquals(FriendMessages.DELETE_FAIL, response.getMessage());
     }
+
+    @DisplayName("friendId로 친구 조회 - 성공")
+    @Test
+    void findByFriendId_success() {
+        FriendDto mockFriend = FriendDto.builder()
+                .id("f123")
+                .requesterId("user1")
+                .receiverId("user2")
+                .status(FriendStatus.ACCEPTED)
+                .build();
+
+        when(mapper.findById("f123")).thenReturn(mockFriend);
+
+        FriendDto result = service.findByFriendId("f123");
+
+        assertNotNull(result);
+        assertEquals("user1", result.getRequesterId());
+        assertEquals("user2", result.getReceiverId());
+        assertEquals(FriendStatus.ACCEPTED, result.getStatus());
+    }
+
+    @DisplayName("friendId로 친구 조회 - 없음")
+    @Test
+    void findByFriendId_notFound() {
+        when(mapper.findById("not_exist")).thenReturn(null);
+
+        FriendDto result = service.findByFriendId("not_exist");
+
+        assertNull(result);
+    }
+
+    @DisplayName("두 userId로 친구 조회 - 성공")
+    @Test
+    void findByBothUserId_success() {
+        FriendDto mockFriend = FriendDto.builder()
+                .id("f456")
+                .requesterId("user1")
+                .receiverId("user2")
+                .status(FriendStatus.PENDING)
+                .build();
+
+        when(mapper.findByBothUserId("user1", "user2")).thenReturn(mockFriend);
+
+        FriendDto result = service.findByBothUserId("user1", "user2");
+
+        assertNotNull(result);
+        assertEquals("user1", result.getRequesterId());
+        assertEquals("user2", result.getReceiverId());
+        assertEquals(FriendStatus.PENDING, result.getStatus());
+    }
+
+    @DisplayName("두 userId로 친구 조회 - 없음")
+    @Test
+    void findByBothUserId_notFound() {
+        when(mapper.findByBothUserId("user1", "user3")).thenReturn(null);
+
+        FriendDto result = service.findByBothUserId("user1", "user3");
+
+        assertNull(result);
+    }
 }
-*/

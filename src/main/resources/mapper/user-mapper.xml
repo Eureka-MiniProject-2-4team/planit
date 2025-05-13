@@ -70,4 +70,10 @@
         WHERE username = #{name}
           AND phone_number = #{phoneNumber}
     </select>
+
+    <select id="findByNickName" parameterType="String">
+        SELECT *
+        FROM users
+        WHERE nickName = #{nickName}
+    </select>
 </mapper>

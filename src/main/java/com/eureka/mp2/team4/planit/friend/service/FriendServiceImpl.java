@@ -8,7 +8,6 @@ import com.eureka.mp2.team4.planit.friend.dto.FriendDto;
 import com.eureka.mp2.team4.planit.friend.dto.request.FriendUpdateStatusDto;
 import com.eureka.mp2.team4.planit.friend.dto.response.FriendListResponseDto;
 import com.eureka.mp2.team4.planit.friend.dto.response.FriendMakeDto;
-import com.eureka.mp2.team4.planit.friend.dto.response.UserSearchDto;
 import com.eureka.mp2.team4.planit.friend.mapper.FriendMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataAccessException;
@@ -174,23 +173,6 @@ public class FriendServiceImpl implements FriendService {
             return ApiResponse.builder()
                     .result(Result.FAIL)
                     .message(DELETE_FAIL)
-                    .build();
-        }
-    }
-
-    @Override
-    public ApiResponse searchFriends(String myUserId, String keyword) {
-        try {
-            List<UserSearchDto> users = mapper.searchFriends(myUserId, keyword);
-            return ApiResponse.builder()
-                    .result(Result.SUCCESS)
-                    .message(SEARCH_SUCCESS)
-                    .data(users)
-                    .build();
-        } catch (DataAccessException e) {
-            return ApiResponse.builder()
-                    .result(Result.FAIL)
-                    .message(SEARCH_FAIL)
                     .build();
         }
     }

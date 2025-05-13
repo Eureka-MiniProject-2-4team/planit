@@ -1,10 +1,7 @@
 package com.eureka.mp2.team4.planit.user.dto;
 
 import com.eureka.mp2.team4.planit.user.enums.UserRole;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDateTime;
 

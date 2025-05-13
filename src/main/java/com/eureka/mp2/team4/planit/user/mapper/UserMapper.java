@@ -28,4 +28,6 @@ public interface UserMapper {
     void deleteById(String userId);
 
     UserDto findUserByNameAndPhoneNumber(@Param("name") String name, @Param("phoneNumber") String phoneNumber);
+
+    UserDto findByNickName(String nickName);
 }

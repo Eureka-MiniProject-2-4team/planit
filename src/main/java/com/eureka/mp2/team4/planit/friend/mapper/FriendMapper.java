@@ -22,14 +22,11 @@ public interface FriendMapper {
 
     void updateStatus(@Param("friendId") String friendId, @Param("status") String status);
 
-    FriendDto findById(String friendId);
     void autoCancelOppositePending(@Param("oppositeRequesterId") String oppositeRequesterId,
                                    @Param("oppositeReceiverId") String oppositeReceiverId);
-
     void delete(String friendId);
 
-    FriendDto findByBothUserId(String userId, String targetUserId);
+    FriendDto findById(String friendId);
 
-    List<UserSearchDto> searchFriends(@Param("userId") String userId,
-                                      @Param("keyword") String keyword);
+    FriendDto findByBothUserId(String userId, String targetUserId);
 }
