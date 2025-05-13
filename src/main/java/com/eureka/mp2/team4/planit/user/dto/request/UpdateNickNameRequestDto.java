@@ -1,4 +1,4 @@
-package com.eureka.mp2.team4.planit.user.dto;
+package com.eureka.mp2.team4.planit.user.dto.request;
 
 import com.eureka.mp2.team4.planit.auth.constants.Constraints;
 import com.eureka.mp2.team4.planit.auth.constants.Messages;

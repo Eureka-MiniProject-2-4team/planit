@@ -4,7 +4,8 @@ import com.eureka.mp2.team4.planit.auth.security.PlanitUserDetails;
 import com.eureka.mp2.team4.planit.common.ApiResponse;
 import com.eureka.mp2.team4.planit.common.Result;
 import com.eureka.mp2.team4.planit.common.exception.InvalidInputException;
-import com.eureka.mp2.team4.planit.user.dto.UpdateNickNameRequestDto;
+import com.eureka.mp2.team4.planit.user.dto.request.UpdateNickNameRequestDto;
+import com.eureka.mp2.team4.planit.user.dto.request.UpdatePasswordRequestDto;
 import com.eureka.mp2.team4.planit.user.dto.response.UserResponseDto;
 import com.eureka.mp2.team4.planit.user.service.UserService;
 import org.junit.jupiter.api.BeforeEach;
@@ -18,6 +19,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
@@ -106,6 +108,53 @@ class UserControllerTest {
 
         assertThat(exception.getMessage()).isEqualTo("닉네임은 필수입니다.");
         verify(userService, never()).updateNickName(any(), any());
+    }
+
+    @Test
+    @DisplayName("비밀번호 변경 성공")
+    void updatePassword_success() {
+        // given
+        UpdatePasswordRequestDto dto = new UpdatePasswordRequestDto("currentPass", "newPass");
+
+        ApiResponse<?> mockResponse = ApiResponse.builder()
+                .result(Result.SUCCESS)
+                .message("비밀번호 변경에 성공했습니다.")
+                .build();
+
+        BindingResult bindingResult = mock(BindingResult.class);
+        when(bindingResult.hasErrors()).thenReturn(false);
+        when(userService.updatePassword("test-user-id", dto)).thenReturn(mockResponse);
+
+        // when
+        ResponseEntity<ApiResponse<?>> response = userController.updateNickName(planitUserDetails, dto, bindingResult);
+
+        // then
+        assertEquals(200, response.getStatusCodeValue());
+        assertEquals(Result.SUCCESS, response.getBody().getResult());
+        assertEquals("비밀번호 변경에 성공했습니다.", response.getBody().getMessage());
+
+        verify(userService).updatePassword("test-user-id", dto);
+    }
+
+    @Test
+    @DisplayName("비밀번호 변경 실패 - 유효성 검증 실패")
+    void updatePassword_validationFail() {
+        // given
+        UpdatePasswordRequestDto dto = new UpdatePasswordRequestDto("", "newPass");
+
+        BindingResult bindingResult = mock(BindingResult.class);
+        when(bindingResult.hasErrors()).thenReturn(true);
+        when(bindingResult.getFieldError()).thenReturn(
+                new FieldError("updatePasswordRequestDto", "currentPassword", "현재 비밀번호를 입력해주세요")
+        );
+
+        // when & then
+        InvalidInputException exception = assertThrows(InvalidInputException.class, () -> {
+            userController.updateNickName(planitUserDetails, dto, bindingResult);
+        });
+
+        assertEquals("현재 비밀번호를 입력해주세요", exception.getMessage());
+        verify(userService, never()).updatePassword(any(), any());
     }
 
 }
