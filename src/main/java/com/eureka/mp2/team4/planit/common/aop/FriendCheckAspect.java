@@ -6,7 +6,6 @@ import com.eureka.mp2.team4.planit.common.exception.ForbiddenException;
 import com.eureka.mp2.team4.planit.common.exception.NotFoundException;
 import com.eureka.mp2.team4.planit.friend.FriendParamType;
 import com.eureka.mp2.team4.planit.friend.FriendRole;
-import com.eureka.mp2.team4.planit.friend.FriendStatus;
 import com.eureka.mp2.team4.planit.friend.dto.FriendDto;
 import com.eureka.mp2.team4.planit.friend.service.FriendService;
 import lombok.RequiredArgsConstructor;
@@ -19,7 +18,8 @@ import org.springframework.stereotype.Component;
 
 import java.util.UUID;
 
-import static com.eureka.mp2.team4.planit.team.constants.TeamMessages.NOT_FOUND_ID;
+import static com.eureka.mp2.team4.planit.friend.constants.FriendMessages.NOT_FOUND_ID;
+
 
 @Aspect
 @Component
