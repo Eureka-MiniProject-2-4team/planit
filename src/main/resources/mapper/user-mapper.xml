@@ -6,29 +6,26 @@
 <mapper namespace="com.eureka.mp2.team4.planit.user.mapper.UserMapper">
 
     <insert id="register" parameterType="com.eureka.mp2.team4.planit.auth.dto.request.UserRegisterRequestDto">
-        INSERT INTO users (
-            id, email, password, username, nickname, phone_number, role, created_at
-        ) VALUES (
-                     #{id}, #{email}, #{password}, #{userName}, #{nickName}, #{phoneNumber}, #{role}, NOW()
-                 )
+        INSERT INTO users (id, email, password, username, nickname, phone_number, role, created_at)
+        VALUES (#{id}, #{email}, #{password}, #{userName}, #{nickName}, #{phoneNumber}, #{role}, NOW())
     </insert>
 
     <select id="isExistEmail" parameterType="string" resultType="boolean">
-        SELECT EXISTS (
-            SELECT 1 FROM users WHERE email = #{email}
-        )
+        SELECT EXISTS (SELECT 1
+                       FROM users
+                       WHERE email = #{email})
     </select>
 
     <select id="isExistPhoneNumber" parameterType="string" resultType="boolean">
-        SELECT EXISTS (
-            SELECT 1 FROM users WHERE phone_number = #{phoneNumber}
-        )
+        SELECT EXISTS (SELECT 1
+                       FROM users
+                       WHERE phone_number = #{phoneNumber})
     </select>
 
     <select id="isExistNickName" parameterType="string" resultType="boolean">
-        SELECT EXISTS (
-            SELECT 1 FROM users WHERE nickname = #{nickname}
-        )
+        SELECT EXISTS (SELECT 1
+                       FROM users
+                       WHERE nickname = #{nickname})
     </select>
 
     <select id="findByEmail" parameterType="string" resultType="com.eureka.mp2.team4.planit.user.dto.UserDto">
@@ -38,6 +35,14 @@
     </select>
 
     <select id="findById" parameterType="string" resultType="com.eureka.mp2.team4.planit.user.dto.UserDto">
-        SELECT * FROM users WHERE id = #{id}
+        SELECT *
+        FROM users
+        WHERE id = #{id}
     </select>
+
+    <update id="updateNickName">
+        UPDATE users
+        SET nickname = #{newNickName}
+        WHERE id = #{userId}
+    </update>
 </mapper>
