@@ -24,6 +24,7 @@
         SELECT id, requester_id, receiver_id, status, created_at, accepted_at
         FROM friend
         WHERE requester_id = #{userId}
+        AND status =
     </select>
 
     <!-- 받은 친구 요청 목록 (대기 중) -->
@@ -75,5 +76,28 @@
         WHERE id = #{friendId}
     </delete>
 
+    <!-- 친구찾기 -->
+    <select id="searchFriends" resultType="com.eureka.mp2.team4.planit.user.dto.UserSearchDto">
+        SELECT u.id, u.nickname, u.email
+        FROM users u
+                 LEFT JOIN friend f
+                           ON (
+                               (f.requester_id = #{userId} AND f.receiver_id = u.id)
+                                   OR (f.receiver_id = #{userId} AND f.requester_id = u.id)
+                               )
+        WHERE (u.nickname LIKE CONCAT('%', #{keyword}, '%')
+            OR u.email LIKE CONCAT('%', #{keyword}, '%'))
+          AND u.id != #{userId}
+          AND f.id IS NULL
+    </select>
 
+<!--    LIKE 검색: nickname 또는 email에 keyword 포함
+
+    본인 제외: u.id != #{userId}
+
+    이미 친구이거나 요청 중인 사용자 제외:
+
+    friend 테이블에서 userId가 관여한 모든 관계를 대상으로 상대방 ID 추출
+
+    그 결과에 포함되지 않는 유저만 반환-->
 </mapper>
