@@ -127,7 +127,14 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public ApiResponse getUserInfo(String currentUserId, String value, String teamId) {
-        UserDto targetUser = getTargetUserOrThrow(value);
+        UserDto targetUser = findUserByValue(value);
+
+        if (targetUser == null) {
+            return ApiResponse.builder()
+                    .result(Result.FAIL)
+                    .message(NOT_FOUND_USER)
+                    .build();
+        }
 
         if (targetUser.getId().equals(currentUserId)) {
             return buildSelfResponse(targetUser);
@@ -148,14 +155,6 @@ public class UserServiceImpl implements UserService {
                 .data(responseDto)
                 .result(Result.SUCCESS)
                 .build();
-    }
-
-    private UserDto getTargetUserOrThrow(String value) {
-        UserDto user = findUserByValue(value);
-        if (user == null) {
-            throw new NotFoundException(NOT_FOUND_USER);
-        }
-        return user;
     }
 
     private ApiResponse buildSelfResponse(UserDto user) {

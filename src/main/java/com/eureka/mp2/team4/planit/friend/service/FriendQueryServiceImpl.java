@@ -14,8 +14,7 @@ public class FriendQueryServiceImpl implements FriendQueryService {
 
     @Override
     public FriendStatus areFriends(String userId, String targetUserId) {
-        FriendDto friendDto = null;
-        // todo 유민님이 구현한 두명아이디로 조회 매퍼 사용
+        FriendDto friendDto = friendMapper.findByBothUserId(userId, targetUserId);
         if (friendDto == null)
             return null;
 

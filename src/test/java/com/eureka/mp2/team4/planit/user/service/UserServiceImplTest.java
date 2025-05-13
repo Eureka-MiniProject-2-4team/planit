@@ -421,4 +421,42 @@ public class UserServiceImplTest {
         verify(userMapper, never()).findByEmail(any());
     }
 
+    @Test
+    @DisplayName("자기 자신 검색 시 isMe=true로 응답한다")
+    void getUserInfo_selfSearch_returnsIsMeTrue() {
+        // given
+        String currentUserId = "test-user-id";
+        String value = "me@planit.com"; // 이메일로 검색
+        String teamId = null;
+
+        UserDto selfUser = new UserDto(
+                currentUserId,
+                value,
+                "홍길동",
+                "encoded-password",
+                "닉네임",
+                UserRole.ROLE_USER,
+                null, null,
+                true,
+                "01012345678"
+        );
+
+        when(userMapper.findByEmail(value)).thenReturn(selfUser);
+
+        // when
+        ApiResponse<?> response = userService.getUserInfo(currentUserId, value, teamId);
+
+        // then
+        assertEquals(Result.SUCCESS, response.getResult());
+
+        UserSearchResponseDto data = (UserSearchResponseDto) response.getData();
+        assertEquals(currentUserId, data.getId());
+        assertTrue(data.getIsMe());
+        assertNull(data.getFriendStatus());
+        assertNull(data.getTeamMembershipStatus());
+
+        verify(userMapper).findByEmail(value);
+        verifyNoInteractions(friendQueryService, userTeamQueryService);
+    }
+
 }
