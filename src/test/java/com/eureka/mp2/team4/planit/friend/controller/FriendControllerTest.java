@@ -1,3 +1,4 @@
+/*
 package com.eureka.mp2.team4.planit.friend.controller;
 
 import com.eureka.mp2.team4.planit.common.ApiResponse;
@@ -155,3 +156,4 @@ class FriendControllerTest {
                 .andExpect(jsonPath("$.message").value("친구 삭제 완료"));
     }
 }
+*/

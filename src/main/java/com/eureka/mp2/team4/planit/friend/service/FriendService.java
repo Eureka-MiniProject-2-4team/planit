@@ -8,7 +8,8 @@ import com.eureka.mp2.team4.planit.common.ApiResponse;
 
 public interface FriendService {
 
-    ApiResponse sendRequest(FriendAskDto dto);
+
+    ApiResponse sendRequest(String requesterId, String receiverId);
 
     ApiResponse<FriendListResponseDto> getFriends(String userId);
 
@@ -23,4 +24,6 @@ public interface FriendService {
     FriendDto findByFriendId(String friendId);
 
     FriendDto findByBothUserId(String userId, String targetUserId);
+
+    ApiResponse searchFriends(String userId, String keyword);
 }
