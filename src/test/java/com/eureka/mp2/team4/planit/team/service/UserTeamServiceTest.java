@@ -1,5 +1,7 @@
 package com.eureka.mp2.team4.planit.team.service;
 
+import static com.eureka.mp2.team4.planit.team.constants.Team_Role.MEMBER;
+import static com.eureka.mp2.team4.planit.team.constants.Team_Status.WAIT;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
@@ -58,8 +60,8 @@ public class UserTeamServiceTest {
                 .id(UUID.randomUUID().toString())
                 .userId(userId)
                 .teamId(teamId)
-                .status("대기")
-                .role("팀원")
+                .status(WAIT)
+                .role(MEMBER)
                 .build();
 
         teamDto = new TeamDto();
