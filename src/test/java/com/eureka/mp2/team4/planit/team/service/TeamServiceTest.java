@@ -1,12 +1,15 @@
-package com.eureka.mp2.team4.planit.team;
+package com.eureka.mp2.team4.planit.team.service;
 
 import com.eureka.mp2.team4.planit.common.ApiResponse;
 import com.eureka.mp2.team4.planit.common.Result;
 import com.eureka.mp2.team4.planit.team.dto.TeamDto;
+import com.eureka.mp2.team4.planit.team.dto.UserTeamDto;
 import com.eureka.mp2.team4.planit.team.dto.request.TeamRequestDto;
+import com.eureka.mp2.team4.planit.team.dto.request.UserTeamRequestDto;
 import com.eureka.mp2.team4.planit.team.mapper.TeamMapper;
-import com.eureka.mp2.team4.planit.team.service.TeamServiceImpl;
+import com.eureka.mp2.team4.planit.team.mapper.UserTeamMapper;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -16,6 +19,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.UUID;
 
 import static com.eureka.mp2.team4.planit.team.constants.TeamMessages.*;
+import static org.mockito.ArgumentMatchers.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
@@ -24,17 +28,34 @@ public class TeamServiceTest {
 
     @Mock
     private TeamMapper teamMapper;
+    @Mock
+    private UserTeamMapper userTeamMapper;
 
     @InjectMocks
     private TeamServiceImpl teamService;
 
     private TeamDto teamDto;
     private TeamRequestDto teamRequestDto;
+    private UserTeamRequestDto userTeamRequestDto;
+    private UserTeamDto userTeamDto;
     private String teamId;
+    private String userId;
 
     @BeforeEach
     void setUp() {
         teamId = UUID.randomUUID().toString();
+        userId = UUID.randomUUID().toString();
+
+        userTeamRequestDto = new UserTeamRequestDto();
+        userTeamRequestDto.setUserId(userId);
+        userTeamRequestDto.setTeamId(teamId);
+
+        userTeamDto = new UserTeamDto();
+        userTeamDto.setId(UUID.randomUUID().toString());
+        userTeamDto.setUserId(userId);
+        userTeamDto.setUserId(teamId);
+        userTeamDto.setStatus("대기");
+        userTeamDto.setRole("팀원");
 
         teamDto = new TeamDto();
         teamDto.setId(teamId);
@@ -49,32 +70,62 @@ public class TeamServiceTest {
 
     // TODO : CREATE
     @Test
-    void testRegisterTeamFail() {
+    @DisplayName("팀 등록 실패 테스트 - 팀 등록 에러")
+    void testRegisterTeamFailOnTeamRegistration() {
         // Given
         doThrow(new RuntimeException("DB 에러")).when(teamMapper).registerTeam(any(TeamDto.class));
 
         // When
-        ApiResponse response = teamService.registerTeam(teamRequestDto);
+        ApiResponse response = teamService.registerTeam(userId, teamRequestDto);
 
         // Then
         assertEquals(Result.FAIL, response.getResult());
         assertEquals(REGISTER_TEAM_FAIL, response.getMessage());
+
+        // teamMapper는 호출되었지만, userTeamMapper는 호출되지 않았는지 확인
         verify(teamMapper, times(1)).registerTeam(any(TeamDto.class));
+        verify(userTeamMapper, never()).registerTeamMember(any(UserTeamDto.class));
     }
 
     @Test
-    void testRegisterTeamSuccess() {
+    @DisplayName("팀 등록 실패 테스트 - 멤버 등록 에러")
+    void testRegisterTeamFailOnMemberRegistration() {
         // Given
         doNothing().when(teamMapper).registerTeam(any(TeamDto.class));
+        doThrow(new RuntimeException("DB 에러")).when(userTeamMapper).registerTeamMember(any(UserTeamDto.class));
 
         // When
-        ApiResponse response = teamService.registerTeam(teamRequestDto);
+        ApiResponse response = teamService.registerTeam(userId, teamRequestDto);
+
+        // Then
+        assertEquals(Result.FAIL, response.getResult());
+        assertEquals(REGISTER_TEAM_FAIL, response.getMessage());
+
+        // 두 매퍼 모두 호출되었는지 확인
+        verify(teamMapper, times(1)).registerTeam(any(TeamDto.class));
+        verify(userTeamMapper, times(1)).registerTeamMember(any(UserTeamDto.class));
+    }
+
+    @Test
+    @DisplayName(" 팀 등록 성공 테스트")
+    void testRegisterTeamSuccess() {
+        // Given
+        // teamMapper와 userTeamMapper가 예외를 발생시키지 않도록 설정
+        doNothing().when(teamMapper).registerTeam(any(TeamDto.class));
+        doNothing().when(userTeamMapper).registerTeamMember(any(UserTeamDto.class));
+
+        // When
+        ApiResponse response = teamService.registerTeam(userId, teamRequestDto);
 
         // Then
         assertEquals(Result.SUCCESS, response.getResult());
         assertEquals(REGISTER_TEAM_SUCCESS, response.getMessage());
+
+        // TeamDto와 UserTeamDto가 생성되어 전달되었는지 확인
         verify(teamMapper, times(1)).registerTeam(any(TeamDto.class));
+        verify(userTeamMapper, times(1)).registerTeamMember(any(UserTeamDto.class));
     }
+
 
     // READ
     @Test

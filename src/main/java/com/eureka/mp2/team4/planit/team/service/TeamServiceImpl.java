@@ -2,10 +2,13 @@ package com.eureka.mp2.team4.planit.team.service;
 
 import com.eureka.mp2.team4.planit.common.ApiResponse;
 import com.eureka.mp2.team4.planit.common.Result;
+import com.eureka.mp2.team4.planit.common.exception.DatabaseException;
 import com.eureka.mp2.team4.planit.common.exception.NotFoundException;
 import com.eureka.mp2.team4.planit.team.dto.TeamDto;
+import com.eureka.mp2.team4.planit.team.dto.UserTeamDto;
 import com.eureka.mp2.team4.planit.team.dto.request.TeamRequestDto;
 import com.eureka.mp2.team4.planit.team.mapper.TeamMapper;
+import com.eureka.mp2.team4.planit.team.mapper.UserTeamMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -18,9 +21,10 @@ import static com.eureka.mp2.team4.planit.team.constants.TeamMessages.*;
 public class TeamServiceImpl implements TeamService {
 
     private final TeamMapper teamMapper;
+    private final UserTeamMapper userTeamMapper;
 
     @Override
-    public ApiResponse registerTeam(TeamRequestDto teamRequestDto) {
+    public ApiResponse registerTeam(String userId, TeamRequestDto teamRequestDto) {
         try {
             TeamDto teamDto = TeamDto.builder()
                     .id(UUID.randomUUID().toString())
@@ -28,8 +32,17 @@ public class TeamServiceImpl implements TeamService {
                     .description(teamRequestDto.getDescription())
                     .build();
 
+            UserTeamDto userTeamDto = UserTeamDto.builder()
+                    .id(UUID.randomUUID().toString())
+                    .userId(userId)
+                    .teamId(teamDto.getId())
+                    .status("가입")
+                    .role("팀장")
+                    .build();
+
             // 팀 등록
             teamMapper.registerTeam(teamDto);
+            userTeamMapper.registerTeamMember(userTeamDto);
 
             // 성공 응답
             return ApiResponse.builder()
@@ -128,12 +141,23 @@ public class TeamServiceImpl implements TeamService {
     @Override
     public boolean isTeamMember(String userId, String teamId) {
         // todo : userId가 teamId의 멤버인지 체크
-        return true;
+        try {
+            System.out.println(userTeamMapper.isTeamMember(teamId, userId));
+            return userTeamMapper.isTeamMember(teamId, userId) == 1;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
     }
 
     @Override
     public boolean isTeamLeader(String userId, String teamId) {
-       // todo : userId가 teamId의 팀 리터인지 체크
-        return false;
+        try {
+            System.out.println(userTeamMapper.isTeamLeader(teamId, userId));
+            return userTeamMapper.isTeamLeader(teamId, userId) == 1;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
     }
 }
