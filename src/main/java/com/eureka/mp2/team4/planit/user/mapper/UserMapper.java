@@ -3,6 +3,7 @@ package com.eureka.mp2.team4.planit.user.mapper;
 import com.eureka.mp2.team4.planit.auth.dto.request.UserRegisterRequestDto;
 import com.eureka.mp2.team4.planit.user.dto.UserDto;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 @Mapper
 public interface UserMapper {
@@ -17,4 +18,6 @@ public interface UserMapper {
     UserDto findByEmail(String email);
 
     UserDto findById(String userId);
+
+    void updateNickName(@Param("userId") String userId, @Param("newNickName") String newNickName);
 }
