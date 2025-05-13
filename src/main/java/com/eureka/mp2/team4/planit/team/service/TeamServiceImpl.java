@@ -15,6 +15,8 @@ import org.springframework.stereotype.Service;
 import java.util.UUID;
 
 import static com.eureka.mp2.team4.planit.team.constants.TeamMessages.*;
+import static com.eureka.mp2.team4.planit.team.constants.Team_Role.LEADER;
+import static com.eureka.mp2.team4.planit.team.constants.Team_Status.JOINED;
 
 @RequiredArgsConstructor
 @Service
@@ -36,8 +38,8 @@ public class TeamServiceImpl implements TeamService {
                     .id(UUID.randomUUID().toString())
                     .userId(userId)
                     .teamId(teamDto.getId())
-                    .status("가입")
-                    .role("팀장")
+                    .status(JOINED)
+                    .role(LEADER)
                     .build();
 
             // 팀 등록

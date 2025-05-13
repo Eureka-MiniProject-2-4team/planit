@@ -19,6 +19,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.UUID;
 
 import static com.eureka.mp2.team4.planit.team.constants.TeamMessages.*;
+import static com.eureka.mp2.team4.planit.team.constants.Team_Role.MEMBER;
+import static com.eureka.mp2.team4.planit.team.constants.Team_Status.JOINED;
 import static org.mockito.ArgumentMatchers.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -54,8 +56,8 @@ public class TeamServiceTest {
         userTeamDto.setId(UUID.randomUUID().toString());
         userTeamDto.setUserId(userId);
         userTeamDto.setUserId(teamId);
-        userTeamDto.setStatus("대기");
-        userTeamDto.setRole("팀원");
+        userTeamDto.setStatus(JOINED);
+        userTeamDto.setRole(MEMBER);
 
         teamDto = new TeamDto();
         teamDto.setId(teamId);
