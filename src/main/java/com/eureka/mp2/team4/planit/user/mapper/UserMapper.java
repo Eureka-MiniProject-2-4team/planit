@@ -26,4 +26,6 @@ public interface UserMapper {
     void updateIsActive(@Param("userId") String userId, @Param("isActive") Boolean isActive);
 
     void deleteById(String userId);
+
+    UserDto findUserByNameAndPhoneNumber(@Param("name") String name, @Param("phoneNumber") String phoneNumber);
 }

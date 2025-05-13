@@ -13,4 +13,7 @@ public class Messages {
     public static final String DELETE_USER_SUCCESS = "회원탈퇴가 완료되었습니다";
     public static final String DELETE_USER_FAIL = "회원탈퇴 중 문제가 발생했습니다";
     public static final String LEADER_CAN_NOT_DELETE = "팀장으로 등록된 팀이 있어 탈퇴할 수 없습니다";
+    public static final String FOUND_EMAIL_SUCCESS = "이메일 조회에 성공했습니다";
+    public static final String FOUND_EMAIL_FAIL = "이메일 조회 중 문제가 발생했습니다";
+
 }
