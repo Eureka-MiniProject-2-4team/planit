@@ -179,23 +179,6 @@ public class FriendServiceImpl implements FriendService {
     }
 
     @Override
-    public ApiResponse searchFriends(String myUserId, String keyword) {
-        try {
-            List<UserSearchDto> users = mapper.searchFriends(myUserId, keyword);
-            return ApiResponse.builder()
-                    .result(Result.SUCCESS)
-                    .message(SEARCH_SUCCESS)
-                    .data(users)
-                    .build();
-        } catch (DataAccessException e) {
-            return ApiResponse.builder()
-                    .result(Result.FAIL)
-                    .message(SEARCH_FAIL)
-                    .build();
-        }
-    }
-
-    @Override
     public FriendDto findByFriendId(String friendId) {
         return mapper.findById(friendId);
     }

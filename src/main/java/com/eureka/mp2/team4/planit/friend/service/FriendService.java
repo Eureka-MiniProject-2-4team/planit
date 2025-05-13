@@ -25,5 +25,4 @@ public interface FriendService {
 
     FriendDto findByBothUserId(String userId, String targetUserId);
 
-    ApiResponse searchFriends(String userId, String keyword);
 }
