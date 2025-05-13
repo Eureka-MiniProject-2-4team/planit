@@ -150,4 +150,18 @@ public class FriendServiceImpl implements FriendService {
                     .build();
         }
     }
+
+    @Override
+    public FriendDto findByFriendId(String friendId) {
+        // todo : friendId로 FriendDto 찾아서 반환해주기
+        return null;
+    }
+
+    @Override
+    public FriendDto findByBothUserId(String userId, String targetUserId) {
+        /*
+         todo : 두명의 아이디가 속한 FriendDto 찾아서 반환하기 -> 두 아이디의 위치가 바뀌어도 동일한 값이 나와야된다
+         */
+        return null;
+    }
 }
