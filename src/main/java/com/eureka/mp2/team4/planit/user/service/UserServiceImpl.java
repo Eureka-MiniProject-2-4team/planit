@@ -1,14 +1,19 @@
 package com.eureka.mp2.team4.planit.user.service;
 
+import com.eureka.mp2.team4.planit.common.ApiResponse;
+import com.eureka.mp2.team4.planit.common.Result;
+import com.eureka.mp2.team4.planit.common.exception.DatabaseException;
 import com.eureka.mp2.team4.planit.common.exception.InternalServerErrorException;
 import com.eureka.mp2.team4.planit.common.exception.NotFoundException;
+import com.eureka.mp2.team4.planit.user.dto.UpdateNickNameRequestDto;
 import com.eureka.mp2.team4.planit.user.dto.UserDto;
 import com.eureka.mp2.team4.planit.user.dto.response.UserResponseDto;
 import com.eureka.mp2.team4.planit.user.mapper.UserMapper;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 
-import static com.eureka.mp2.team4.planit.user.constants.Messages.NOT_FOUND_USER;
+import static com.eureka.mp2.team4.planit.user.constants.Messages.*;
 
 @Service
 @RequiredArgsConstructor
@@ -28,11 +33,24 @@ public class UserServiceImpl implements UserService {
                     .nickname(userDto.getNickName())
                     .userName(userDto.getUserName())
                     .build();
-        }catch (NotFoundException e){
+        } catch (NotFoundException e) {
             throw e;
         } catch (Exception e) {
             throw new InternalServerErrorException();
         }
 
+    }
+
+    @Override
+    public ApiResponse updateNickName(String userId, UpdateNickNameRequestDto requestDto) {
+        try {
+            userMapper.updateNickName(userId, requestDto.getNewNickName());
+            return ApiResponse.builder()
+                    .result(Result.SUCCESS)
+                    .message(UPDATE_NICKNAME_SUCCESS)
+                    .build();
+        } catch (DataAccessException e) {
+            throw new DatabaseException(UPDATE_NICKNAME_FAIL);
+        }
     }
 }

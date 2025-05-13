@@ -16,7 +16,7 @@
   </p>
 
   <div id="nickname-edit" style="display: none;">
-    <input type="text" id="new-nickname" placeholder="새 닉네임">
+    <input type="text" id="new-nickname" placeholder="새 닉네임" oninput="disableSaveButtonOnChange()">
     <button onclick="checkDuplicate()">중복 확인</button>
     <button onclick="updateNickname()" id="save-nickname-btn" disabled>저장</button>
     <p id="nickname-message" style="color: red;"></p>
@@ -83,7 +83,7 @@
     }
 
     try {
-      const response = await fetch(`/api/users/check-nickname?nickname=${encodeURIComponent(nickname)}`);
+      const response = await fetch(`/auth/check-nickName?value=${encodeURIComponent(nickname)}`);
       const result = await response.json();
 
       if (response.ok && result.result === 'SUCCESS') {
@@ -112,7 +112,7 @@
           'Content-Type': 'application/json',
           'Authorization': token
         },
-        body: JSON.stringify({ nickname })
+        body: JSON.stringify({ newNickName: nickname })
       });
 
       const result = await response.json();
@@ -129,6 +129,12 @@
       alert('닉네임 변경 중 오류 발생');
     }
   }
+
+  function disableSaveButtonOnChange() {
+    document.getElementById('save-nickname-btn').disabled = true;
+    document.getElementById('nickname-message').textContent = ''; // 메시지도 초기화
+  }
+
 
   window.onload = loadUserData;
 </script>
