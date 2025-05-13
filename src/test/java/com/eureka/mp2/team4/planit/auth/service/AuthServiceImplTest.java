@@ -263,7 +263,7 @@ public class AuthServiceImplTest {
         assertEquals(FOUND_EMAIL_SUCCESS, response.getMessage());
 
         FindEmailResponseDto dto = (FindEmailResponseDto) response.getData();
-        assertEquals("hong@test.com", dto.getEmail());
+        assertEquals("ho**@test.com", dto.getEmail());
 
         verify(userMapper).findUserByNameAndPhoneNumber("홍길동", "01012345678");
     }

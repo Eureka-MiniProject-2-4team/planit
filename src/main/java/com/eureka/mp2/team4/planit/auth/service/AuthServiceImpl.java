@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
 import java.util.UUID;
 
 import static com.eureka.mp2.team4.planit.auth.constants.Messages.*;
+import static com.eureka.mp2.team4.planit.common.utils.MaskingUtil.maskEmail;
 import static com.eureka.mp2.team4.planit.user.constants.Messages.*;
 
 @Service
@@ -122,10 +123,12 @@ public class AuthServiceImpl implements AuthService {
                     .build();
         }
 
+        String maskedEmail = maskEmail(userDto.getEmail());
+
         return ApiResponse.builder()
                 .result(Result.SUCCESS)
                 .message(FOUND_EMAIL_SUCCESS)
-                .data(FindEmailResponseDto.builder().email(userDto.getEmail()).build())
+                .data(FindEmailResponseDto.builder().email(maskedEmail).build())
                 .build();
     }
 
