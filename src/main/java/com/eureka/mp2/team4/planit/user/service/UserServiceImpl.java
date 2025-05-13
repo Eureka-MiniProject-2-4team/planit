@@ -127,36 +127,58 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public ApiResponse getUserInfo(String currentUserId, String value, String teamId) {
-        UserDto targetUser = findUserByValue(value);
-        if (targetUser == null) {
-            return ApiResponse.builder()
-                    .message(NOT_FOUND_USER)
-                    .result(Result.FAIL)
-                    .build();
+        UserDto targetUser = getTargetUserOrThrow(value);
+
+        if (targetUser.getId().equals(currentUserId)) {
+            return buildSelfResponse(targetUser);
         }
 
         FriendStatus friendStatus = null;
         String teamMembershipStatus = null;
 
         if (teamId == null) {
-            // 팀 정보 없으면 → 친구 관계 확인
             friendStatus = friendQueryService.areFriends(currentUserId, targetUser.getId());
         } else {
-            // 팀 정보 있으면 → 팀 소속 여부 확인
             teamMembershipStatus = userTeamQueryService.getTeamMemberShipStatus(teamId, targetUser.getId());
         }
-        UserSearchResponseDto responseDto = UserSearchResponseDto.builder()
-                .id(targetUser.getId())
-                .nickName(targetUser.getNickName())
-                .email(targetUser.getEmail())
-                .friendStatus(friendStatus)
-                .teamMembershipStatus(teamMembershipStatus)
-                .build();
 
+        UserSearchResponseDto responseDto = buildUserSearchResponse(targetUser, friendStatus, teamMembershipStatus);
         return ApiResponse.builder()
-                .result(Result.SUCCESS)
                 .message(FOUND_USER_SUCCESS)
                 .data(responseDto)
+                .result(Result.SUCCESS)
+                .build();
+    }
+
+    private UserDto getTargetUserOrThrow(String value) {
+        UserDto user = findUserByValue(value);
+        if (user == null) {
+            throw new NotFoundException(NOT_FOUND_USER);
+        }
+        return user;
+    }
+
+    private ApiResponse buildSelfResponse(UserDto user) {
+        UserSearchResponseDto dto = UserSearchResponseDto.builder()
+                .id(user.getId())
+                .nickName(user.getNickName())
+                .email(user.getEmail())
+                .isMe(true)
+                .build();
+        return ApiResponse.builder()
+                .data(dto)
+                .message(FOUND_USER_SUCCESS)
+                .result(Result.SUCCESS)
+                .build();
+    }
+
+    private UserSearchResponseDto buildUserSearchResponse(UserDto user, FriendStatus friendStatus, String teamStatus) {
+        return UserSearchResponseDto.builder()
+                .id(user.getId())
+                .nickName(user.getNickName())
+                .email(user.getEmail())
+                .friendStatus(friendStatus)
+                .teamMembershipStatus(teamStatus)
                 .build();
     }
 

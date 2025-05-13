@@ -12,4 +12,5 @@ public class UserSearchResponseDto {
     private String nickName;
     private FriendStatus friendStatus;
     private String teamMembershipStatus;
+    private Boolean isMe;
 }
