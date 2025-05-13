@@ -27,4 +27,7 @@ public class Messages {
     public static final String INVALID_TOKEN = "유효하지 않은 토큰입니다";
     public static final String NEED_LOGIN = "로그인 후 이용해주세요";
     public static final String ACCESS_DENIED = "접근 권한이 없습니다";
+    public static final String NOT_MATCH_CURRENT_PASSWORD = "비밀번호가 일치하지 않습니다";
+    public static final String VERIFY_PASSWORD_SUCCESS = "비밀번호 검증이 완료되었습니다";
+    public static final String VERIFY_PASSWORD_FAIL = "비밀번호 검증중 문제가 발생헀습니다";
 }
