@@ -64,6 +64,13 @@
         WHERE id = #{userId}
     </delete>
 
+    <select id="findUserByNameAndPhoneNumber" resultType="com.eureka.mp2.team4.planit.user.dto.UserDto">
+        SELECT email
+        FROM users
+        WHERE username = #{name}
+          AND phone_number = #{phoneNumber}
+    </select>
+
     <select id="findByNickName" parameterType="String">
         SELECT *
         FROM users

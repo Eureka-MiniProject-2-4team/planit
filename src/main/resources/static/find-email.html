@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>이메일 찾기</title>
+</head>
+<body>
+<h2>이메일 찾기</h2>
+<div>
+    <input type="text" id="name" placeholder="이름">
+    <input type="text" id="phoneNumber" placeholder="전화번호">
+    <button onclick="findEmail()">이메일 찾기</button>
+    <p id="result-message" style="color: green;"></p>
+    <p id="error-message" style="color: red;"></p>
+</div>
+
+<script>
+    async function findEmail() {
+        const name = document.getElementById('name').value;
+        const phoneNumber = document.getElementById('phoneNumber').value;
+        const result = document.getElementById('result-message');
+        const error = document.getElementById('error-message');
+        result.textContent = '';
+        error.textContent = '';
+
+        try {
+            const response = await fetch('/auth/find-email', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({name, phoneNumber})
+            });
+
+            const data = await response.json();
+            if (response.ok && data.result === 'SUCCESS') {
+                result.textContent = `가입된 이메일: ${data.data.email}`;
+            } else {
+                error.textContent = data.message || '일치하는 사용자를 찾을 수 없습니다.';
+            }
+        } catch (e) {
+            console.error(e);
+            error.textContent = '서버 오류';
+        }
+    }
+</script>
+</body>
+</html>

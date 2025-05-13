@@ -1,7 +1,9 @@
 package com.eureka.mp2.team4.planit.auth.service;
 
+import com.eureka.mp2.team4.planit.auth.dto.request.FindEmailRequestDto;
 import com.eureka.mp2.team4.planit.auth.dto.request.UserRegisterRequestDto;
 import com.eureka.mp2.team4.planit.auth.dto.request.VerifyPasswordRequestDto;
+import com.eureka.mp2.team4.planit.auth.dto.response.FindEmailResponseDto;
 import com.eureka.mp2.team4.planit.common.ApiResponse;
 import com.eureka.mp2.team4.planit.common.Result;
 import com.eureka.mp2.team4.planit.common.exception.DatabaseException;
@@ -21,7 +23,7 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import static com.eureka.mp2.team4.planit.auth.constants.Messages.*;
-import static com.eureka.mp2.team4.planit.user.constants.Messages.NOT_FOUND_USER;
+import static com.eureka.mp2.team4.planit.user.constants.Messages.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -242,5 +244,64 @@ public class AuthServiceImplTest {
         });
 
         assertEquals(VERIFY_PASSWORD_FAIL, ex.getMessage());
+    }
+
+    @Test
+    @DisplayName("이메일 찾기 성공")
+    void findEmail_success() {
+        // given
+        FindEmailRequestDto request = new FindEmailRequestDto("홍길동", "01012345678");
+        UserDto mockUser = new UserDto("id", "hong@test.com", "홍길동", "encodedPw", "nick", UserRole.ROLE_USER, null, null, true, "01012345678");
+
+        when(userMapper.findUserByNameAndPhoneNumber("홍길동", "01012345678")).thenReturn(mockUser);
+
+        // when
+        ApiResponse<?> response = authService.findEmail(request);
+
+        // then
+        assertEquals(Result.SUCCESS, response.getResult());
+        assertEquals(FOUND_EMAIL_SUCCESS, response.getMessage());
+
+        FindEmailResponseDto dto = (FindEmailResponseDto) response.getData();
+        assertEquals("ho**@test.com", dto.getEmail());
+
+        verify(userMapper).findUserByNameAndPhoneNumber("홍길동", "01012345678");
+    }
+
+    @Test
+    @DisplayName("이메일 찾기 실패 - 유저 없음")
+    void findEmail_userNotFound() {
+        // given
+        FindEmailRequestDto request = new FindEmailRequestDto("홍길순", "01000000000");
+
+        when(userMapper.findUserByNameAndPhoneNumber("홍길순", "01000000000")).thenReturn(null);
+
+        // when
+        ApiResponse<?> response = authService.findEmail(request);
+
+        // then
+        assertEquals(Result.FAIL, response.getResult());
+        assertEquals(NOT_FOUND_USER, response.getMessage());
+
+        verify(userMapper).findUserByNameAndPhoneNumber("홍길순", "01000000000");
+    }
+
+    @Test
+    @DisplayName("이메일 찾기 실패 - DB 오류")
+    void findEmail_dbError() {
+        // given
+        FindEmailRequestDto request = new FindEmailRequestDto("홍길동", "01012345678");
+
+        when(userMapper.findUserByNameAndPhoneNumber(any(), any()))
+                .thenThrow(new DataAccessException("DB 오류") {
+                });
+
+        // when & then
+        DatabaseException ex = assertThrows(DatabaseException.class, () -> {
+            authService.findEmail(request);
+        });
+
+        assertEquals(FOUND_EMAIL_FAIL, ex.getMessage());
+        verify(userMapper).findUserByNameAndPhoneNumber("홍길동", "01012345678");
     }
 }

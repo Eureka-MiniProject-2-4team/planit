@@ -1,7 +1,9 @@
 package com.eureka.mp2.team4.planit.auth.service;
 
+import com.eureka.mp2.team4.planit.auth.dto.request.FindEmailRequestDto;
 import com.eureka.mp2.team4.planit.auth.dto.request.UserRegisterRequestDto;
 import com.eureka.mp2.team4.planit.auth.dto.request.VerifyPasswordRequestDto;
+import com.eureka.mp2.team4.planit.auth.dto.response.FindEmailResponseDto;
 import com.eureka.mp2.team4.planit.common.ApiResponse;
 import com.eureka.mp2.team4.planit.common.Result;
 import com.eureka.mp2.team4.planit.common.exception.DatabaseException;
@@ -18,7 +20,8 @@ import org.springframework.stereotype.Service;
 import java.util.UUID;
 
 import static com.eureka.mp2.team4.planit.auth.constants.Messages.*;
-import static com.eureka.mp2.team4.planit.user.constants.Messages.NOT_FOUND_USER;
+import static com.eureka.mp2.team4.planit.common.utils.MaskingUtil.maskEmail;
+import static com.eureka.mp2.team4.planit.user.constants.Messages.*;
 
 @Service
 @RequiredArgsConstructor
@@ -108,6 +111,35 @@ public class AuthServiceImpl implements AuthService {
             throw new DatabaseException(VERIFY_PASSWORD_FAIL);
         }
     }
+
+    @Override
+    public ApiResponse findEmail(FindEmailRequestDto requestDto) {
+        UserDto userDto = getUserByNameAndPhone(requestDto.getName(), requestDto.getPhoneNumber());
+
+        if (userDto == null) {
+            return ApiResponse.builder()
+                    .result(Result.FAIL)
+                    .message(NOT_FOUND_USER)
+                    .build();
+        }
+
+        String maskedEmail = maskEmail(userDto.getEmail());
+
+        return ApiResponse.builder()
+                .result(Result.SUCCESS)
+                .message(FOUND_EMAIL_SUCCESS)
+                .data(FindEmailResponseDto.builder().email(maskedEmail).build())
+                .build();
+    }
+
+    private UserDto getUserByNameAndPhone(String name, String phoneNumber) {
+        try {
+            return userMapper.findUserByNameAndPhoneNumber(name, phoneNumber);
+        } catch (DataAccessException e) {
+            throw new DatabaseException(FOUND_EMAIL_FAIL);
+        }
+    }
+
 
     private UserDto getUserDto(String userId) {
         UserDto userDto = userMapper.findById(userId);

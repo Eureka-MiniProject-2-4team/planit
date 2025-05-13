@@ -1,7 +1,9 @@
 package com.eureka.mp2.team4.planit.auth.controller;
 
+import com.eureka.mp2.team4.planit.auth.dto.request.FindEmailRequestDto;
 import com.eureka.mp2.team4.planit.auth.dto.request.UserRegisterRequestDto;
 import com.eureka.mp2.team4.planit.auth.dto.request.VerifyPasswordRequestDto;
+import com.eureka.mp2.team4.planit.auth.dto.response.FindEmailResponseDto;
 import com.eureka.mp2.team4.planit.auth.security.PlanitUserDetails;
 import com.eureka.mp2.team4.planit.auth.service.AuthService;
 import com.eureka.mp2.team4.planit.common.ApiResponse;
@@ -197,5 +199,51 @@ class AuthControllerTest {
                 .andExpect(jsonPath("$.message").value("현재 비밀번호가 일치하지 않습니다."));
 
         verify(authService, times(1)).verifyPassword(eq("test-user-id"), any(VerifyPasswordRequestDto.class));
+    }
+
+    @Test
+    @DisplayName("이메일 찾기 성공")
+    void findEmail_success() throws Exception {
+        // given
+        FindEmailRequestDto request = new FindEmailRequestDto("홍길동", "01012345678");
+
+        ApiResponse<?> successResponse = ApiResponse.builder()
+                .result(Result.SUCCESS)
+                .message("이메일 조회에 성공했습니다.")
+                .data(FindEmailResponseDto.builder().email("hong@test.com").build())
+                .build();
+
+        when(authService.findEmail(any(FindEmailRequestDto.class))).thenReturn(successResponse);
+
+        // when & then
+        mockMvc.perform(post("/auth/find-email")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.result").value(Result.SUCCESS.name()))
+                .andExpect(jsonPath("$.message").value("이메일 조회에 성공했습니다."))
+                .andExpect(jsonPath("$.data.email").value("hong@test.com"));
+    }
+
+    @Test
+    @DisplayName("이메일 찾기 실패 - 유저 없음")
+    void findEmail_userNotFound() throws Exception {
+        // given
+        FindEmailRequestDto request = new FindEmailRequestDto("홍길순", "01099999999");
+
+        ApiResponse<?> failResponse = ApiResponse.builder()
+                .result(Result.FAIL)
+                .message("유저를 찾을 수 없습니다.")
+                .build();
+
+        when(authService.findEmail(any(FindEmailRequestDto.class))).thenReturn(failResponse);
+
+        // when & then
+        mockMvc.perform(post("/auth/find-email")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.result").value(Result.FAIL.name()))
+                .andExpect(jsonPath("$.message").value("유저를 찾을 수 없습니다."));
     }
 }
