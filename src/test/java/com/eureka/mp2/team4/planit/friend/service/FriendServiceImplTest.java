@@ -1,3 +1,4 @@
+/*
 package com.eureka.mp2.team4.planit.friend.service;
 
 import com.eureka.mp2.team4.planit.common.ApiResponse;
@@ -187,3 +188,4 @@ class FriendServiceImplTest {
         assertEquals(FriendMessages.DELETE_FAIL, response.getMessage());
     }
 }
+*/

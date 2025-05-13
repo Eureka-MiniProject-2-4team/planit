@@ -2,6 +2,8 @@ package com.eureka.mp2.team4.planit.friend.mapper;
 
 import com.eureka.mp2.team4.planit.friend.dto.request.FriendAskDto;
 import com.eureka.mp2.team4.planit.friend.dto.FriendDto;
+import com.eureka.mp2.team4.planit.friend.dto.response.FriendMakeDto;
+import com.eureka.mp2.team4.planit.friend.dto.response.UserSearchDto;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -10,7 +12,7 @@ import java.util.List;
 @Mapper
 public interface FriendMapper {
 
-    void insert(FriendAskDto friendAskDto);
+    void insert(FriendMakeDto friendMakeDto);
 
     List<FriendDto> findAllByUserId(String userId);
 
@@ -26,4 +28,8 @@ public interface FriendMapper {
 
     void delete(String friendId);
 
+    FriendDto findByBothUserId(String userId, String targetUserId);
+
+    List<UserSearchDto> searchFriends(@Param("userId") String userId,
+                                      @Param("keyword") String keyword);
 }
