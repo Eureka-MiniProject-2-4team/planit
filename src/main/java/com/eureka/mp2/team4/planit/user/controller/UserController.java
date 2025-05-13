@@ -4,7 +4,8 @@ import com.eureka.mp2.team4.planit.auth.security.PlanitUserDetails;
 import com.eureka.mp2.team4.planit.common.ApiResponse;
 import com.eureka.mp2.team4.planit.common.Result;
 import com.eureka.mp2.team4.planit.common.exception.InvalidInputException;
-import com.eureka.mp2.team4.planit.user.dto.UpdateNickNameRequestDto;
+import com.eureka.mp2.team4.planit.user.dto.request.UpdateNickNameRequestDto;
+import com.eureka.mp2.team4.planit.user.dto.request.UpdatePasswordRequestDto;
 import com.eureka.mp2.team4.planit.user.dto.response.UserResponseDto;
 import com.eureka.mp2.team4.planit.user.service.UserService;
 import jakarta.validation.Valid;
@@ -39,6 +40,17 @@ public class UserController {
             throw new InvalidInputException(bindingResult.getFieldError().getDefaultMessage());
 
         ApiResponse apiResponse = userService.updateNickName(userDetails.getUsername(), requestDto);
+        return ResponseEntity.ok(apiResponse);
+    }
+
+    @PatchMapping("/me/password")
+    public ResponseEntity<ApiResponse<?>> updateNickName(@AuthenticationPrincipal PlanitUserDetails userDetails,
+                                                         @Valid @RequestBody UpdatePasswordRequestDto requestDto,
+                                                         BindingResult bindingResult) {
+        if (bindingResult.hasErrors())
+            throw new InvalidInputException(bindingResult.getFieldError().getDefaultMessage());
+
+        ApiResponse apiResponse = userService.updatePassword(userDetails.getUsername(), requestDto);
         return ResponseEntity.ok(apiResponse);
     }
 }

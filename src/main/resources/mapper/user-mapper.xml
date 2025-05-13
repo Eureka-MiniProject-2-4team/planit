@@ -45,4 +45,10 @@
         SET nickname = #{newNickName}
         WHERE id = #{userId}
     </update>
+
+    <update id="updatePassword">
+        UPDATE users
+        SET password = #{newPassword}
+        WHERE id = #{userId}
+    </update>
 </mapper>

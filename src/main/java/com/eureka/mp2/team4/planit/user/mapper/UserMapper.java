@@ -20,4 +20,6 @@ public interface UserMapper {
     UserDto findById(String userId);
 
     void updateNickName(@Param("userId") String userId, @Param("newNickName") String newNickName);
+
+    void updatePassword(@Param("userId") String userId, @Param("newPassword") String newPassword);
 }
