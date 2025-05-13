@@ -8,7 +8,6 @@ import com.eureka.mp2.team4.planit.friend.dto.FriendDto;
 import com.eureka.mp2.team4.planit.friend.dto.request.FriendUpdateStatusDto;
 import com.eureka.mp2.team4.planit.friend.dto.response.FriendListResponseDto;
 import com.eureka.mp2.team4.planit.friend.dto.response.FriendMakeDto;
-import com.eureka.mp2.team4.planit.friend.dto.response.UserSearchDto;
 import com.eureka.mp2.team4.planit.friend.mapper.FriendMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataAccessException;
