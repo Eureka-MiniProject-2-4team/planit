@@ -5,8 +5,11 @@ import com.eureka.mp2.team4.planit.common.Result;
 import com.eureka.mp2.team4.planit.common.exception.DatabaseException;
 import com.eureka.mp2.team4.planit.common.exception.InternalServerErrorException;
 import com.eureka.mp2.team4.planit.common.exception.NotFoundException;
+import com.eureka.mp2.team4.planit.friend.FriendStatus;
+import com.eureka.mp2.team4.planit.friend.service.FriendQueryService;
 import com.eureka.mp2.team4.planit.team.service.UserTeamQueryService;
 import com.eureka.mp2.team4.planit.user.dto.UserDto;
+import com.eureka.mp2.team4.planit.user.dto.UserSearchResponseDto;
 import com.eureka.mp2.team4.planit.user.dto.request.UpdatePasswordRequestDto;
 import com.eureka.mp2.team4.planit.user.dto.request.UpdateUserRequestDto;
 import com.eureka.mp2.team4.planit.user.dto.response.UserResponseDto;
@@ -25,6 +28,7 @@ public class UserServiceImpl implements UserService {
     private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
     private final UserTeamQueryService userTeamQueryService;
+    private final FriendQueryService friendQueryService;
 
     @Override
     public UserResponseDto getMyPageData(String userId) {
@@ -120,4 +124,52 @@ public class UserServiceImpl implements UserService {
             throw new DatabaseException(DELETE_USER_FAIL);
         }
     }
+
+    @Override
+    public ApiResponse getUserInfo(String currentUserId, String value, String teamId) {
+        UserDto targetUser = findUserByValue(value);
+        if (targetUser == null) {
+            return ApiResponse.builder()
+                    .message(NOT_FOUND_USER)
+                    .result(Result.FAIL)
+                    .build();
+        }
+
+        FriendStatus friendStatus = null;
+        String teamMembershipStatus = null;
+
+        if (teamId == null) {
+            // 팀 정보 없으면 → 친구 관계 확인
+            friendStatus = friendQueryService.areFriends(currentUserId, targetUser.getId());
+        } else {
+            // 팀 정보 있으면 → 팀 소속 여부 확인
+            teamMembershipStatus = userTeamQueryService.getTeamMemberShipStatus(teamId, targetUser.getId());
+        }
+        UserSearchResponseDto responseDto = UserSearchResponseDto.builder()
+                .id(targetUser.getId())
+                .nickName(targetUser.getNickName())
+                .email(targetUser.getEmail())
+                .friendStatus(friendStatus)
+                .teamMembershipStatus(teamMembershipStatus)
+                .build();
+
+        return ApiResponse.builder()
+                .result(Result.SUCCESS)
+                .message(FOUND_USER_SUCCESS)
+                .data(responseDto)
+                .build();
+    }
+
+    private UserDto findUserByValue(String value) {
+        try {
+            if (value.contains("@")) {
+                return userMapper.findByEmail(value);
+            } else {
+                return userMapper.findByNickName(value);
+            }
+        } catch (DataAccessException e) {
+            throw new DatabaseException(FOUND_USER_FAIL);
+        }
+    }
+
 }

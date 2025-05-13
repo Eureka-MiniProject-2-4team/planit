@@ -13,4 +13,6 @@ public interface UserService {
     ApiResponse updatePassword(String userId, UpdatePasswordRequestDto requestDto);
 
     ApiResponse deleteUser(String userId);
+
+    ApiResponse getUserInfo(String username, String value, String teamId);
 }

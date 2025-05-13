@@ -4,6 +4,8 @@ import com.eureka.mp2.team4.planit.auth.security.PlanitUserDetails;
 import com.eureka.mp2.team4.planit.common.ApiResponse;
 import com.eureka.mp2.team4.planit.common.Result;
 import com.eureka.mp2.team4.planit.common.exception.InvalidInputException;
+import com.eureka.mp2.team4.planit.friend.FriendStatus;
+import com.eureka.mp2.team4.planit.user.dto.UserSearchResponseDto;
 import com.eureka.mp2.team4.planit.user.dto.request.UpdatePasswordRequestDto;
 import com.eureka.mp2.team4.planit.user.dto.request.UpdateUserRequestDto;
 import com.eureka.mp2.team4.planit.user.dto.response.UserResponseDto;
@@ -200,6 +202,59 @@ class UserControllerTest {
         assertEquals("팀장으로 등록된 팀이 있어 탈퇴할 수 없습니다.", response.getBody().getMessage());
 
         verify(userService).deleteUser("test-user-id");
+    }
+
+    @Test
+    @DisplayName("유저 정보 조회 성공 - 친구 상태 포함")
+    void getUserInfo_success_friendOnly() {
+        // given
+        ApiResponse<?> successResponse = ApiResponse.builder()
+                .result(Result.SUCCESS)
+                .message("유저 조회 성공")
+                .data(UserSearchResponseDto.builder()
+                        .id("target-id")
+                        .email("target@domain.com")
+                        .nickName("홍길동")
+                        .friendStatus(FriendStatus.ACCEPTED)
+                        .teamMembershipStatus(null)
+                        .build())
+                .build();
+
+        when(userService.getUserInfo("test-user-id", "target@domain.com", null))
+                .thenReturn(successResponse);
+
+        // when
+        ResponseEntity<ApiResponse<?>> response = userController.getUserInfo(planitUserDetails, "target@domain.com", null);
+
+        // then
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(Result.SUCCESS, response.getBody().getResult());
+        assertEquals("유저 조회 성공", response.getBody().getMessage());
+
+        verify(userService).getUserInfo("test-user-id", "target@domain.com", null);
+    }
+
+    @Test
+    @DisplayName("유저 정보 조회 실패 - 존재하지 않는 유저")
+    void getUserInfo_fail_userNotFound() {
+        // given
+        ApiResponse<?> failResponse = ApiResponse.builder()
+                .result(Result.FAIL)
+                .message("유저를 찾을 수 없습니다.")
+                .build();
+
+        when(userService.getUserInfo("test-user-id", "없는닉네임", null))
+                .thenReturn(failResponse);
+
+        // when
+        ResponseEntity<ApiResponse<?>> response = userController.getUserInfo(planitUserDetails, "없는닉네임", null);
+
+        // then
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(Result.FAIL, response.getBody().getResult());
+        assertEquals("유저를 찾을 수 없습니다.", response.getBody().getMessage());
+
+        verify(userService).getUserInfo("test-user-id", "없는닉네임", null);
     }
 
 
