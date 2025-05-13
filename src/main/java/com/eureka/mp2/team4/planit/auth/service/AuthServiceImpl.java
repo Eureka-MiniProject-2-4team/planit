@@ -1,10 +1,13 @@
 package com.eureka.mp2.team4.planit.auth.service;
 
 import com.eureka.mp2.team4.planit.auth.dto.request.UserRegisterRequestDto;
+import com.eureka.mp2.team4.planit.auth.dto.request.VerifyPasswordRequestDto;
 import com.eureka.mp2.team4.planit.common.ApiResponse;
 import com.eureka.mp2.team4.planit.common.Result;
 import com.eureka.mp2.team4.planit.common.exception.DatabaseException;
 import com.eureka.mp2.team4.planit.common.exception.DuplicateFieldException;
+import com.eureka.mp2.team4.planit.common.exception.NotFoundException;
+import com.eureka.mp2.team4.planit.user.dto.UserDto;
 import com.eureka.mp2.team4.planit.user.enums.UserRole;
 import com.eureka.mp2.team4.planit.user.mapper.UserMapper;
 import lombok.RequiredArgsConstructor;
@@ -15,6 +18,7 @@ import org.springframework.stereotype.Service;
 import java.util.UUID;
 
 import static com.eureka.mp2.team4.planit.auth.constants.Messages.*;
+import static com.eureka.mp2.team4.planit.user.constants.Messages.NOT_FOUND_USER;
 
 @Service
 @RequiredArgsConstructor
@@ -82,6 +86,35 @@ public class AuthServiceImpl implements AuthService {
                     .message(DUPLICATED_NICKNAME)
                     .build();
         }
+    }
+
+    @Override
+    public ApiResponse verifyPassword(String userId, VerifyPasswordRequestDto requestDto) {
+        Result result = Result.FAIL;
+        String message = NOT_MATCH_CURRENT_PASSWORD;
+        try {
+            UserDto userDto = getUserDto(userId);
+
+            if (passwordEncoder.matches(requestDto.getPassword(), userDto.getPassword())) {
+                result = Result.SUCCESS;
+                message = VERIFY_PASSWORD_SUCCESS;
+            }
+            return ApiResponse.builder()
+                    .result(result)
+                    .message(message)
+                    .build();
+
+        } catch (DataAccessException e) {
+            throw new DatabaseException(VERIFY_PASSWORD_FAIL);
+        }
+    }
+
+    private UserDto getUserDto(String userId) {
+        UserDto userDto = userMapper.findById(userId);
+        if (userDto == null) {
+            throw new NotFoundException(NOT_FOUND_USER);
+        }
+        return userDto;
     }
 
     private void validateRegisterData(UserRegisterRequestDto requestDto) {

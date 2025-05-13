@@ -1,13 +1,17 @@
 package com.eureka.mp2.team4.planit.auth.service;
 
 import com.eureka.mp2.team4.planit.auth.dto.request.UserRegisterRequestDto;
+import com.eureka.mp2.team4.planit.auth.dto.request.VerifyPasswordRequestDto;
 import com.eureka.mp2.team4.planit.common.ApiResponse;
 import com.eureka.mp2.team4.planit.common.Result;
 import com.eureka.mp2.team4.planit.common.exception.DatabaseException;
 import com.eureka.mp2.team4.planit.common.exception.DuplicateFieldException;
+import com.eureka.mp2.team4.planit.common.exception.NotFoundException;
+import com.eureka.mp2.team4.planit.user.dto.UserDto;
 import com.eureka.mp2.team4.planit.user.enums.UserRole;
 import com.eureka.mp2.team4.planit.user.mapper.UserMapper;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -16,7 +20,10 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.dao.DataAccessException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import static com.eureka.mp2.team4.planit.auth.constants.Messages.*;
+import static com.eureka.mp2.team4.planit.user.constants.Messages.NOT_FOUND_USER;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
@@ -155,5 +162,85 @@ public class AuthServiceImplTest {
         when(userMapper.isExistNickName(anyString())).thenThrow(new DataAccessException("DB 오류") {
         });
         assertThrows(DatabaseException.class, () -> authService.checkNickNameIsExist("nickname"));
+    }
+
+    private final String userId = "test-user-id";
+
+    private final UserDto mockUser = new UserDto(
+            userId,
+            "test@planit.com",
+            "테스트유저",
+            "encodedOldPass",
+            "닉네임",
+            UserRole.ROLE_USER,
+            null,
+            null,
+            true,
+            "01012341234"
+    );
+
+    @Test
+    @DisplayName("비밀번호 검증 성공")
+    void verifyPassword_success() {
+        // given
+        VerifyPasswordRequestDto dto = new VerifyPasswordRequestDto("password123");
+
+        when(userMapper.findById(userId)).thenReturn(mockUser);
+        when(passwordEncoder.matches("password123", "encodedOldPass")).thenReturn(true);
+
+        // when
+        ApiResponse<?> response = authService.verifyPassword(userId, dto);
+
+        // then
+        assertEquals(Result.SUCCESS, response.getResult());
+        assertEquals(VERIFY_PASSWORD_SUCCESS, response.getMessage());
+    }
+
+    @Test
+    @DisplayName("비밀번호 불일치 - FAIL 반환")
+    void verifyPassword_fail_mismatch() {
+        // given
+        VerifyPasswordRequestDto dto = new VerifyPasswordRequestDto("wrong-password");
+
+        when(userMapper.findById(userId)).thenReturn(mockUser);
+        when(passwordEncoder.matches("wrong-password", "encodedOldPass")).thenReturn(false);
+
+        // when
+        ApiResponse<?> response = authService.verifyPassword(userId, dto);
+
+        // then
+        assertEquals(Result.FAIL, response.getResult());
+        assertEquals(NOT_MATCH_CURRENT_PASSWORD, response.getMessage());
+    }
+
+    @Test
+    @DisplayName("사용자 없음 - NotFoundException 발생")
+    void verifyPassword_notFoundUser() {
+        // given
+        VerifyPasswordRequestDto dto = new VerifyPasswordRequestDto("password");
+        when(userMapper.findById(userId)).thenReturn(null);
+
+        // when & then
+        NotFoundException ex = assertThrows(NotFoundException.class, () -> {
+            authService.verifyPassword(userId, dto);
+        });
+
+        assertEquals(NOT_FOUND_USER, ex.getMessage());
+    }
+
+    @Test
+    @DisplayName("DB 오류 발생 - DatabaseException 발생")
+    void verifyPassword_dataAccessException() {
+        // given
+        VerifyPasswordRequestDto dto = new VerifyPasswordRequestDto("password");
+        when(userMapper.findById(userId)).thenThrow(new DataAccessException("DB 오류") {
+        });
+
+        // when & then
+        DatabaseException ex = assertThrows(DatabaseException.class, () -> {
+            authService.verifyPassword(userId, dto);
+        });
+
+        assertEquals(VERIFY_PASSWORD_FAIL, ex.getMessage());
     }
 }

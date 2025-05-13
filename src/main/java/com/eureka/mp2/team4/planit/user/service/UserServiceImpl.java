@@ -6,8 +6,8 @@ import com.eureka.mp2.team4.planit.common.exception.DatabaseException;
 import com.eureka.mp2.team4.planit.common.exception.InternalServerErrorException;
 import com.eureka.mp2.team4.planit.common.exception.NotFoundException;
 import com.eureka.mp2.team4.planit.user.dto.UserDto;
-import com.eureka.mp2.team4.planit.user.dto.request.UpdateNickNameRequestDto;
 import com.eureka.mp2.team4.planit.user.dto.request.UpdatePasswordRequestDto;
+import com.eureka.mp2.team4.planit.user.dto.request.UpdateUserRequestDto;
 import com.eureka.mp2.team4.planit.user.dto.response.UserResponseDto;
 import com.eureka.mp2.team4.planit.user.mapper.UserMapper;
 import lombok.RequiredArgsConstructor;
@@ -46,7 +46,14 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public ApiResponse updateNickName(String userId, UpdateNickNameRequestDto requestDto) {
+    public ApiResponse updateUser(String userId, UpdateUserRequestDto requestDto) {
+        if (requestDto.getNewNickName() != null) {
+            return updateNickName(userId, requestDto);
+        }
+        return null;
+    }
+
+    private ApiResponse<Object> updateNickName(String userId, UpdateUserRequestDto requestDto) {
         try {
             userMapper.updateNickName(userId, requestDto.getNewNickName());
             return ApiResponse.builder()
@@ -61,23 +68,17 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public ApiResponse updatePassword(String userId, UpdatePasswordRequestDto requestDto) {
-        Result result = Result.FAIL;
-        String message = NOT_MATCH_CURRENT_PASSWORD;
         try {
             UserDto userDto = userMapper.findById(userId);
             if (userDto == null) {
                 throw new NotFoundException(NOT_FOUND_USER);
             }
+            String encodedPassword = passwordEncoder.encode(requestDto.getNewPassword());
+            userMapper.updatePassword(userId, encodedPassword);
 
-            if (passwordEncoder.matches(requestDto.getCurrentPassword(), userDto.getPassword())) {
-                String encodedPassword = passwordEncoder.encode(requestDto.getNewPassword());
-                userMapper.updatePassword(userId, encodedPassword);
-                result = Result.SUCCESS;
-                message = UPDATE_PASSWORD_SUCCESS;
-            }
             return ApiResponse.builder()
-                    .message(message)
-                    .result(result)
+                    .message(UPDATE_PASSWORD_SUCCESS)
+                    .result(Result.SUCCESS)
                     .build();
         } catch (DataAccessException e) {
             throw new DatabaseException(UPDATE_PASSWORD_FAIL);

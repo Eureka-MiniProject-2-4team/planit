@@ -6,8 +6,8 @@ import com.eureka.mp2.team4.planit.common.exception.DatabaseException;
 import com.eureka.mp2.team4.planit.common.exception.InternalServerErrorException;
 import com.eureka.mp2.team4.planit.common.exception.NotFoundException;
 import com.eureka.mp2.team4.planit.user.dto.UserDto;
-import com.eureka.mp2.team4.planit.user.dto.request.UpdateNickNameRequestDto;
 import com.eureka.mp2.team4.planit.user.dto.request.UpdatePasswordRequestDto;
+import com.eureka.mp2.team4.planit.user.dto.request.UpdateUserRequestDto;
 import com.eureka.mp2.team4.planit.user.dto.response.UserResponseDto;
 import com.eureka.mp2.team4.planit.user.enums.UserRole;
 import com.eureka.mp2.team4.planit.user.mapper.UserMapper;
@@ -90,13 +90,13 @@ public class UserServiceImplTest {
 
     @Test
     @DisplayName("닉네임 수정 성공 테스트")
-    void updateNickName_success() {
+    void updateUser_success() {
         // given
         String userId = "user-123";
-        UpdateNickNameRequestDto dto = new UpdateNickNameRequestDto("newNickname");
+        UpdateUserRequestDto dto = new UpdateUserRequestDto("newNickname");
 
         // when
-        ApiResponse response = userService.updateNickName(userId, dto);
+        ApiResponse response = userService.updateUser(userId, dto);
 
         // then
         assertEquals(Result.SUCCESS, response.getResult());
@@ -106,16 +106,16 @@ public class UserServiceImplTest {
 
     @Test
     @DisplayName("닉네임 수정 실패 테스트 - DataAccessException 발생")
-    void updateNickName_dataAccessException() {
+    void updateUser_dataAccessException() {
         // given
         String userId = "user-123";
-        UpdateNickNameRequestDto dto = new UpdateNickNameRequestDto("newNickname");
+        UpdateUserRequestDto dto = new UpdateUserRequestDto("newNickname");
 
         doThrow(new DataAccessException(UPDATE_NICKNAME_FAIL) {
         }).when(userMapper).updateNickName(userId, "newNickname");
 
         // when & then
-        assertThrows(DatabaseException.class, () -> userService.updateNickName(userId, dto));
+        assertThrows(DatabaseException.class, () -> userService.updateUser(userId, dto));
         verify(userMapper, times(1)).updateNickName(userId, "newNickname");
     }
 
@@ -123,7 +123,7 @@ public class UserServiceImplTest {
     @DisplayName("비밀번호 변경 성공")
     void updatePassword_success() {
         // given
-        UpdatePasswordRequestDto dto = new UpdatePasswordRequestDto("oldPass", "newPass");
+        UpdatePasswordRequestDto dto = new UpdatePasswordRequestDto("newPassword");
         UserDto user = new UserDto(
                 "test-user-id",
                 "test@planit.com",
@@ -138,68 +138,38 @@ public class UserServiceImplTest {
         );
 
         when(userMapper.findById(userId)).thenReturn(user);
-        when(passwordEncoder.matches("oldPass", "encodedOldPass")).thenReturn(true);
-        when(passwordEncoder.encode("newPass")).thenReturn("encodedNewPass");
+        when(passwordEncoder.encode("newPassword")).thenReturn("encodedPassword");
 
         // when
-        ApiResponse response = userService.updatePassword(userId, dto);
+        ApiResponse<?> response = userService.updatePassword(userId, dto);
 
         // then
         assertEquals(Result.SUCCESS, response.getResult());
         assertEquals(UPDATE_PASSWORD_SUCCESS, response.getMessage());
-        verify(userMapper).updatePassword(userId, "encodedNewPass");
-    }
-
-    @Test
-    @DisplayName("비밀번호 변경 실패 - 현재 비밀번호 불일치")
-    void updatePassword_incorrectCurrentPassword() {
-        // given
-        UpdatePasswordRequestDto dto = new UpdatePasswordRequestDto("wrongPass", "newPass");
-        UserDto user = new UserDto(
-                "test-user-id",
-                "test@planit.com",
-                "테스트유저",
-                "encodedOldPass",
-                "닉네임",
-                UserRole.ROLE_USER,
-                null,
-                null,
-                true,
-                "01012341234"
-        );
-
-
-        when(userMapper.findById(userId)).thenReturn(user);
-        when(passwordEncoder.matches("wrongPass", "encodedOldPass")).thenReturn(false);
-
-        // when
-        ApiResponse response = userService.updatePassword(userId, dto);
-
-        // then
-        assertEquals(Result.FAIL, response.getResult());
-        assertEquals(NOT_MATCH_CURRENT_PASSWORD, response.getMessage());
-        verify(userMapper, never()).updatePassword(any(), any());
+        verify(userMapper).updatePassword(userId, "encodedPassword");
     }
 
     @Test
     @DisplayName("비밀번호 변경 실패 - 사용자 없음")
     void updatePassword_userNotFound() {
         // given
-        UpdatePasswordRequestDto dto = new UpdatePasswordRequestDto("pass", "newPass");
+        UpdatePasswordRequestDto dto = new UpdatePasswordRequestDto("newPassword");
         when(userMapper.findById(userId)).thenReturn(null);
 
         // when & then
-        NotFoundException exception = assertThrows(NotFoundException.class, () -> {
+        NotFoundException ex = assertThrows(NotFoundException.class, () -> {
             userService.updatePassword(userId, dto);
         });
-        assertEquals(NOT_FOUND_USER, exception.getMessage());
+
+        assertEquals(NOT_FOUND_USER, ex.getMessage());
+        verify(userMapper, never()).updatePassword(any(), any());
     }
 
     @Test
     @DisplayName("비밀번호 변경 실패 - DB 예외 발생")
-    void updatePassword_databaseError() {
+    void updatePassword_dbException() {
         // given
-        UpdatePasswordRequestDto dto = new UpdatePasswordRequestDto("oldPass", "newPass");
+        UpdatePasswordRequestDto dto = new UpdatePasswordRequestDto("newPassword");
         UserDto user = new UserDto(
                 "test-user-id",
                 "test@planit.com",
@@ -213,17 +183,16 @@ public class UserServiceImplTest {
                 "01012341234"
         );
 
-
         when(userMapper.findById(userId)).thenReturn(user);
-        when(passwordEncoder.matches("oldPass", "encodedOldPass")).thenReturn(true);
-        when(passwordEncoder.encode("newPass")).thenReturn("encodedNewPass");
+        when(passwordEncoder.encode("newPassword")).thenReturn("encodedPassword");
         doThrow(new DataAccessException("DB 오류") {
-        }).when(userMapper).updatePassword(userId, "encodedNewPass");
+        }).when(userMapper).updatePassword(userId, "encodedPassword");
 
         // when & then
-        DatabaseException exception = assertThrows(DatabaseException.class, () -> {
+        DatabaseException ex = assertThrows(DatabaseException.class, () -> {
             userService.updatePassword(userId, dto);
         });
-        assertEquals(UPDATE_PASSWORD_FAIL, exception.getMessage());
+
+        assertEquals(UPDATE_PASSWORD_FAIL, ex.getMessage());
     }
 }
