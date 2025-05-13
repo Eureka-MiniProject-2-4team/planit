@@ -1,24 +1,28 @@
 package com.eureka.mp2.team4.planit.todo.personal.controller;
 
+import com.eureka.mp2.team4.planit.auth.security.PlanitUserDetails;
 import com.eureka.mp2.team4.planit.common.ApiResponse;
 import com.eureka.mp2.team4.planit.common.Result;
 import com.eureka.mp2.team4.planit.todo.personal.dto.request.PersonalTodoRequestDto;
 import com.eureka.mp2.team4.planit.todo.personal.service.PersonalTodoService;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.MediaType;
+import org.springframework.security.authentication.TestingAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.test.context.support.WithMockUser;
 
 import java.time.LocalDateTime;
 
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 
 @WebMvcTest(PersonalTodoController.class)
 class PersonalTodoControllerTest {
@@ -32,11 +36,23 @@ class PersonalTodoControllerTest {
     @Autowired
     private ObjectMapper objectMapper;
 
+    @Mock
+    private PlanitUserDetails userDetails;
+
+    private static final String USER_ID = "user-1";
+
+    @BeforeEach
+    void setUp() {
+        Mockito.when(userDetails.getUsername()).thenReturn(USER_ID);
+        TestingAuthenticationToken auth =
+                new TestingAuthenticationToken(userDetails, null);
+        auth.setAuthenticated(true); // 인증된 사용자 설정
+        SecurityContextHolder.getContext().setAuthentication(auth);
+    }
+
     @Test
-    @WithMockUser
     void createTest() throws Exception {
         PersonalTodoRequestDto request = PersonalTodoRequestDto.builder()
-                .userId("user-1")
                 .title("title")
                 .content("content")
                 .targetDate(LocalDateTime.now())
@@ -47,9 +63,9 @@ class PersonalTodoControllerTest {
                 .message("개인 투두 생성 완료")
                 .build();
 
-        Mockito.when(personalTodoService.create(Mockito.any())).thenReturn(response);
+        Mockito.when(personalTodoService.create(Mockito.eq(USER_ID), Mockito.any())).thenReturn(response);
 
-        mockMvc.perform(post("/api/todo/personal")
+        mockMvc.perform(post("/api/todo/me")
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
@@ -59,7 +75,6 @@ class PersonalTodoControllerTest {
     }
 
     @Test
-    @WithMockUser
     void updateTest() throws Exception {
         String id = "todo-1";
         PersonalTodoRequestDto request = PersonalTodoRequestDto.builder()
@@ -74,9 +89,9 @@ class PersonalTodoControllerTest {
                 .message("개인 투두 수정 완료")
                 .build();
 
-        Mockito.when(personalTodoService.update(Mockito.eq(id), Mockito.any())).thenReturn(response);
+        Mockito.when(personalTodoService.update(Mockito.eq(USER_ID), Mockito.eq(id), Mockito.any())).thenReturn(response);
 
-        mockMvc.perform(patch("/api/todo/personal/" + id)
+        mockMvc.perform(patch("/api/todo/me/" + id)
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
@@ -86,7 +101,6 @@ class PersonalTodoControllerTest {
     }
 
     @Test
-    @WithMockUser
     void deleteTest() throws Exception {
         String id = "todo-1";
 
@@ -95,17 +109,15 @@ class PersonalTodoControllerTest {
                 .message("개인 투두 삭제 완료")
                 .build();
 
-        Mockito.when(personalTodoService.delete(id)).thenReturn(response);
+        Mockito.when(personalTodoService.delete(USER_ID, id)).thenReturn(response);
 
-        mockMvc.perform(delete("/api/todo/personal/" + id)
-                        .with(csrf()))
+        mockMvc.perform(delete("/api/todo/me/" + id).with(csrf()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.result").value("SUCCESS"))
                 .andExpect(jsonPath("$.message").value("개인 투두 삭제 완료"));
     }
 
     @Test
-    @WithMockUser
     void getByIdTest() throws Exception {
         String id = "todo-1";
 
@@ -115,29 +127,25 @@ class PersonalTodoControllerTest {
                 .data(null)
                 .build();
 
-        Mockito.when(personalTodoService.getById(id)).thenReturn(response);
+        Mockito.when(personalTodoService.getById(USER_ID, id)).thenReturn(response);
 
-        mockMvc.perform(get("/api/todo/personal/" + id))
+        mockMvc.perform(get("/api/todo/me/" + id))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.result").value("SUCCESS"))
                 .andExpect(jsonPath("$.message").value("개인 투두 조회 완료"));
     }
 
     @Test
-    @WithMockUser
     void getAllByUserTest() throws Exception {
-        String userId = "user-1";
-
         ApiResponse response = ApiResponse.builder()
                 .result(Result.SUCCESS)
                 .message("개인 투두 전체 조회 완료")
                 .data(null)
                 .build();
 
-        Mockito.when(personalTodoService.getAllByUser(userId)).thenReturn(response);
+        Mockito.when(personalTodoService.getAllByUser(USER_ID)).thenReturn(response);
 
-        mockMvc.perform(get("/api/todo/personal")
-                        .param("userId", userId))
+        mockMvc.perform(get("/api/todo/me"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.result").value("SUCCESS"))
                 .andExpect(jsonPath("$.message").value("개인 투두 전체 조회 완료"));
