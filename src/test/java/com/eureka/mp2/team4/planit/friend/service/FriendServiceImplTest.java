@@ -215,4 +215,64 @@ class FriendServiceImplTest {
         assertEquals(Result.FAIL, response.getResult());
         assertEquals(FriendMessages.DELETE_FAIL, response.getMessage());
     }
+
+    @DisplayName("friendId로 친구 조회 - 성공")
+    @Test
+    void findByFriendId_success() {
+        FriendDto mockFriend = FriendDto.builder()
+                .id("f123")
+                .requesterId("user1")
+                .receiverId("user2")
+                .status(FriendStatus.ACCEPTED)
+                .build();
+
+        when(mapper.findById("f123")).thenReturn(mockFriend);
+
+        FriendDto result = service.findByFriendId("f123");
+
+        assertNotNull(result);
+        assertEquals("user1", result.getRequesterId());
+        assertEquals("user2", result.getReceiverId());
+        assertEquals(FriendStatus.ACCEPTED, result.getStatus());
+    }
+
+    @DisplayName("friendId로 친구 조회 - 없음")
+    @Test
+    void findByFriendId_notFound() {
+        when(mapper.findById("not_exist")).thenReturn(null);
+
+        FriendDto result = service.findByFriendId("not_exist");
+
+        assertNull(result);
+    }
+
+    @DisplayName("두 userId로 친구 조회 - 성공")
+    @Test
+    void findByBothUserId_success() {
+        FriendDto mockFriend = FriendDto.builder()
+                .id("f456")
+                .requesterId("user1")
+                .receiverId("user2")
+                .status(FriendStatus.PENDING)
+                .build();
+
+        when(mapper.findByBothUserId("user1", "user2")).thenReturn(mockFriend);
+
+        FriendDto result = service.findByBothUserId("user1", "user2");
+
+        assertNotNull(result);
+        assertEquals("user1", result.getRequesterId());
+        assertEquals("user2", result.getReceiverId());
+        assertEquals(FriendStatus.PENDING, result.getStatus());
+    }
+
+    @DisplayName("두 userId로 친구 조회 - 없음")
+    @Test
+    void findByBothUserId_notFound() {
+        when(mapper.findByBothUserId("user1", "user3")).thenReturn(null);
+
+        FriendDto result = service.findByBothUserId("user1", "user3");
+
+        assertNull(result);
+    }
 }
