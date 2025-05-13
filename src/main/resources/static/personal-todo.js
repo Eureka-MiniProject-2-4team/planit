@@ -11,41 +11,49 @@ document.addEventListener('DOMContentLoaded', () => {
 
         await fetch(myApiBase, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: buildHeaders(),
             body: JSON.stringify({ title, content, targetDate })
         });
+
         document.getElementById('todo-form').reset();
         fetchMyTodos();
     });
+
+    document.getElementById('friend-btn').addEventListener('click', getFriendTodos);
 });
 
 async function fetchMyTodos() {
-    const res = await fetch(myApiBase);
+    const res = await fetch(myApiBase, { headers: buildHeaders() });
     const data = await res.json();
-    renderTodos('todo-list', data.data.personalTodosDto, true);
+    renderTodos('todo-list', data.data.personalTodosDto || [], true);
 }
 
 async function deleteTodo(id) {
-    await fetch(`${myApiBase}/${id}`, { method: 'DELETE' });
+    await fetch(`${myApiBase}/${id}`, {
+        method: 'DELETE',
+        headers: buildHeaders()
+    });
     fetchMyTodos();
 }
 
 async function toggleComplete(id, isCompleted) {
     await fetch(`${myApiBase}/${id}`, {
         method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
+        headers: buildHeaders(),
         body: JSON.stringify({ isCompleted })
     });
     fetchMyTodos();
 }
 
 async function getFriendTodos() {
-    const friendId = document.getElementById('friendId').value;
+    const friendId = document.getElementById('friendId').value.trim();
     if (!friendId) return alert('친구 ID를 입력하세요');
 
-    const res = await fetch(`/api/todo/${friendId}`);
+    const res = await fetch(`/api/todo/${friendId}`, {
+        headers: buildHeaders()
+    });
     const data = await res.json();
-    renderTodos('friend-todo-list', data.data.personalTodosDto, false);
+    renderTodos('friend-todo-list', data.data.personalTodosDto || [], false);
 }
 
 function renderTodos(listId, todos, isMine) {
@@ -54,13 +62,19 @@ function renderTodos(listId, todos, isMine) {
     todos.forEach(todo => {
         const li = document.createElement('li');
         li.innerHTML = `
-            ${isMine ? `
-                <input type="checkbox" ${todo.completed ? 'checked' : ''} onclick="toggleComplete('${todo.id}', ${!todo.completed})">
-            ` : ''}
+            ${isMine ? `<input type="checkbox" ${todo.completed ? 'checked' : ''} onclick="toggleComplete('${todo.id}', ${!todo.completed})">` : ''}
             <strong>${todo.title}</strong> (${todo.targetDate})<br>
             ${todo.content}
             ${isMine ? `<button onclick="deleteTodo('${todo.id}')">삭제</button>` : ''}
         `;
         list.appendChild(li);
     });
+}
+
+function buildHeaders() {
+    const token = localStorage.getItem('accessToken');
+    return {
+        'Content-Type': 'application/json',
+        ...(token && { 'Authorization': token })
+    };
 }

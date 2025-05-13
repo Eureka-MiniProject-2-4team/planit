@@ -6,7 +6,7 @@ import com.eureka.mp2.team4.planit.team.dto.request.TeamRequestDto;
 public interface TeamService {
 
     // Create
-    ApiResponse registerTeam(TeamRequestDto teamRequestDto);
+    ApiResponse registerTeam(String userId, TeamRequestDto teamRequestDto);
 
     // Read
     ApiResponse getTeamById(String teamId);
