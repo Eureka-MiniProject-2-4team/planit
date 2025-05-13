@@ -13,4 +13,5 @@ public class UpdateUserRequestDto {
     @Size(min = Constraints.NICKNAME_MIN, max = Constraints.NICKNAME_MAX)
     @Pattern(regexp = Constraints.NICKNAME_REGEX, message = Messages.INVALID_NICKNAME)
     private String newNickName;
+    private Boolean isActive;
 }

@@ -22,4 +22,8 @@ public interface UserMapper {
     void updateNickName(@Param("userId") String userId, @Param("newNickName") String newNickName);
 
     void updatePassword(@Param("userId") String userId, @Param("newPassword") String newPassword);
+
+    void updateIsActive(@Param("userId") String userId, @Param("isActive") Boolean isActive);
+
+    void deleteById(String userId);
 }

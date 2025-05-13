@@ -5,6 +5,7 @@ import com.eureka.mp2.team4.planit.common.Result;
 import com.eureka.mp2.team4.planit.common.exception.DatabaseException;
 import com.eureka.mp2.team4.planit.common.exception.InternalServerErrorException;
 import com.eureka.mp2.team4.planit.common.exception.NotFoundException;
+import com.eureka.mp2.team4.planit.team.service.UserTeamQueryService;
 import com.eureka.mp2.team4.planit.user.dto.UserDto;
 import com.eureka.mp2.team4.planit.user.dto.request.UpdatePasswordRequestDto;
 import com.eureka.mp2.team4.planit.user.dto.request.UpdateUserRequestDto;
@@ -93,7 +94,7 @@ public class UserServiceImplTest {
     void updateUser_success() {
         // given
         String userId = "user-123";
-        UpdateUserRequestDto dto = new UpdateUserRequestDto("newNickname");
+        UpdateUserRequestDto dto = new UpdateUserRequestDto("newNickname", null);
 
         // when
         ApiResponse response = userService.updateUser(userId, dto);
@@ -109,7 +110,7 @@ public class UserServiceImplTest {
     void updateUser_dataAccessException() {
         // given
         String userId = "user-123";
-        UpdateUserRequestDto dto = new UpdateUserRequestDto("newNickname");
+        UpdateUserRequestDto dto = new UpdateUserRequestDto("newNickname", null);
 
         doThrow(new DataAccessException(UPDATE_NICKNAME_FAIL) {
         }).when(userMapper).updateNickName(userId, "newNickname");
@@ -194,5 +195,89 @@ public class UserServiceImplTest {
         });
 
         assertEquals(UPDATE_PASSWORD_FAIL, ex.getMessage());
+    }
+
+    @Test
+    @DisplayName("isActive 업데이트 성공")
+    void updateUser_isActive_success() {
+        // given
+        UpdateUserRequestDto dto = new UpdateUserRequestDto(null, false); // 닉네임 없음, 비활성화 요청
+
+        // when
+        ApiResponse<?> response = userService.updateUser(userId, dto);
+
+        // then
+        assertEquals(Result.SUCCESS, response.getResult());
+        assertEquals(UPDATE_DISACTIVE, response.getMessage());
+
+        verify(userMapper).updateIsActive(userId, false);
+    }
+
+    @Test
+    @DisplayName("isActive 업데이트 실패 - DB 오류")
+    void updateUser_isActive_fail_database() {
+        // given
+        UpdateUserRequestDto dto = new UpdateUserRequestDto(null, false);
+
+        doThrow(new DataAccessException("DB 오류") {
+        }).when(userMapper).updateIsActive(userId, false);
+
+        // when & then
+        DatabaseException ex = assertThrows(DatabaseException.class, () -> {
+            userService.updateUser(userId, dto);
+        });
+
+        assertEquals(UPDATE_DISACTIVE_FAIL, ex.getMessage());
+    }
+
+    @Mock
+    private UserTeamQueryService userTeamQueryService;
+
+
+    @Test
+    @DisplayName("유저 삭제 성공")
+    void deleteUser_success() {
+        // given
+        when(userTeamQueryService.isUserTeamLeader(userId)).thenReturn(false);
+
+        // when
+        ApiResponse<?> response = userService.deleteUser(userId);
+
+        // then
+        assertEquals(Result.SUCCESS, response.getResult());
+        assertEquals(DELETE_USER_SUCCESS, response.getMessage());
+        verify(userMapper).deleteById(userId);
+    }
+
+    @Test
+    @DisplayName("유저가 팀장일 경우 삭제 실패")
+    void deleteUser_fail_leaderExists() {
+        // given
+        when(userTeamQueryService.isUserTeamLeader(userId)).thenReturn(true);
+
+        // when
+        ApiResponse<?> response = userService.deleteUser(userId);
+
+        // then
+        assertEquals(Result.FAIL, response.getResult());
+        assertEquals(LEADER_CAN_NOT_DELETE, response.getMessage());
+        verify(userMapper, never()).deleteById(any());
+    }
+
+    @Test
+    @DisplayName("DB 오류로 삭제 실패 - 예외 발생")
+    void deleteUser_fail_databaseException() {
+        // given
+        when(userTeamQueryService.isUserTeamLeader(userId)).thenReturn(false);
+        doThrow(new DataAccessException("DB 오류") {
+        }).when(userMapper).deleteById(userId);
+
+        // when & then
+        DatabaseException ex = assertThrows(DatabaseException.class, () -> {
+            userService.deleteUser(userId);
+        });
+
+        assertEquals(DELETE_USER_FAIL, ex.getMessage());
+        verify(userMapper).deleteById(userId);
     }
 }

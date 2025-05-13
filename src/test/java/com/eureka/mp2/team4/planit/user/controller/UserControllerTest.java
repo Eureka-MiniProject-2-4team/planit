@@ -14,6 +14,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
@@ -69,7 +70,7 @@ class UserControllerTest {
     @DisplayName("PATCH /api/users/me - 닉네임 변경 성공")
     void updateNickNameSuccess() {
         // given
-        UpdateUserRequestDto requestDto = new UpdateUserRequestDto("newNickname");
+        UpdateUserRequestDto requestDto = new UpdateUserRequestDto("newNickname", null);
 
         ApiResponse<?> mockResponse = ApiResponse.builder()
                 .result(Result.SUCCESS)
@@ -95,7 +96,7 @@ class UserControllerTest {
     @DisplayName("PATCH /api/users/me - 닉네임 유효성 검사 실패")
     void updateNickName_validationFail() {
         // given
-        UpdateUserRequestDto requestDto = new UpdateUserRequestDto(""); // 빈 닉네임 등 유효하지 않은 값
+        UpdateUserRequestDto requestDto = new UpdateUserRequestDto("", null); // 빈 닉네임 등 유효하지 않은 값
 
         BindingResult bindingResult = mock(BindingResult.class);
         when(bindingResult.hasErrors()).thenReturn(true);
@@ -156,5 +157,50 @@ class UserControllerTest {
         assertEquals("현재 비밀번호를 입력해주세요", exception.getMessage());
         verify(userService, never()).updatePassword(any(), any());
     }
+
+    @Test
+    @DisplayName("회원 탈퇴 성공")
+    void deleteUser_success() {
+        // given
+        ApiResponse<?> successResponse = ApiResponse.builder()
+                .result(Result.SUCCESS)
+                .message("회원 탈퇴에 성공했습니다.")
+                .build();
+
+        when(userService.deleteUser("test-user-id")).thenReturn(successResponse);
+
+        // when
+        ResponseEntity<ApiResponse<?>> response = userController.deleteUser(planitUserDetails);
+
+        // then
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(Result.SUCCESS, response.getBody().getResult());
+        assertEquals("회원 탈퇴에 성공했습니다.", response.getBody().getMessage());
+
+        verify(userService).deleteUser("test-user-id");
+    }
+
+    @Test
+    @DisplayName("회원 탈퇴 실패 - 팀장인 경우")
+    void deleteUser_fail_leaderExists() {
+        // given
+        ApiResponse<?> failResponse = ApiResponse.builder()
+                .result(Result.FAIL)
+                .message("팀장으로 등록된 팀이 있어 탈퇴할 수 없습니다.")
+                .build();
+
+        when(userService.deleteUser("test-user-id")).thenReturn(failResponse);
+
+        // when
+        ResponseEntity<ApiResponse<?>> response = userController.deleteUser(planitUserDetails);
+
+        // then
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(Result.FAIL, response.getBody().getResult());
+        assertEquals("팀장으로 등록된 팀이 있어 탈퇴할 수 없습니다.", response.getBody().getMessage());
+
+        verify(userService).deleteUser("test-user-id");
+    }
+
 
 }
