@@ -188,27 +188,52 @@
     }
 
     async function performDeactivate(token) {
-        const res = await fetch('/api/users/me', {
-            method: 'PATCH', headers: {'Authorization': token},
-            body: JSON.stringify({isActive: false})
-        });
-        const result = await res.json();
-        if (res.ok && result.result === 'SUCCESS') {
-            alert('계정이 비활성화되었습니다.');
-            localStorage.removeItem('accessToken');
-            location.href = '/login.html';
+        try {
+            const res = await fetch('/api/users/me', {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': token
+                },
+                body: JSON.stringify({isActive: false})
+            });
+
+            const result = await res.json();
+
+            if (res.ok && result.result === 'SUCCESS') {
+                alert('계정이 비활성화되었습니다.');
+                localStorage.removeItem('accessToken');
+                location.href = '/login.html';
+            } else {
+                alert(result.message || '비활성화에 실패했습니다.');
+            }
+
+        } catch (error) {
+            console.error('비활성화 중 오류:', error);
+            alert('서버와 통신 중 문제가 발생했습니다.');
         }
     }
 
     async function performDelete(token) {
-        const res = await fetch('/api/users/me', {
-            method: 'DELETE', headers: {'Authorization': token}
-        });
-        const result = await res.json();
-        if (res.ok && result.result === 'SUCCESS') {
-            alert('회원 탈퇴 완료');
-            localStorage.removeItem('accessToken');
-            location.href = '/signup.html';
+        try {
+            const res = await fetch('/api/users/me', {
+                method: 'DELETE',
+                headers: {'Authorization': token}
+            });
+
+            const result = await res.json();
+
+            if (res.ok && result.result === 'SUCCESS') {
+                alert('회원 탈퇴가 완료되었습니다.');
+                localStorage.removeItem('accessToken');
+                location.href = '/login.html';
+            } else {
+                alert(result.message || '회원 탈퇴에 실패했습니다.');
+            }
+
+        } catch (error) {
+            console.error('회원 탈퇴 중 오류:', error);
+            alert('서버와 통신 중 문제가 발생했습니다.');
         }
     }
 

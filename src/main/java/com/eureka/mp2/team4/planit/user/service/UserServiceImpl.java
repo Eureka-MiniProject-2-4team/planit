@@ -5,6 +5,7 @@ import com.eureka.mp2.team4.planit.common.Result;
 import com.eureka.mp2.team4.planit.common.exception.DatabaseException;
 import com.eureka.mp2.team4.planit.common.exception.InternalServerErrorException;
 import com.eureka.mp2.team4.planit.common.exception.NotFoundException;
+import com.eureka.mp2.team4.planit.team.service.UserTeamQueryService;
 import com.eureka.mp2.team4.planit.user.dto.UserDto;
 import com.eureka.mp2.team4.planit.user.dto.request.UpdatePasswordRequestDto;
 import com.eureka.mp2.team4.planit.user.dto.request.UpdateUserRequestDto;
@@ -23,6 +24,7 @@ import static com.eureka.mp2.team4.planit.user.constants.Messages.*;
 public class UserServiceImpl implements UserService {
     private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
+    private final UserTeamQueryService userTeamQueryService;
 
     @Override
     public UserResponseDto getMyPageData(String userId) {
@@ -50,7 +52,21 @@ public class UserServiceImpl implements UserService {
         if (requestDto.getNewNickName() != null) {
             return updateNickName(userId, requestDto);
         }
-        return null;
+
+        return updateIsActive(userId, requestDto);
+
+    }
+
+    private ApiResponse updateIsActive(String userId, UpdateUserRequestDto requestDto) {
+        try {
+            userMapper.updateIsActive(userId, requestDto.getIsActive());
+            return ApiResponse.builder()
+                    .result(Result.SUCCESS)
+                    .message(UPDATE_DISACTIVE)
+                    .build();
+        } catch (DataAccessException e) {
+            throw new DatabaseException(UPDATE_DISACTIVE_FAIL);
+        }
     }
 
     private ApiResponse<Object> updateNickName(String userId, UpdateUserRequestDto requestDto) {
@@ -82,6 +98,26 @@ public class UserServiceImpl implements UserService {
                     .build();
         } catch (DataAccessException e) {
             throw new DatabaseException(UPDATE_PASSWORD_FAIL);
+        }
+    }
+
+    @Override
+    public ApiResponse deleteUser(String userId) {
+        if (userTeamQueryService.isUserTeamLeader(userId)) {
+            return ApiResponse.builder()
+                    .message(LEADER_CAN_NOT_DELETE)
+                    .result(Result.FAIL)
+                    .build();
+        }
+
+        try {
+            userMapper.deleteById(userId);
+            return ApiResponse.builder()
+                    .message(DELETE_USER_SUCCESS)
+                    .result(Result.SUCCESS)
+                    .build();
+        } catch (DataAccessException e) {
+            throw new DatabaseException(DELETE_USER_FAIL);
         }
     }
 }

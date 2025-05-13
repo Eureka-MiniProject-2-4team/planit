@@ -58,8 +58,15 @@
 
     <!--DELETE-->
     <delete id="deleteTeamMember">
-        DELETE FROM user_team
+        DELETE
+        FROM user_team
         WHERE team_id = #{teamId}
-        AND user_id = #{userId}
+          AND user_id = #{userId}
     </delete>
+
+    <select id="findTeamByLeaderId" parameterType="java.lang.String" resultType="com.eureka.mp2.team4.planit.team.dto.UserTeamDto">
+        SELECT * FROM user_team
+        WHERE user_id = #{userId}
+        AND role = 'LEADER'
+    </select>
 </mapper>

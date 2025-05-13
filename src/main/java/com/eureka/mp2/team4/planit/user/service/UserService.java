@@ -11,4 +11,6 @@ public interface UserService {
     ApiResponse updateUser(String userId, UpdateUserRequestDto requestDto);
 
     ApiResponse updatePassword(String userId, UpdatePasswordRequestDto requestDto);
+
+    ApiResponse deleteUser(String userId);
 }

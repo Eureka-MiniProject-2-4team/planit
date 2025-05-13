@@ -51,4 +51,16 @@
         SET password = #{newPassword}
         WHERE id = #{userId}
     </update>
+
+    <update id="updateIsActive">
+        UPDATE users
+        SET is_Active = #{isActive}
+        WHERE id = #{userId}
+    </update>
+
+    <delete id="deleteById" parameterType="string">
+        DELETE
+        FROM users
+        WHERE id = #{userId}
+    </delete>
 </mapper>

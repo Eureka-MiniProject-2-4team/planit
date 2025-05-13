@@ -36,6 +36,9 @@ public class PlanitAuthenticationProvider implements AuthenticationProvider {
             throw new BadCredentialsException(INVALID_CREDENTIALS);
         }
 
+
+        PlanitUserDetails planitUser = (PlanitUserDetails) userDetails;
+        userDetailService.activateUser(planitUser.getUsername());
         return new UsernamePasswordAuthenticationToken(userDetails, password, userDetails.getAuthorities());
     }
 

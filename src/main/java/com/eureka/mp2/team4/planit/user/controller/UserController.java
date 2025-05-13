@@ -43,6 +43,12 @@ public class UserController {
         return ResponseEntity.ok(apiResponse);
     }
 
+    @DeleteMapping("/me")
+    public ResponseEntity<ApiResponse<?>> deleteUser(@AuthenticationPrincipal PlanitUserDetails userDetails) {
+        ApiResponse apiResponse = userService.deleteUser(userDetails.getUsername());
+        return ResponseEntity.ok(apiResponse);
+    }
+
     @PatchMapping("/me/password")
     public ResponseEntity<ApiResponse<?>> updatePassword(@AuthenticationPrincipal PlanitUserDetails userDetails,
                                                          @Valid @RequestBody UpdatePasswordRequestDto requestDto,
