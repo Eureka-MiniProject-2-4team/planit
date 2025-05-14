@@ -3,10 +3,11 @@ package com.eureka.mp2.team4.planit.todo.personal.service;
 import com.eureka.mp2.team4.planit.common.ApiResponse;
 import com.eureka.mp2.team4.planit.common.Result;
 import com.eureka.mp2.team4.planit.common.exception.DatabaseException;
+import com.eureka.mp2.team4.planit.common.exception.ForbiddenException;
 import com.eureka.mp2.team4.planit.common.exception.NotFoundException;
-import com.eureka.mp2.team4.planit.todo.personal.dto.response.PersonalTodoListResponseDto;
-import com.eureka.mp2.team4.planit.todo.personal.dto.request.PersonalTodoRequestDto;
 import com.eureka.mp2.team4.planit.todo.personal.dto.PersonalTodoDto;
+import com.eureka.mp2.team4.planit.todo.personal.dto.request.PersonalTodoRequestDto;
+import com.eureka.mp2.team4.planit.todo.personal.dto.response.PersonalTodoListResponseDto;
 import com.eureka.mp2.team4.planit.todo.personal.mapper.PersonalTodoMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataAccessException;
@@ -22,18 +23,10 @@ public class PersonalTodoServiceImpl implements PersonalTodoService {
     private final PersonalTodoMapper mapper;
 
     @Override
-    public ApiResponse create(PersonalTodoRequestDto request) {
+    public ApiResponse create(String userId, PersonalTodoRequestDto request) {
         try {
-            PersonalTodoRequestDto requestWithId = PersonalTodoRequestDto.builder()
-                    .id(UUID.randomUUID().toString())
-                    .userId(request.getUserId())
-                    .title(request.getTitle())
-                    .content(request.getContent())
-                    .targetDate(request.getTargetDate())
-                    .isCompleted(false)
-                    .build();
-
-            mapper.insert(requestWithId);
+            String id = UUID.randomUUID().toString();
+            mapper.insert(id, userId, request);
             return ApiResponse.builder()
                     .result(Result.SUCCESS)
                     .message("개인 투두 생성 완료")
@@ -44,13 +37,18 @@ public class PersonalTodoServiceImpl implements PersonalTodoService {
     }
 
     @Override
-    public ApiResponse update(String id, PersonalTodoRequestDto request) {
+    public ApiResponse update(String userId, String todoId, PersonalTodoRequestDto request) {
         try {
-            if (mapper.findById(id) == null) {
+            PersonalTodoDto todo = mapper.findById(todoId);
+            if (todo == null) {
                 throw new NotFoundException("해당 ID의 투두가 존재하지 않습니다.");
             }
 
-            mapper.update(id, request);
+            if (!todo.getUserId().equals(userId)) {
+                throw new ForbiddenException();
+            }
+
+            mapper.update(todoId, request);
             return ApiResponse.builder()
                     .result(Result.SUCCESS)
                     .message("개인 투두 수정 완료")
@@ -61,13 +59,18 @@ public class PersonalTodoServiceImpl implements PersonalTodoService {
     }
 
     @Override
-    public ApiResponse delete(String id) {
+    public ApiResponse delete(String userId, String todoId) {
         try {
-            if (mapper.findById(id) == null) {
+            PersonalTodoDto todo = mapper.findById(todoId);
+            if (todo == null) {
                 throw new NotFoundException("해당 ID의 투두가 존재하지 않습니다.");
             }
 
-            mapper.delete(id);
+            if (!todo.getUserId().equals(userId)) {
+                throw new ForbiddenException();
+            }
+
+            mapper.delete(todoId);
             return ApiResponse.builder()
                     .result(Result.SUCCESS)
                     .message("개인 투두 삭제 완료")
@@ -78,11 +81,15 @@ public class PersonalTodoServiceImpl implements PersonalTodoService {
     }
 
     @Override
-    public ApiResponse getById(String id) {
+    public ApiResponse getById(String userId, String todoId) {
         try {
-            PersonalTodoDto todo = mapper.findById(id);
+            PersonalTodoDto todo = mapper.findById(todoId);
             if (todo == null) {
                 throw new NotFoundException("해당 ID의 투두가 존재하지 않습니다.");
+            }
+
+            if (!todo.getUserId().equals(userId)) {
+                throw new ForbiddenException();
             }
 
             return ApiResponse.<PersonalTodoDto>builder()
@@ -99,15 +106,49 @@ public class PersonalTodoServiceImpl implements PersonalTodoService {
     public ApiResponse getAllByUser(String userId) {
         try {
             List<PersonalTodoDto> list = mapper.findAllByUserId(userId);
-            PersonalTodoListResponseDto build = PersonalTodoListResponseDto.builder().personalTodosDto(list).build();
-
             return ApiResponse.<PersonalTodoListResponseDto>builder()
                     .result(Result.SUCCESS)
                     .message("개인 투두 전체 조회 완료")
-                    .data(build)
+                    .data(PersonalTodoListResponseDto.builder().personalTodosDto(list).build())
                     .build();
         } catch (DataAccessException e) {
             throw new DatabaseException("개인 투두 전체 조회 중 DB 오류 발생");
+        }
+    }
+
+    @Override
+    public ApiResponse getAllByFriend(String friendId) {
+        try {
+            List<PersonalTodoDto> list = mapper.findAllByUserId(friendId);
+            return ApiResponse.<PersonalTodoListResponseDto>builder()
+                    .result(Result.SUCCESS)
+                    .message("친구 투두 전체 조회 완료")
+                    .data(PersonalTodoListResponseDto.builder().personalTodosDto(list).build())
+                    .build();
+        } catch (DataAccessException e) {
+            throw new DatabaseException("친구 투두 전체 조회 중 DB 오류 발생");
+        }
+    }
+
+    @Override
+    public ApiResponse getFriendTodoById(String friendId, String todoId) {
+        try {
+            PersonalTodoDto todo = mapper.findById(todoId);
+            if (todo == null) {
+                throw new NotFoundException("해당 ID의 투두가 존재하지 않습니다.");
+            }
+
+            if (!todo.getUserId().equals(friendId)) {
+                throw new ForbiddenException();
+            }
+
+            return ApiResponse.<PersonalTodoDto>builder()
+                    .result(Result.SUCCESS)
+                    .message("친구 투두 개별 조회 완료")
+                    .data(todo)
+                    .build();
+        } catch (DataAccessException e) {
+            throw new DatabaseException("친구 투두 조회 중 DB 오류 발생");
         }
     }
 }

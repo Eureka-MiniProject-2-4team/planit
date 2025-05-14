@@ -22,4 +22,8 @@ public class PlanitUserDetailService implements UserDetailsService {
             throw new UsernameNotFoundException(INVALID_CREDENTIALS);
         return new PlanitUserDetails(userDto);
     }
+
+    public void activateUser(String userId) {
+        userMapper.updateIsActive(userId, true);
+    }
 }

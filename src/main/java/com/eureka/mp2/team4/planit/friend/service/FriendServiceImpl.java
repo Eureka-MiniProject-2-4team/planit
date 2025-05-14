@@ -2,20 +2,22 @@ package com.eureka.mp2.team4.planit.friend.service;
 
 import com.eureka.mp2.team4.planit.common.ApiResponse;
 import com.eureka.mp2.team4.planit.common.Result;
+import com.eureka.mp2.team4.planit.common.exception.NotFoundException;
 import com.eureka.mp2.team4.planit.friend.FriendStatus;
-import com.eureka.mp2.team4.planit.friend.constants.FriendMessages;
-import com.eureka.mp2.team4.planit.friend.dto.response.FriendListResponseDto;
-import com.eureka.mp2.team4.planit.friend.dto.request.FriendAskDto;
-import com.eureka.mp2.team4.planit.friend.dto.request.FriendUpdateStatusDto;
 import com.eureka.mp2.team4.planit.friend.dto.FriendDto;
+import com.eureka.mp2.team4.planit.friend.dto.request.FriendUpdateStatusDto;
+import com.eureka.mp2.team4.planit.friend.dto.response.FriendListResponseDto;
+import com.eureka.mp2.team4.planit.friend.dto.response.FriendMakeDto;
 import com.eureka.mp2.team4.planit.friend.mapper.FriendMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataAccessException;
-import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.UUID;
+
+import static com.eureka.mp2.team4.planit.friend.constants.FriendMessages.*;
 
 @Service
 @RequiredArgsConstructor
@@ -24,30 +26,53 @@ public class FriendServiceImpl implements FriendService {
     private final FriendMapper mapper;
 
     @Override
-    public ApiResponse sendRequest(FriendAskDto dto) {
+    public ApiResponse sendRequest(String requesterId, String receiverId) {
+        if (receiverId == null) {
+            throw new NotFoundException(RECEIVER_NOT_FOUND);
+        }
+
+        FriendDto existing = mapper.findByBothUserId(requesterId, receiverId);
+        if (existing != null) {
+            FriendStatus status = existing.getStatus();
+
+            if (status == FriendStatus.ACCEPTED) {
+                return ApiResponse.builder()
+                        .result(Result.FAIL)
+                        .message(ALREADY_FRIEND)
+                        .build();
+            }
+
+            if (existing.getRequesterId().equals(requesterId)) {
+                return ApiResponse.builder()
+                        .result(Result.FAIL)
+                        .message(ALREADY_SENT_REQUEST)
+                        .build();
+            } else {
+                return ApiResponse.builder()
+                        .result(Result.FAIL)
+                        .message(REQUEST_EXISTS_FROM_RECEIVER)
+                        .build();
+            }
+        }
+
         try {
-            FriendAskDto friendAskDto = FriendAskDto.builder()
+            FriendMakeDto friendMakeDto = FriendMakeDto.builder()
                     .id(UUID.randomUUID().toString())
-                    .requesterId(dto.getRequesterId())
-                    .receiverId(dto.getReceiverId())
+                    .requesterId(requesterId)
+                    .receiverId(receiverId)
                     .build();
 
-            mapper.insert(friendAskDto);
+            mapper.insert(friendMakeDto);
+
             return ApiResponse.builder()
                     .result(Result.SUCCESS)
-                    .message(FriendMessages.REQUEST_SUCCESS)
+                    .message(REQUEST_SUCCESS)
                     .build();
 
-        }catch (DuplicateKeyException e) {
+        } catch (DataAccessException e) {
             return ApiResponse.builder()
                     .result(Result.FAIL)
-                    .message(FriendMessages.REQUEST_ALREADY_EXISTS)
-                    .build();
-
-        }catch (DataAccessException e) {
-            return ApiResponse.builder()
-                    .result(Result.FAIL)
-                    .message(FriendMessages.REQUEST_FAIL)
+                    .message(REQUEST_FAIL)
                     .build();
         }
     }
@@ -60,13 +85,13 @@ public class FriendServiceImpl implements FriendService {
 
             return ApiResponse.<FriendListResponseDto>builder()
                     .result(Result.SUCCESS)
-                    .message(FriendMessages.GET_FRIENDS_SUCCESS)
+                    .message(GET_FRIENDS_SUCCESS)
                     .data(list)
                     .build();
         } catch (DataAccessException e) {
             return ApiResponse.<FriendListResponseDto>builder()
                     .result(Result.FAIL)
-                    .message(FriendMessages.GET_FRIENDS_FAIL)
+                    .message(GET_FRIENDS_FAIL)
                     .build();
         }
     }
@@ -79,13 +104,13 @@ public class FriendServiceImpl implements FriendService {
 
             return ApiResponse.<FriendListResponseDto>builder()
                     .result(Result.SUCCESS)
-                    .message(FriendMessages.GET_PENDING_SUCCESS)
+                    .message(GET_PENDING_SUCCESS)
                     .data(list)
                     .build();
         } catch (DataAccessException e) {
             return ApiResponse.<FriendListResponseDto>builder()
                     .result(Result.FAIL)
-                    .message(FriendMessages.GET_PENDING_FAIL)
+                    .message(GET_PENDING_FAIL)
                     .build();
         }
     }
@@ -98,18 +123,19 @@ public class FriendServiceImpl implements FriendService {
 
             return ApiResponse.<FriendListResponseDto>builder()
                     .result(Result.SUCCESS)
-                    .message(FriendMessages.GET_SENT_SUCCESS)
+                    .message(GET_SENT_SUCCESS)
                     .data(list)
                     .build();
         } catch (DataAccessException e) {
             return ApiResponse.<FriendListResponseDto>builder()
                     .result(Result.FAIL)
-                    .message(FriendMessages.GET_SENT_FAIL)
+                    .message(GET_SENT_FAIL)
                     .build();
         }
     }
 
     @Override
+    @Transactional
     public ApiResponse updateStatus(String friendId, FriendUpdateStatusDto dto) {
         try {
             mapper.updateStatus(friendId, dto.getStatus().name());
@@ -125,12 +151,12 @@ public class FriendServiceImpl implements FriendService {
 
             return ApiResponse.builder()
                     .result(Result.SUCCESS)
-                    .message(FriendMessages.UPDATE_STATUS_SUCCESS)
+                    .message(UPDATE_STATUS_SUCCESS)
                     .build();
         } catch (DataAccessException e) {
             return ApiResponse.builder()
                     .result(Result.FAIL)
-                    .message(FriendMessages.UPDATE_STATUS_FAIL)
+                    .message(UPDATE_STATUS_FAIL)
                     .build();
         }
     }
@@ -141,27 +167,23 @@ public class FriendServiceImpl implements FriendService {
             mapper.delete(friendId);
             return ApiResponse.builder()
                     .result(Result.SUCCESS)
-                    .message(FriendMessages.DELETE_SUCCESS)
+                    .message(DELETE_SUCCESS)
                     .build();
         } catch (DataAccessException e) {
             return ApiResponse.builder()
                     .result(Result.FAIL)
-                    .message(FriendMessages.DELETE_FAIL)
+                    .message(DELETE_FAIL)
                     .build();
         }
     }
 
     @Override
     public FriendDto findByFriendId(String friendId) {
-        // todo : friendId로 FriendDto 찾아서 반환해주기
-        return null;
+        return mapper.findById(friendId);
     }
 
     @Override
     public FriendDto findByBothUserId(String userId, String targetUserId) {
-        /*
-         todo : 두명의 아이디가 속한 FriendDto 찾아서 반환하기 -> 두 아이디의 위치가 바뀌어도 동일한 값이 나와야된다
-         */
-        return null;
+        return mapper.findByBothUserId(userId, targetUserId);
     }
 }

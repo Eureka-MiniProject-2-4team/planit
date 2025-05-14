@@ -2,6 +2,7 @@ package com.eureka.mp2.team4.planit.todo.personal.service;
 
 import com.eureka.mp2.team4.planit.common.ApiResponse;
 import com.eureka.mp2.team4.planit.common.Result;
+import com.eureka.mp2.team4.planit.common.exception.ForbiddenException;
 import com.eureka.mp2.team4.planit.common.exception.NotFoundException;
 import com.eureka.mp2.team4.planit.todo.personal.dto.response.PersonalTodoListResponseDto;
 import com.eureka.mp2.team4.planit.todo.personal.dto.request.PersonalTodoRequestDto;
@@ -10,7 +11,9 @@ import com.eureka.mp2.team4.planit.todo.personal.mapper.PersonalTodoMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.*;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -31,118 +34,131 @@ class PersonalTodoServiceImplTest {
         MockitoAnnotations.openMocks(this);
     }
 
-    @DisplayName("개인 투두 생성 성공")
     @Test
-    void createTest() {
+    @DisplayName("투두 생성 성공")
+    void create_success() {
+        String userId = "user-1";
         PersonalTodoRequestDto request = PersonalTodoRequestDto.builder()
-                .userId("user-1")
-                .title("Test Todo")
-                .content("content")
+                .title("할 일")
+                .content("내용")
                 .targetDate(LocalDateTime.now())
                 .build();
 
-        ApiResponse response = service.create(request);
+        ApiResponse response = service.create(userId, request);
 
-        verify(mapper, times(1)).insert(any());
+        verify(mapper).insert(anyString(), eq(userId), eq(request));
         assertEquals(Result.SUCCESS, response.getResult());
-        assertEquals("개인 투두 생성 완료", response.getMessage());
     }
 
-    @DisplayName("개인 투두 수정 성공")
     @Test
-    void updateTest_success() {
-        String id = "todo-1";
-        PersonalTodoRequestDto request = PersonalTodoRequestDto.builder()
-                .title("Updated Title")
-                .content("Updated content")
-                .targetDate(LocalDateTime.now())
-                .isCompleted(true)
-                .build();
+    @DisplayName("투두 수정 성공")
+    void update_success() {
+        String userId = "user-1";
+        String todoId = "todo-1";
+        PersonalTodoDto dto = PersonalTodoDto.builder().userId(userId).build();
+        PersonalTodoRequestDto request = PersonalTodoRequestDto.builder().title("변경").build();
 
-        when(mapper.findById(id)).thenReturn(new PersonalTodoDto());
+        when(mapper.findById(todoId)).thenReturn(dto);
 
-        ApiResponse response = service.update(id, request);
+        ApiResponse response = service.update(userId, todoId, request);
 
-        verify(mapper).update(id, request);
+        verify(mapper).update(todoId, request);
         assertEquals(Result.SUCCESS, response.getResult());
-        assertEquals("개인 투두 수정 완료", response.getMessage());
     }
 
-    @DisplayName("수정 대상 개인 투두가 존재하지 않을 경우 예외 발생")
     @Test
-    void updateTest_notFound() {
-        String id = "todo-404";
+    @DisplayName("투두 수정 시 권한 없음")
+    void update_forbidden() {
+        String userId = "user-1";
+        String todoId = "todo-1";
+        PersonalTodoDto dto = PersonalTodoDto.builder().userId("other").build();
         PersonalTodoRequestDto request = PersonalTodoRequestDto.builder().build();
 
-        when(mapper.findById(id)).thenReturn(null);
+        when(mapper.findById(todoId)).thenReturn(dto);
 
-        assertThrows(NotFoundException.class, () -> service.update(id, request));
+        assertThrows(ForbiddenException.class, () -> service.update(userId, todoId, request));
     }
 
-    @DisplayName("개인 투두 삭제 성공")
     @Test
-    void deleteTest_success() {
-        String id = "todo-1";
-        when(mapper.findById(id)).thenReturn(new PersonalTodoDto());
-
-        ApiResponse response = service.delete(id);
-
-        verify(mapper).delete(id);
-        assertEquals(Result.SUCCESS, response.getResult());
-        assertEquals("개인 투두 삭제 완료", response.getMessage());
-    }
-
-    @DisplayName("삭제 대상 개인 투두가 존재하지 않을 경우 예외 발생")
-    @Test
-    void deleteTest_notFound() {
-        String id = "todo-404";
-
-        when(mapper.findById(id)).thenReturn(null);
-
-        assertThrows(NotFoundException.class, () -> service.delete(id));
-    }
-
-    @DisplayName("ID로 개인 투두 조회 성공")
-    @Test
-    void getByIdTest_success() {
-        String id = "todo-1";
-        PersonalTodoDto dummyDto = new PersonalTodoDto();
-
-        when(mapper.findById(id)).thenReturn(dummyDto);
-
-        ApiResponse response = service.getById(id);
-
-        verify(mapper).findById(id);
-        assertEquals(Result.SUCCESS, response.getResult());
-        assertEquals("개인 투두 조회 완료", response.getMessage());
-        assertEquals(dummyDto, response.getData());
-    }
-
-    @DisplayName("ID로 조회할 개인 투두가 존재하지 않을 경우 예외 발생")
-    @Test
-    void getByIdTest_notFound() {
-        String id = "todo-404";
-
-        when(mapper.findById(id)).thenReturn(null);
-
-        assertThrows(NotFoundException.class, () -> service.getById(id));
-    }
-
-    @DisplayName("사용자의 전체 개인 투두 조회 성공")
-    @Test
-    void getAllByUserTest() {
+    @DisplayName("투두 수정 시 존재하지 않음")
+    void update_notFound() {
         String userId = "user-1";
-        List<PersonalTodoDto> list = List.of(new PersonalTodoDto());
+        String todoId = "todo-x";
+        PersonalTodoRequestDto request = PersonalTodoRequestDto.builder().build();
 
-        when(mapper.findAllByUserId(userId)).thenReturn(list);
+        when(mapper.findById(todoId)).thenReturn(null);
+
+        assertThrows(NotFoundException.class, () -> service.update(userId, todoId, request));
+    }
+
+    @Test
+    @DisplayName("투두 삭제 성공")
+    void delete_success() {
+        String userId = "user-1";
+        String todoId = "todo-1";
+        when(mapper.findById(todoId)).thenReturn(PersonalTodoDto.builder().userId(userId).build());
+
+        ApiResponse response = service.delete(userId, todoId);
+
+        verify(mapper).delete(todoId);
+        assertEquals(Result.SUCCESS, response.getResult());
+    }
+
+    @Test
+    @DisplayName("투두 삭제 시 권한 없음")
+    void delete_forbidden() {
+        String userId = "user-1";
+        String todoId = "todo-1";
+        when(mapper.findById(todoId)).thenReturn(PersonalTodoDto.builder().userId("other").build());
+
+        assertThrows(ForbiddenException.class, () -> service.delete(userId, todoId));
+    }
+
+    @Test
+    @DisplayName("투두 조회 성공")
+    void getById_success() {
+        String userId = "user-1";
+        String todoId = "todo-1";
+        PersonalTodoDto dto = PersonalTodoDto.builder().userId(userId).build();
+
+        when(mapper.findById(todoId)).thenReturn(dto);
+
+        ApiResponse response = service.getById(userId, todoId);
+
+        assertEquals(Result.SUCCESS, response.getResult());
+        assertEquals(dto, response.getData());
+    }
+
+    @Test
+    @DisplayName("투두 조회 시 권한 없음")
+    void getById_forbidden() {
+        String userId = "user-1";
+        String todoId = "todo-1";
+        when(mapper.findById(todoId)).thenReturn(PersonalTodoDto.builder().userId("other").build());
+
+        assertThrows(ForbiddenException.class, () -> service.getById(userId, todoId));
+    }
+
+    @Test
+    @DisplayName("투두 조회 시 존재하지 않음")
+    void getById_notFound() {
+        String userId = "user-1";
+        String todoId = "todo-x";
+        when(mapper.findById(todoId)).thenReturn(null);
+
+        assertThrows(NotFoundException.class, () -> service.getById(userId, todoId));
+    }
+
+    @Test
+    @DisplayName("투두 전체 조회 성공")
+    void getAllByUser_success() {
+        String userId = "user-1";
+        List<PersonalTodoDto> todos = List.of(PersonalTodoDto.builder().build());
+        when(mapper.findAllByUserId(userId)).thenReturn(todos);
 
         ApiResponse response = service.getAllByUser(userId);
 
-        verify(mapper).findAllByUserId(userId);
         assertEquals(Result.SUCCESS, response.getResult());
-        assertEquals("개인 투두 전체 조회 완료", response.getMessage());
-
-        PersonalTodoListResponseDto responseData = (PersonalTodoListResponseDto) response.getData();
-        assertEquals(list.size(), responseData.getPersonalTodosDto().size());
+        assertEquals(1, ((PersonalTodoListResponseDto) response.getData()).getPersonalTodosDto().size());
     }
 }

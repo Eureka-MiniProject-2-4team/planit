@@ -1,10 +1,13 @@
 package com.eureka.mp2.team4.planit.auth.security;
 
 import com.eureka.mp2.team4.planit.auth.constants.Messages;
+import com.eureka.mp2.team4.planit.user.dto.UserDto;
+import com.eureka.mp2.team4.planit.user.enums.UserRole;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
@@ -25,16 +28,24 @@ class PlanitAuthenticationProviderTest {
         String rawPassword = "password123";
         String encodedPassword = "encodedPass";
 
-        UserDetails userDetails = mock(UserDetails.class);
-        when(userDetails.getPassword()).thenReturn(encodedPassword);
-        when(userDetails.getAuthorities()).thenReturn(null);
+        UserDto userDto = new UserDto(
+                "test-user-id",
+                email,
+                "테스트유저",
+                encodedPassword,
+                "닉네임",
+                UserRole.ROLE_USER,
+                null, null, true, "01012341234"
+        );
+
+        PlanitUserDetails userDetails = new PlanitUserDetails(userDto);
 
         when(userDetailService.loadUserByUsername(email)).thenReturn(userDetails);
         when(passwordEncoder.matches(rawPassword, encodedPassword)).thenReturn(true);
 
         UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(email, rawPassword);
 
-        var result = provider.authenticate(token);
+        Authentication result = provider.authenticate(token);
 
         assertThat(result.isAuthenticated()).isTrue();
         assertThat(result.getPrincipal()).isEqualTo(userDetails);

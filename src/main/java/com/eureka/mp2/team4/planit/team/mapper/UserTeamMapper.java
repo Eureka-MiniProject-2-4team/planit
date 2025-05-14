@@ -1,5 +1,6 @@
 package com.eureka.mp2.team4.planit.team.mapper;
 
+import com.eureka.mp2.team4.planit.team.dto.TeamDto;
 import com.eureka.mp2.team4.planit.team.dto.UserTeamDto;
 import com.eureka.mp2.team4.planit.team.dto.response.UserTeamResponseDto;
 import org.apache.ibatis.annotations.Mapper;
@@ -16,16 +17,24 @@ public interface UserTeamMapper {
 
     // READ
     UserTeamResponseDto getTeamMember(String userId);
+
     List<UserTeamDto> getTeamMemberList(String teamId);
+
     List<UserTeamDto> getMyTeamList(String userId);
+
     List<UserTeamDto> getMyInvitedList(String userId);
+
     UserTeamDto findByTeamIdAndUserId(@Param("teamId") String teamId, @Param("userId") String userId);
+
     Integer isTeamMember(@Param("teamId") String teamId, @Param("userId") String userId);
+
     Integer isTeamLeader(@Param("teamId") String teamId, @Param("userId") String userId);
 
     // UPDATE
-    void acceptTeamJoin(@Param("teamId")String teamId, @Param("userId")String userId);
+    void acceptTeamJoin(@Param("teamId") String teamId, @Param("userId") String userId);
 
     // DELETE
     void deleteTeamMember(@Param("teamId") String teamId, @Param("userId") String userId); // 팀장이 타인 강퇴, 팀원이 자진 탈퇴 및 가입 거절 -> 같은 쿼리 사용
+
+    List<TeamDto> findTeamByLeaderId(@Param("userId") String userId);    // 팀장아이디로 된 검색
 }

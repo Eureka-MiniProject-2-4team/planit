@@ -1,13 +1,14 @@
 package com.eureka.mp2.team4.planit.auth.controller;
 
-import com.eureka.mp2.team4.planit.common.ApiResponse;
-import com.eureka.mp2.team4.planit.auth.dto.request.UserRegisterRequestDto;
+import com.eureka.mp2.team4.planit.auth.dto.request.*;
+import com.eureka.mp2.team4.planit.auth.security.PlanitUserDetails;
 import com.eureka.mp2.team4.planit.auth.service.AuthService;
-
+import com.eureka.mp2.team4.planit.common.ApiResponse;
 import com.eureka.mp2.team4.planit.common.exception.InvalidInputException;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
@@ -44,4 +45,30 @@ public class AuthController {
         ApiResponse response = authService.checkNickNameIsExist(nickName);
         return ResponseEntity.ok().body(response);
     }
+
+    @PostMapping("/verify-password")
+    public ResponseEntity<?> verifyPassword(@AuthenticationPrincipal PlanitUserDetails planitUserDetails,
+                                            @RequestBody VerifyPasswordRequestDto requestDto) {
+        ApiResponse response = authService.verifyPassword(planitUserDetails.getUsername(), requestDto);
+        return ResponseEntity.ok().body(response);
+    }
+
+    @PostMapping("/find-email")
+    public ResponseEntity<?> findEmail(@RequestBody FindEmailRequestDto requestDto) {
+        ApiResponse response = authService.findEmail(requestDto);
+        return ResponseEntity.ok().body(response);
+    }
+
+    @PostMapping("/find-password")
+    public ResponseEntity<?> findPassword(@RequestBody FindPasswordRequestDto requestDto) {
+        ApiResponse response = authService.findPassword(requestDto);
+        return ResponseEntity.ok().body(response);
+    }
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<?> resetPassword(@RequestBody ResetPasswordRequestDto requestDto) {
+        ApiResponse response = authService.resetPassword(requestDto);
+        return ResponseEntity.ok().body(response);
+    }
+
 }

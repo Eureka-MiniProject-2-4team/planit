@@ -10,29 +10,26 @@
     <h1>친구 관리</h1>
 
     <section>
-        <h2>친구 요청 보내기</h2>
-        <input type="text" id="requesterId" placeholder="보낸 사람 ID">
-        <input type="text" id="receiverId" placeholder="받는 사람 ID">
-        <button onclick="sendFriendRequest()">요청 보내기</button>
+        <h2>유저 검색 (친구 요청용)</h2>
+        <input type="text" id="searchValue" placeholder="닉네임 또는 이메일">
+        <button onclick="searchUser()">검색</button>
+        <div id="searchResult"></div>
     </section>
 
     <section>
         <h2>내 친구 목록</h2>
-        <input type="text" id="userIdForFriends" placeholder="내 ID">
         <button onclick="getFriends()">조회</button>
         <ul id="friendList"></ul>
     </section>
 
     <section>
         <h2>받은 친구 요청 (대기 중)</h2>
-        <input type="text" id="userIdForPending" placeholder="내 ID">
         <button onclick="getReceivedRequests()">조회</button>
         <ul id="pendingList"></ul>
     </section>
 
     <section>
         <h2>보낸 친구 요청</h2>
-        <input type="text" id="userIdForSent" placeholder="내 ID">
         <button onclick="getSentRequests()">조회</button>
         <ul id="sentList"></ul>
     </section>

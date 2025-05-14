@@ -13,7 +13,13 @@ import java.time.LocalDateTime;
 public class FriendDto {
     private String id;
     private String requesterId;
+    private String requesterNickName;
+    private String requesterEmail;
+
     private String receiverId;
+    private String receiverNickName;
+    private String receiverEmail;
+
     private FriendStatus status;
     private LocalDateTime createdAt;
     private LocalDateTime acceptedAt;

@@ -1,142 +1,243 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8">
-  <title>마이페이지</title>
+    <meta charset="UTF-8">
+    <title>마이페이지</title>
+    <style>
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 999;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.4);
+        }
+
+        .modal-content {
+            background-color: #fff;
+            margin: 15% auto;
+            padding: 20px;
+            border-radius: 8px;
+            width: 300px;
+            text-align: center;
+        }
+
+        .close {
+            float: right;
+            font-size: 20px;
+            cursor: pointer;
+        }
+    </style>
 </head>
 <body>
 <h1>마이페이지</h1>
-
 <div id="user-info">
-  <p><strong>이메일:</strong> <span id="email"></span></p>
-  <p><strong>이름:</strong> <span id="userName"></span></p>
+    <p><strong>이메일:</strong> <span id="email"></span></p>
+    <p><strong>이름:</strong> <span id="userName"></span></p>
+    <p><strong>닉네임:</strong> <span id="nickname"></span>
+        <button onclick="openModal('nickname-modal')">수정</button>
+    </p>
+    <p><strong>전화번호:</strong> <span id="phoneNumber"></span></p>
+    <p>
+        <button onclick="openModal('verify-modal', 'change-password')">비밀번호 변경</button>
+    </p>
+    <p>
+        <button onclick="openModal('verify-modal', 'deactivate')">비활성화</button>
+        <button onclick="openModal('verify-modal', 'delete')">회원 탈퇴</button>
+    </p>
+</div>
 
-  <p><strong>닉네임:</strong> <span id="nickname"></span>
-    <button onclick="toggleNicknameEdit()">수정</button>
-  </p>
+<!-- 닉네임 변경 모달 -->
+<div id="nickname-modal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeModal('nickname-modal')">&times;</span>
+        <h3>닉네임 변경</h3>
+        <input type="text" id="new-nickname" placeholder="새 닉네임" oninput="disableNicknameSave()">
+        <button onclick="checkDuplicateNickname()">중복 확인</button>
+        <button id="save-nickname-btn" onclick="updateNickname()" disabled>저장</button>
+        <p id="nickname-message" style="color: red;"></p>
+    </div>
+</div>
 
-  <div id="nickname-edit" style="display: none;">
-    <input type="text" id="new-nickname" placeholder="새 닉네임" oninput="disableSaveButtonOnChange()">
-    <button onclick="checkDuplicate()">중복 확인</button>
-    <button onclick="updateNickname()" id="save-nickname-btn" disabled>저장</button>
-    <p id="nickname-message" style="color: red;"></p>
-  </div>
+<!-- 비밀번호 확인 모달 (공용) -->
+<div id="verify-modal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeModal('verify-modal')">&times;</span>
+        <h3>비밀번호 확인</h3>
+        <input type="password" id="confirm-password" placeholder="비밀번호 입력">
+        <button onclick="verifyPasswordForAction()">확인</button>
+        <p id="verify-message" style="color: red;"></p>
+    </div>
+</div>
 
-  <p><strong>전화번호:</strong> <span id="phoneNumber"></span></p>
-
-  <p>
-    <button onclick="window.location.href='/change-password.html'">비밀번호 변경</button>
-  </p>
-
+<!-- 새 비밀번호 입력 모달 -->
+<div id="password-modal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeModal('password-modal')">&times;</span>
+        <h3>새 비밀번호 입력</h3>
+        <input type="password" id="new-password" placeholder="새 비밀번호">
+        <button onclick="updatePassword()">변경</button>
+        <p id="password-update-message" style="color: red;"></p>
+    </div>
 </div>
 
 <script>
-  async function loadUserData() {
-    const token = localStorage.getItem('accessToken');
-    if (!token) {
-      alert('로그인이 필요합니다.');
-      window.location.href = '/login.html';
-      return;
+    let pendingAction = null;
+
+    function openModal(id, action) {
+        document.getElementById(id).style.display = 'block';
+        if (action) pendingAction = action;
     }
 
-    try {
-      const response = await fetch('/api/users/me', {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': token
-        }
-      });
-
-      const result = await response.json();
-
-      if (response.ok && result.result === "SUCCESS") {
-        const data = result.data;
-        document.getElementById('email').textContent = data.email;
-        document.getElementById('userName').textContent = data.userName;
-        document.getElementById('nickname').textContent = data.nickname;
-        document.getElementById('phoneNumber').textContent = data.phoneNumber;
-      } else {
-        alert(result.message || "사용자 정보를 불러오지 못했습니다.");
-      }
-    } catch (error) {
-      console.error("에러 발생:", error);
-      alert("서버 오류");
-    }
-  }
-
-  function toggleNicknameEdit() {
-    document.getElementById('nickname-edit').style.display = 'block';
-    document.getElementById('new-nickname').value = '';
-    document.getElementById('nickname-message').textContent = '';
-    document.getElementById('save-nickname-btn').disabled = true;
-  }
-
-  async function checkDuplicate() {
-    const nickname = document.getElementById('new-nickname').value;
-    const msg = document.getElementById('nickname-message');
-    msg.textContent = '';
-
-    if (!nickname.trim()) {
-      msg.textContent = '닉네임을 입력해주세요.';
-      return;
+    function closeModal(id) {
+        document.getElementById(id).style.display = 'none';
     }
 
-    try {
-      const response = await fetch(`/auth/check-nickName?value=${encodeURIComponent(nickname)}`);
-      const result = await response.json();
-
-      if (response.ok && result.result === 'SUCCESS') {
-        msg.style.color = 'green';
-        msg.textContent = '사용 가능한 닉네임입니다.';
-        document.getElementById('save-nickname-btn').disabled = false;
-      } else {
-        msg.style.color = 'red';
-        msg.textContent = result.message || '이미 사용 중인 닉네임입니다.';
+    function disableNicknameSave() {
         document.getElementById('save-nickname-btn').disabled = true;
-      }
-    } catch (err) {
-      console.error(err);
-      msg.textContent = '중복 확인 중 오류가 발생했습니다.';
+        document.getElementById('nickname-message').textContent = '';
     }
-  }
 
-  async function updateNickname() {
-    const nickname = document.getElementById('new-nickname').value;
-
-    try {
-      const token = localStorage.getItem('accessToken');
-      const response = await fetch('/api/users/me/nickname', {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': token
-        },
-        body: JSON.stringify({ newNickName: nickname })
-      });
-
-      const result = await response.json();
-
-      if (response.ok && result.result === 'SUCCESS') {
-        alert('닉네임이 변경되었습니다.');
-        document.getElementById('nickname').textContent = nickname;
-        document.getElementById('nickname-edit').style.display = 'none';
-      } else {
-        alert(result.message || '닉네임 변경 실패');
-      }
-    } catch (err) {
-      console.error(err);
-      alert('닉네임 변경 중 오류 발생');
+    async function loadUserData() {
+        const token = localStorage.getItem('accessToken');
+        const res = await fetch('/api/users/me', {
+            headers: {'Authorization': token}
+        });
+        const result = await res.json();
+        if (res.ok && result.result === 'SUCCESS') {
+            const d = result.data;
+            document.getElementById('email').textContent = d.email;
+            document.getElementById('userName').textContent = d.userName;
+            document.getElementById('nickname').textContent = d.nickname;
+            document.getElementById('phoneNumber').textContent = d.phoneNumber;
+        }
     }
-  }
 
-  function disableSaveButtonOnChange() {
-    document.getElementById('save-nickname-btn').disabled = true;
-    document.getElementById('nickname-message').textContent = ''; // 메시지도 초기화
-  }
+    async function checkDuplicateNickname() {
+        const nickname = document.getElementById('new-nickname').value;
+        const msg = document.getElementById('nickname-message');
+        const res = await fetch(`/auth/check-nickName?value=${encodeURIComponent(nickname)}`);
+        const result = await res.json();
+        if (res.ok && result.result === 'SUCCESS') {
+            msg.style.color = 'green';
+            msg.textContent = '사용 가능';
+            document.getElementById('save-nickname-btn').disabled = false;
+        } else {
+            msg.style.color = 'red';
+            msg.textContent = result.message || '사용 불가';
+            document.getElementById('save-nickname-btn').disabled = true;
+        }
+    }
 
+    async function updateNickname() {
+        const token = localStorage.getItem('accessToken');
+        const nickname = document.getElementById('new-nickname').value;
+        const res = await fetch('/api/users/me', {
+            method: 'PATCH',
+            headers: {'Content-Type': 'application/json', 'Authorization': token},
+            body: JSON.stringify({newNickName: nickname})
+        });
+        const result = await res.json();
+        if (res.ok && result.result === 'SUCCESS') {
+            alert('닉네임 변경 완료');
+            document.getElementById('nickname').textContent = nickname;
+            closeModal('nickname-modal');
+        }
+    }
 
-  window.onload = loadUserData;
+    async function verifyPasswordForAction() {
+        const pw = document.getElementById('confirm-password').value;
+        const token = localStorage.getItem('accessToken');
+        const msg = document.getElementById('verify-message');
+        const res = await fetch('/auth/verify-password', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json', 'Authorization': token},
+            body: JSON.stringify({password: pw})
+        });
+        const result = await res.json();
+        if (res.ok && result.result === 'SUCCESS') {
+            closeModal('verify-modal');
+            if (pendingAction === 'change-password') openModal('password-modal');
+            else if (pendingAction === 'deactivate') await performDeactivate(token);
+            else if (pendingAction === 'delete') await performDelete(token);
+        } else {
+            msg.textContent = result.message || '비밀번호가 틀렸습니다';
+        }
+    }
+
+    async function updatePassword() {
+        const token = localStorage.getItem('accessToken');
+        const newPw = document.getElementById('new-password').value;
+        const currentPw = document.getElementById('confirm-password').value;
+        const msg = document.getElementById('password-update-message');
+        const res = await fetch('/api/users/me/password', {
+            method: 'PATCH',
+            headers: {'Content-Type': 'application/json', 'Authorization': token},
+            body: JSON.stringify({currentPassword: currentPw, newPassword: newPw})
+        });
+        const result = await res.json();
+        if (res.ok && result.result === 'SUCCESS') {
+            alert('비밀번호가 변경되었습니다. 다시 로그인해주세요.');
+            localStorage.removeItem('accessToken');
+            location.href = '/login.html';
+        } else {
+            msg.textContent = result.message || '변경 실패';
+        }
+    }
+
+    async function performDeactivate(token) {
+        try {
+            const res = await fetch('/api/users/me', {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': token
+                },
+                body: JSON.stringify({isActive: false})
+            });
+
+            const result = await res.json();
+
+            if (res.ok && result.result === 'SUCCESS') {
+                alert('계정이 비활성화되었습니다.');
+                localStorage.removeItem('accessToken');
+                location.href = '/login.html';
+            } else {
+                alert(result.message || '비활성화에 실패했습니다.');
+            }
+
+        } catch (error) {
+            console.error('비활성화 중 오류:', error);
+            alert('서버와 통신 중 문제가 발생했습니다.');
+        }
+    }
+
+    async function performDelete(token) {
+        try {
+            const res = await fetch('/api/users/me', {
+                method: 'DELETE',
+                headers: {'Authorization': token}
+            });
+
+            const result = await res.json();
+
+            if (res.ok && result.result === 'SUCCESS') {
+                alert('회원 탈퇴가 완료되었습니다.');
+                localStorage.removeItem('accessToken');
+                location.href = '/login.html';
+            } else {
+                alert(result.message || '회원 탈퇴에 실패했습니다.');
+            }
+
+        } catch (error) {
+            console.error('회원 탈퇴 중 오류:', error);
+            alert('서버와 통신 중 문제가 발생했습니다.');
+        }
+    }
+
+    window.onload = loadUserData;
 </script>
 </body>
 </html>

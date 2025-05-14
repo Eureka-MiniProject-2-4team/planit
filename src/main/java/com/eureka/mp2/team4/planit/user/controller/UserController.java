@@ -4,8 +4,8 @@ import com.eureka.mp2.team4.planit.auth.security.PlanitUserDetails;
 import com.eureka.mp2.team4.planit.common.ApiResponse;
 import com.eureka.mp2.team4.planit.common.Result;
 import com.eureka.mp2.team4.planit.common.exception.InvalidInputException;
-import com.eureka.mp2.team4.planit.user.dto.request.UpdateNickNameRequestDto;
 import com.eureka.mp2.team4.planit.user.dto.request.UpdatePasswordRequestDto;
+import com.eureka.mp2.team4.planit.user.dto.request.UpdateUserRequestDto;
 import com.eureka.mp2.team4.planit.user.dto.response.UserResponseDto;
 import com.eureka.mp2.team4.planit.user.service.UserService;
 import jakarta.validation.Valid;
@@ -32,25 +32,40 @@ public class UserController {
         return ResponseEntity.ok(apiResponse);
     }
 
-    @PatchMapping("/me/nickname")
-    public ResponseEntity<ApiResponse<?>> updateNickName(@AuthenticationPrincipal PlanitUserDetails userDetails,
-                                                         @Valid @RequestBody UpdateNickNameRequestDto requestDto,
-                                                         BindingResult bindingResult) {
+    @PatchMapping("/me")
+    public ResponseEntity<ApiResponse<?>> updateUser(@AuthenticationPrincipal PlanitUserDetails userDetails,
+                                                     @Valid @RequestBody UpdateUserRequestDto requestDto,
+                                                     BindingResult bindingResult) {
         if (bindingResult.hasErrors())
             throw new InvalidInputException(bindingResult.getFieldError().getDefaultMessage());
 
-        ApiResponse apiResponse = userService.updateNickName(userDetails.getUsername(), requestDto);
+        ApiResponse apiResponse = userService.updateUser(userDetails.getUsername(), requestDto);
+        return ResponseEntity.ok(apiResponse);
+    }
+
+    @DeleteMapping("/me")
+    public ResponseEntity<ApiResponse<?>> deleteUser(@AuthenticationPrincipal PlanitUserDetails userDetails) {
+        ApiResponse apiResponse = userService.deleteUser(userDetails.getUsername());
         return ResponseEntity.ok(apiResponse);
     }
 
     @PatchMapping("/me/password")
-    public ResponseEntity<ApiResponse<?>> updateNickName(@AuthenticationPrincipal PlanitUserDetails userDetails,
+    public ResponseEntity<ApiResponse<?>> updatePassword(@AuthenticationPrincipal PlanitUserDetails userDetails,
                                                          @Valid @RequestBody UpdatePasswordRequestDto requestDto,
                                                          BindingResult bindingResult) {
         if (bindingResult.hasErrors())
             throw new InvalidInputException(bindingResult.getFieldError().getDefaultMessage());
 
         ApiResponse apiResponse = userService.updatePassword(userDetails.getUsername(), requestDto);
+        return ResponseEntity.ok(apiResponse);
+    }
+
+    @GetMapping("/{value}")
+    public ResponseEntity<ApiResponse<?>> getUserInfo(@AuthenticationPrincipal PlanitUserDetails userDetails,
+                                                      @PathVariable("value") String value,
+                                                      @RequestParam(required = false) String teamId) {
+
+        ApiResponse apiResponse = userService.getUserInfo(userDetails.getUsername(), value, teamId);
         return ResponseEntity.ok(apiResponse);
     }
 }

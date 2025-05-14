@@ -8,7 +8,5 @@ import lombok.*;
 @AllArgsConstructor
 @Builder
 public class FriendAskDto {
-    private String id;
-    private String requesterId;
     private String receiverId;
 }
