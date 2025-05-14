@@ -1,5 +1,6 @@
 const baseUrl = '/api/friend';
 
+// JWT 헤더 생성
 function authHeaders() {
     const raw = localStorage.getItem('accessToken') || '';
     const token = raw.replace(/^Bearer\s+/i, '');
@@ -9,19 +10,25 @@ function authHeaders() {
     };
 }
 
-// ✅ 친구 요청 (검색 기반)
+// 로그인 사용자 ID (localStorage에 저장되어 있다고 가정)
+function getMyId() {
+    return localStorage.getItem('userId');
+}
+
+// ✅ 친구 요청 보내기
 async function sendFriendRequestById(receiverId) {
     const response = await fetch(baseUrl, {
         method: 'POST',
         headers: authHeaders(),
-        body: JSON.stringify({ receiverId })  // requesterId는 로그인 사용자 기준
+        body: JSON.stringify({ receiverId })
     });
 
     const result = await response.json();
     alert(result.message);
+    getSentRequests();
 }
 
-// ✅ 내 친구 목록
+// ✅ 친구 목록 조회
 async function getFriends() {
     const response = await fetch(baseUrl, {
         method: 'GET',
@@ -33,17 +40,29 @@ async function getFriends() {
     list.innerHTML = '';
 
     result.data.friends.forEach(f => {
+        const isMeRequester = f.requesterId === getMyId();
+        const friendNick = isMeRequester ? f.receiverNickName : f.requesterNickName;
+        const friendEmail = isMeRequester ? f.receiverEmail : f.requesterEmail;
+
         const item = document.createElement('li');
-        item.textContent = `${f.requesterId} ↔ ${f.receiverId} (${f.status})`;
+        item.className = 'list-group-item d-flex justify-content-between align-items-center';
+        item.innerHTML = `
+            <div>
+                <strong>${friendNick}</strong> (${friendEmail})
+            </div>
+        `;
+
         const delBtn = document.createElement('button');
+        delBtn.className = 'btn btn-sm btn-danger';
         delBtn.textContent = '삭제';
         delBtn.onclick = () => deleteFriend(f.id);
+
         item.appendChild(delBtn);
         list.appendChild(item);
     });
 }
 
-// ✅ 받은 친구 요청
+// ✅ 받은 친구 요청 조회
 async function getReceivedRequests() {
     const response = await fetch(`${baseUrl}/pending`, {
         method: 'GET',
@@ -56,23 +75,32 @@ async function getReceivedRequests() {
 
     result.data.friends.forEach(f => {
         const item = document.createElement('li');
-        item.textContent = `${f.requesterId} → 나`;
+        item.className = 'list-group-item d-flex justify-content-between align-items-center';
+
+        const text = `<strong>${f.requesterNickName}</strong> (${f.requesterEmail}) → 나`;
+        item.innerHTML = `<div>${text}</div>`;
+
+        const btnGroup = document.createElement('div');
 
         const acceptBtn = document.createElement('button');
+        acceptBtn.className = 'btn btn-success btn-sm me-2';
         acceptBtn.textContent = '수락';
         acceptBtn.onclick = () => updateStatus(f.id, 'ACCEPTED');
 
         const rejectBtn = document.createElement('button');
+        rejectBtn.className = 'btn btn-secondary btn-sm';
         rejectBtn.textContent = '거절';
         rejectBtn.onclick = () => updateStatus(f.id, 'REJECTED');
 
-        item.appendChild(acceptBtn);
-        item.appendChild(rejectBtn);
+        btnGroup.appendChild(acceptBtn);
+        btnGroup.appendChild(rejectBtn);
+        item.appendChild(btnGroup);
+
         list.appendChild(item);
     });
 }
 
-// ✅ 보낸 친구 요청
+// ✅ 보낸 친구 요청 조회
 async function getSentRequests() {
     const response = await fetch(`${baseUrl}/sent`, {
         method: 'GET',
@@ -85,12 +113,13 @@ async function getSentRequests() {
 
     result.data.friends.forEach(f => {
         const item = document.createElement('li');
-        item.textContent = `나 → ${f.receiverId} (${f.status})`;
+        item.className = 'list-group-item';
+        item.innerHTML = `나 → <strong>${f.receiverNickName}</strong> (${f.receiverEmail}) [${f.status}]`;
         list.appendChild(item);
     });
 }
 
-// ✅ 상태 변경
+// ✅ 상태 변경 (수락/거절)
 async function updateStatus(friendId, status) {
     const response = await fetch(`${baseUrl}/${friendId}`, {
         method: 'PATCH',
@@ -101,9 +130,10 @@ async function updateStatus(friendId, status) {
     const result = await response.json();
     alert(result.message);
     getReceivedRequests();
+    getFriends();
 }
 
-// ✅ 삭제
+// ✅ 친구 삭제
 async function deleteFriend(friendId) {
     const response = await fetch(`${baseUrl}/${friendId}`, {
         method: 'DELETE',
@@ -137,19 +167,21 @@ async function searchUser() {
 
     const info = document.createElement('div');
     info.innerHTML = `
-        <p>닉네임: ${nickName} (${email})</p>
+        <p>닉네임: <strong>${nickName}</strong></p>
+        <p>이메일: ${email}</p>
         <p>친구 상태: ${friendStatus ?? '없음'}</p>
     `;
 
     const btn = document.createElement('button');
+    btn.className = 'btn btn-primary';
 
     if (isMe) {
         btn.textContent = '본인입니다.';
         btn.disabled = true;
-    } else if (friendStatus === 'PENDING' || friendStatus === 'ACCEPTED') {
-        btn.textContent = '이미 친구 요청이 존재합니다.';
+    } else if (['PENDING', 'ACCEPTED'].includes(friendStatus)) {
+        btn.textContent = '요청 불가 (이미 존재)';
         btn.disabled = true;
-    } else if (friendStatus === 'REJECTED' || friendStatus === 'AUTO_CANCELLED') {
+    } else if (['REJECTED', 'AUTO_CANCELLED'].includes(friendStatus)) {
         btn.textContent = '친구 요청 불가';
         btn.disabled = true;
     } else {
@@ -160,3 +192,8 @@ async function searchUser() {
     container.appendChild(info);
     container.appendChild(btn);
 }
+
+// ✅ 초기 로딩 시 자동 호출
+getFriends();
+getReceivedRequests();
+getSentRequests();
