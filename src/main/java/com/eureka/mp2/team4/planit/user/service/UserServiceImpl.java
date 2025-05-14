@@ -33,7 +33,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserResponseDto getMyPageData(String userId) {
         try {
-            UserDto userDto = userMapper.findById(userId);
+            UserDto userDto = userMapper.findUserById(userId);
             if (userDto == null) {
                 throw new NotFoundException(NOT_FOUND_USER);
             }
@@ -89,7 +89,7 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public ApiResponse updatePassword(String userId, UpdatePasswordRequestDto requestDto) {
         try {
-            UserDto userDto = userMapper.findById(userId);
+            UserDto userDto = userMapper.findUserById(userId);
             if (userDto == null) {
                 throw new NotFoundException(NOT_FOUND_USER);
             }
@@ -115,7 +115,7 @@ public class UserServiceImpl implements UserService {
         }
 
         try {
-            userMapper.deleteById(userId);
+            userMapper.deleteUserById(userId);
             return ApiResponse.builder()
                     .message(DELETE_USER_SUCCESS)
                     .result(Result.SUCCESS)
@@ -183,7 +183,7 @@ public class UserServiceImpl implements UserService {
             if (value.contains("@")) {
                 return userMapper.findActiveUserByEmail(value);
             } else {
-                return userMapper.findByNickName(value);
+                return userMapper.findActiveUserByNickName(value);
             }
         } catch (DataAccessException e) {
             throw new DatabaseException(FOUND_USER_FAIL);

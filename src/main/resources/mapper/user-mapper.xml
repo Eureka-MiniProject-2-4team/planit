@@ -41,7 +41,7 @@
         and is_active = true
     </select>
 
-    <select id="findById" parameterType="string" resultType="com.eureka.mp2.team4.planit.user.dto.UserDto">
+    <select id="findUserById" parameterType="string" resultType="com.eureka.mp2.team4.planit.user.dto.UserDto">
         SELECT *
         FROM users
         WHERE id = #{id}
@@ -65,7 +65,7 @@
         WHERE id = #{userId}
     </update>
 
-    <delete id="deleteById" parameterType="string">
+    <delete id="deleteUserById" parameterType="string">
         DELETE
         FROM users
         WHERE id = #{userId}
@@ -78,7 +78,7 @@
           AND phone_number = #{phoneNumber}
     </select>
 
-    <select id="findByNickName" parameterType="String">
+    <select id="findActiveUserByNickName" parameterType="String">
         SELECT *
         FROM users
         WHERE nickName = #{nickName}
