@@ -13,25 +13,58 @@
 
     <!-- 내 친구 목록 조회 -->
     <select id="findAllByUserId" resultType="com.eureka.mp2.team4.planit.friend.dto.FriendDto">
-        SELECT id, requester_id, receiver_id, status, created_at, accepted_at
-        FROM friend
-        WHERE (requester_id = #{userId} OR receiver_id = #{userId})
-          AND status = 'ACCEPTED'
+        SELECT f.id,
+               f.requester_id,
+               u1.nickname AS requesterNickName,
+               u1.email AS requesterEmail,
+               f.receiver_id,
+               u2.nickname AS receiverNickName,
+               u2.email AS receiverEmail,
+               f.status,
+               f.created_at,
+               f.accepted_at
+        FROM friend f
+                 JOIN users u1 ON f.requester_id = u1.id
+                 JOIN users u2 ON f.receiver_id = u2.id
+        WHERE (f.requester_id = #{userId} OR f.receiver_id = #{userId})
+          AND f.status = 'ACCEPTED'
     </select>
 
     <!-- 보낸 친구 요청 목록 -->
     <select id="findAskedByRequesterId" resultType="com.eureka.mp2.team4.planit.friend.dto.FriendDto">
-        SELECT id, requester_id, receiver_id, status, created_at, accepted_at
-        FROM friend
-        WHERE requester_id = #{userId}
+        SELECT f.id,
+               f.requester_id,
+               u1.nickname AS requesterNickName,
+               u1.email AS requesterEmail,
+               f.receiver_id,
+               u2.nickname AS receiverNickName,
+               u2.email AS receiverEmail,
+               f.status,
+               f.created_at,
+               f.accepted_at
+        FROM friend f
+                 JOIN users u1 ON f.requester_id = u1.id
+                 JOIN users u2 ON f.receiver_id = u2.id
+        WHERE f.requester_id = #{userId}
     </select>
 
     <!-- 받은 친구 요청 목록 (대기 중) -->
     <select id="findPendingByReceiverId" resultType="com.eureka.mp2.team4.planit.friend.dto.FriendDto">
-        SELECT id, requester_id, receiver_id, status, created_at, accepted_at
-        FROM friend
-        WHERE receiver_id = #{userId}
-          AND status = 'PENDING'
+        SELECT f.id,
+               f.requester_id,
+               u1.nickname AS requesterNickName,
+               u1.email AS requesterEmail,
+               f.receiver_id,
+               u2.nickname AS receiverNickName,
+               u2.email AS receiverEmail,
+               f.status,
+               f.created_at,
+               f.accepted_at
+        FROM friend f
+                 JOIN users u1 ON f.requester_id = u1.id
+                 JOIN users u2 ON f.receiver_id = u2.id
+        WHERE f.receiver_id = #{userId}
+          AND f.status = 'PENDING'
     </select>
 
     <!-- 친구 요청 상태 변경 -->
@@ -45,6 +78,7 @@
         WHERE id = #{friendId}
     </update>
 
+    <!-- 친구 수락 시 상대방이 보낸 대기 상태 요청 자동 취소 -->
     <update id="autoCancelOppositePending">
         UPDATE friend
         SET status = 'AUTO_CANCELLED'
@@ -53,20 +87,41 @@
           AND status = 'PENDING'
     </update>
 
-
     <!-- ID로 친구 요청 조회 -->
     <select id="findById" resultType="com.eureka.mp2.team4.planit.friend.dto.FriendDto">
-        SELECT id, requester_id, receiver_id, status, created_at, accepted_at
-        FROM friend
-        WHERE id = #{friendId}
+        SELECT f.id,
+               f.requester_id,
+               u1.nickname AS requesterNickName,
+               u1.email AS requesterEmail,
+               f.receiver_id,
+               u2.nickname AS receiverNickName,
+               u2.email AS receiverEmail,
+               f.status,
+               f.created_at,
+               f.accepted_at
+        FROM friend f
+                 JOIN users u1 ON f.requester_id = u1.id
+                 JOIN users u2 ON f.receiver_id = u2.id
+        WHERE f.id = #{friendId}
     </select>
 
     <!-- 요청자/수신자의 위치가 바뀌어도 동일한 관계 -->
     <select id="findByBothUserId" resultType="com.eureka.mp2.team4.planit.friend.dto.FriendDto">
-        SELECT id, requester_id, receiver_id, status, created_at, accepted_at
-        FROM friend
-        WHERE (requester_id = #{userId} AND receiver_id = #{targetUserId})
-           OR (requester_id = #{targetUserId} AND receiver_id = #{userId})
+        SELECT f.id,
+               f.requester_id,
+               u1.nickname AS requesterNickName,
+               u1.email AS requesterEmail,
+               f.receiver_id,
+               u2.nickname AS receiverNickName,
+               u2.email AS receiverEmail,
+               f.status,
+               f.created_at,
+               f.accepted_at
+        FROM friend f
+                 JOIN users u1 ON f.requester_id = u1.id
+                 JOIN users u2 ON f.receiver_id = u2.id
+        WHERE (f.requester_id = #{userId} AND f.receiver_id = #{targetUserId})
+           OR (f.requester_id = #{targetUserId} AND f.receiver_id = #{userId})
     </select>
 
     <!-- 친구 삭제 -->
