@@ -15,4 +15,9 @@ public class UserTeamDto {
     private Timestamp joinedAt;
     private String status;
     private String role;
+
+    // user
+    private String userName;
+    private String userEmail;
+    private String userNickName;
 }

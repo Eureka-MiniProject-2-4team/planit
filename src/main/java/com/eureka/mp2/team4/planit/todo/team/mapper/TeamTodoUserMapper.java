@@ -9,6 +9,8 @@ import java.util.List;
 @Mapper
 public interface TeamTodoUserMapper {
 
+    void registerTeamTodoToMembers(@Param("teamTodoId") String teamTodoId, @Param("userId") String userId);
+    List<TeamTodoUserDto> getMyTeamTodoList(@Param("teamId") String teamId, @Param("userId") String userId);
     // 나의 팀 투두 완료 상태 리스트로 가져오기
     TeamTodoUserDto getMyTeamTodoDetail(@Param("teamTodoId") String teamTodoId, @Param("userId") String userId);
 

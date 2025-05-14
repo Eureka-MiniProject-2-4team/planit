@@ -159,10 +159,6 @@
     <label for="teamTodoUserIdStatus">팀 투두 사용자 ID:</label>
     <input type="text" id="teamTodoUserIdStatus" placeholder="상태 변경할 팀 투두 사용자 ID">
   </div>
-  <div class="form-group">
-    <label for="todoStatus">상태 (0: 미완료, 1: 완료):</label>
-    <input type="text" id="todoStatus" placeholder="0 또는 1">
-  </div>
   <button onclick="updateMyTeamTodo()">투두 상태 변경</button>
 </div>
 
@@ -234,7 +230,7 @@
       return;
     }
 
-    fetch(`/api/team/todo/${todoId}`, {
+    fetch(`/api/team/${teamId}/todo/${todoId}`, {
       method: 'GET',
       headers: {
         'Authorization': localStorage.getItem('accessToken')
@@ -348,15 +344,9 @@
   // 8. 나의 팀 투두 상태 변경
   function updateMyTeamTodo() {
     const teamTodoUserId = document.getElementById('teamTodoUserIdStatus').value;
-    const status = document.getElementById('todoStatus').value;
 
     if (!teamTodoUserId) {
       showResponse("수정할 나의 팀 투두 ID를 입력해주세요.");
-      return;
-    }
-
-    if (status !== '0' && status !== '1') {
-      showResponse("상태는 0(미완료) 또는 1(완료)만 입력 가능합니다.");
       return;
     }
 
@@ -367,7 +357,9 @@
         'Authorization': localStorage.getItem('accessToken')
       },
       body: JSON.stringify({
-        status: parseInt(status)
+        teamTodoId : "이게 아닌데",
+        userId : "이것도 아니고",
+        isCompleted : false
       })
     })
             .then(response => response.json())

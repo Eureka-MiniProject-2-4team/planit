@@ -4,6 +4,20 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.eureka.mp2.team4.planit.todo.team.mapper.TeamTodoUserMapper">
+    <insert id="registerTeamTodoToMembers" parameterType="java.lang.String">
+        INSERT INTO team_todo_user (team_todo_id, user_id, is_completed, created_at, updated_at)
+        VALUES (#{teamTodoId}, #{userId}, false, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+    </insert>
+
+    <select id="getMyTeamTodoList" parameterType="java.lang.String" resultType="com.eureka.mp2.team4.planit.todo.team.dto.TeamTodoUserDto">
+        SELECT td.title, td.content, td.created_at, du.team_todo_id, du.is_completed, du.updated_at
+        FROM team_todo_user du
+        JOIN
+            team_todo td ON td.id = du.team_todo_id
+        WHERE td.team_id = #{teamId}
+        AND du.user_id = #{userId}
+    </select>
+
     <select id="getMyTeamTodoDetail" parameterType="java.lang.String" resultType="com.eureka.mp2.team4.planit.todo.team.dto.TeamTodoUserDto">
         SELECT *
         FROM team_todo_user
@@ -13,7 +27,7 @@
 
     <update id="updateMyTeamTodo" parameterType="com.eureka.mp2.team4.planit.todo.team.dto.TeamTodoUserDto">
         UPDATE team_todo_user
-        SET status     = #{status},
+        SET is_completed     = #{isCompleted},
             updated_at = CURRENT_TIMESTAMP
         WHERE team_todo_id = #{teamTodoId}
           AND user_id = #{userId}

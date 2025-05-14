@@ -3,14 +3,17 @@ package com.eureka.mp2.team4.planit.todo.team.service;
 import com.eureka.mp2.team4.planit.common.ApiResponse;
 import com.eureka.mp2.team4.planit.common.Result;
 import com.eureka.mp2.team4.planit.common.exception.NotFoundException;
+import com.eureka.mp2.team4.planit.team.dto.UserTeamDto;
 import com.eureka.mp2.team4.planit.team.mapper.UserTeamMapper;
 import com.eureka.mp2.team4.planit.todo.team.dto.TeamTodoDto;
 import com.eureka.mp2.team4.planit.todo.team.dto.request.TeamTodoRequestDto;
 import com.eureka.mp2.team4.planit.todo.team.dto.response.TeamTodoListResponseDto;
 import com.eureka.mp2.team4.planit.todo.team.dto.response.TeamTodoResponseDto;
 import com.eureka.mp2.team4.planit.todo.team.mapper.TeamTodoMapper;
+import com.eureka.mp2.team4.planit.todo.team.mapper.TeamTodoUserMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.UUID;
@@ -22,8 +25,10 @@ public class TeamTodoServiceImpl implements TeamTodoService {
 
     private final TeamTodoMapper teamTodoMapper;
     private final UserTeamMapper userTeamMapper;
+    private final TeamTodoUserMapper teamTodoUserMapper;
 
     @Override
+    @Transactional
     public ApiResponse createTeamTodo(TeamTodoRequestDto teamTodoRequestDto) {
         try{
             TeamTodoDto teamTodoDto = TeamTodoDto.builder()
@@ -36,6 +41,10 @@ public class TeamTodoServiceImpl implements TeamTodoService {
 
             teamTodoMapper.createTeamTodo(teamTodoDto);
             // 팀 유저들에게도 모두 등록해주는 로직 필요
+            List<UserTeamDto> users = userTeamMapper.getTeamMemberList(teamTodoDto.getTeamId());
+            for(UserTeamDto user : users) {
+                teamTodoUserMapper.registerTeamTodoToMembers(teamTodoDto.getId(), user.getUserId());
+            }
 
             return ApiResponse.builder()
                     .result(Result.SUCCESS)

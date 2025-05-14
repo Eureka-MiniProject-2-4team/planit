@@ -11,6 +11,15 @@
     </insert>
 
     <!--READ-->
+    <select id="getTeamMemberList" parameterType="java.lang.String" resultType="com.eureka.mp2.team4.planit.team.dto.UserTeamDto">
+        SELECT u.email AS userEmail, u.username AS userName, u.nickname AS userNickName, ut.user_id, ut.role, ut.joined_at, ut.team_id
+        FROM user_team ut
+                 JOIN
+             users u ON ut.user_id = u.id
+        WHERE team_id = #{teamId}
+    </select>
+
+
     <select id="getMyTeamList" parameterType="java.lang.String" resultType="com.eureka.mp2.team4.planit.team.dto.UserTeamDto">
         SELECT *
         FROM user_team

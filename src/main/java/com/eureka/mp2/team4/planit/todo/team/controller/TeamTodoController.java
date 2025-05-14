@@ -53,7 +53,7 @@ public class TeamTodoController {
     @GetMapping("{teamId}/todo/my/list")
     public ResponseEntity<ApiResponse> getMyTeamListTodoList(@PathVariable("teamId") String teamId, @AuthenticationPrincipal PlanitUserDetails planitUserDetails) {
         String userId = planitUserDetails.getUsername();
-        return ResponseEntity.ok(myTeamTodoService.getMyTeamListAndTodoList(userId)); // teamId 로 해당 팀의 투두 id 리스트 싹 담아와서 -> userId 로 각 투두 id 리스트에 대한 상태 표시
+        return ResponseEntity.ok(myTeamTodoService.getMyTeamListAndTodoList(teamId, userId)); // teamId 로 해당 팀의 투두 id 리스트 싹 담아와서 -> userId 로 각 투두 id 리스트에 대한 상태 표시
     }
 
     @Operation(summary = "나의 팀 투두 상세 조회", description = "팀에서 나에게 부여한 투두를 나의 진행도에 맞게 개인별 확인")

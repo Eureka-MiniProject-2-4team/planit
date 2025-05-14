@@ -1,13 +1,17 @@
 package com.eureka.mp2.team4.planit.todo.team.dto.response;
 
 import lombok.Builder;
+import lombok.Getter;
 
 import java.sql.Timestamp;
 
+@Getter
 @Builder
 public class MyTeamTodoResponseDto {
     private String teamTodoId;
-    private String teamId;
+    private String title;
+    private String content;
     private boolean isCompleted;
+    private Timestamp createdAt;
     private Timestamp updatedAt;
 }

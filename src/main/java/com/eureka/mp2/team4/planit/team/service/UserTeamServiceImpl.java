@@ -61,14 +61,23 @@ public class UserTeamServiceImpl implements UserTeamService {
 
     // user 테이블 건드리는것 보류
     @Override
-    public ApiResponse getTeamMember(String userId) {
-        return null;
-    }
-
-    // user 테이블 건드리는것 보류
-    @Override
     public ApiResponse getTeamMemberList(String teamId) {
-        return null;
+       try{
+           List<UserTeamDto> userTeamDtoList = userTeamMapper.getTeamMemberList(teamId);
+
+           return ApiResponse.builder()
+                   .result(Result.SUCCESS)
+                   .message(GET_TEAM_MEMBER_LIST_SUCCESS)
+                   .data(userTeamDtoList)
+                   .build();
+
+       } catch (Exception e){
+           e.printStackTrace();
+           return ApiResponse.builder()
+                   .result(Result.FAIL)
+                   .message(GET_TEAM_MEMBER_LIST_FAIL)
+                   .build();
+       }
     }
 
     @Override

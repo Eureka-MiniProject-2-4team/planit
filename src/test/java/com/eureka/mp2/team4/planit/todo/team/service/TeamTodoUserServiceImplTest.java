@@ -7,9 +7,7 @@ import com.eureka.mp2.team4.planit.team.mapper.UserTeamMapper;
 import com.eureka.mp2.team4.planit.todo.team.dto.TeamTodoDto;
 import com.eureka.mp2.team4.planit.todo.team.dto.TeamTodoUserDto;
 import com.eureka.mp2.team4.planit.todo.team.dto.request.MyTeamTodoRequestDto;
-import com.eureka.mp2.team4.planit.todo.team.dto.response.MyTeamListResponseDto;
-import com.eureka.mp2.team4.planit.todo.team.dto.response.MyTeamTodoDetailResponseDto;
-import com.eureka.mp2.team4.planit.todo.team.dto.response.TeamWithTodoResponseDto;
+import com.eureka.mp2.team4.planit.todo.team.dto.response.*;
 import com.eureka.mp2.team4.planit.todo.team.mapper.TeamTodoMapper;
 import com.eureka.mp2.team4.planit.todo.team.mapper.TeamTodoUserMapper;
 import org.junit.jupiter.api.BeforeEach;
@@ -22,6 +20,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
@@ -106,52 +105,157 @@ public class TeamTodoUserServiceImplTest {
     }
 
     // 1. getMyTeamListAndTodoList 테스트 - 성공 케이스
+    // 1. getMyTeamListAndTodoList 테스트 - 성공 케이스
     @Test
     void testGetMyTeamListAndTodoListSuccess() {
         // Given
-        when(userTeamMapper.getMyTeamList(userId)).thenReturn(userTeamDtoList);
-        when(teamTodoMapper.getTeamTodoList(teamId)).thenReturn(teamTodoDtoList);
-        when(myMapper.getMyTeamTodoDetail(any(), eq(userId))).thenReturn(teamTodoUserDto);
+        // TeamTodoUser DTO 리스트 생성
+        List<TeamTodoUserDto> teamTodoUserDtoList = Arrays.asList(
+                TeamTodoUserDto.builder()
+                        .title("테스트 할 일 1")
+                        .content("테스트 내용 1")
+                        .isCompleted(false)
+                        .createdAt(Timestamp.valueOf(LocalDateTime.now()))
+                        .updatedAt(Timestamp.valueOf(LocalDateTime.now()))
+                        .build(),
+                TeamTodoUserDto.builder()
+                        .title("테스트 할 일 2")
+                        .content("테스트 내용 2")
+                        .isCompleted(true)
+                        .createdAt(Timestamp.valueOf(LocalDateTime.now()))
+                        .updatedAt(Timestamp.valueOf(LocalDateTime.now()))
+                        .build()
+        );
+
+        // 팀 투두 존재 여부 모킹
+        when(teamTodoMapper.existTeamTodoByTeamId(eq(teamId))).thenReturn(1); // 팀 투두 존재
+
+        // 내 팀 리스트 존재 여부 모킹
+        when(userTeamMapper.getMyTeamList(eq(userId))).thenReturn(Arrays.asList(new UserTeamDto())); // 내 팀 리스트 존재
+
+        // 내 팀 투두 리스트 조회 모킹
+        when(myMapper.getMyTeamTodoList(eq(teamId), eq(userId))).thenReturn(teamTodoUserDtoList);
 
         // When
-        ApiResponse response = teamTodoUserService.getMyTeamListAndTodoList(userId);
+        ApiResponse response = teamTodoUserService.getMyTeamListAndTodoList(teamId, userId);
 
         // Then
         assertEquals(Result.SUCCESS, response.getResult());
         assertEquals(GET_MY_TEAM_AND_TODO_LIST_SUCCESS, response.getMessage());
         assertNotNull(response.getData());
 
-        MyTeamListResponseDto responseData = (MyTeamListResponseDto) response.getData();
-        assertNotNull(responseData.getTeams());
-        assertEquals(1, responseData.getTeams().size());
+        // 응답 데이터 검증
+        MyTeamTodoListResponseDto responseData = (MyTeamTodoListResponseDto) response.getData();
+        List<MyTeamTodoResponseDto> todoList = responseData.getMyTeamTodoStatus();
 
-        TeamWithTodoResponseDto teamData = responseData.getTeams().get(0);
-        assertEquals(teamId, teamData.getTeamId());
-        assertNotNull(teamData.getTodos());
-        assertEquals(2, teamData.getTodos().size());
+        assertEquals(2, todoList.size());
+        assertEquals("테스트 할 일 1", todoList.get(0).getTitle());
+        assertEquals("테스트 내용 1", todoList.get(0).getContent());
+        assertFalse(todoList.get(0).isCompleted());
 
-        verify(userTeamMapper, times(1)).getMyTeamList(userId);
-        verify(teamTodoMapper, times(1)).getTeamTodoList(teamId);
-        verify(myMapper, times(2)).getMyTeamTodoDetail(any(), eq(userId));
+        assertEquals("테스트 할 일 2", todoList.get(1).getTitle());
+        assertEquals("테스트 내용 2", todoList.get(1).getContent());
+        assertTrue(todoList.get(1).isCompleted());
+
+        // 메서드 호출 검증
+        verify(teamTodoMapper, times(1)).existTeamTodoByTeamId(eq(teamId));
+        verify(userTeamMapper, times(1)).getMyTeamList(eq(userId));
+        verify(myMapper, times(1)).getMyTeamTodoList(eq(teamId), eq(userId));
     }
 
-    // 2. getMyTeamListAndTodoList 테스트 - 팀 리스트가 없는 경우
+    // 2. getMyTeamListAndTodoList 테스트 - 팀 투두가 없는 경우
     @Test
-    void testGetMyTeamListAndTodoListWithNoTeams() {
+    void testGetMyTeamListAndTodoListNoTeamTodo() {
         // Given
-        when(userTeamMapper.getMyTeamList(userId)).thenReturn(null);
+        // 팀 투두 없음 모킹
+        when(teamTodoMapper.existTeamTodoByTeamId(eq(teamId))).thenReturn(null);
 
         // When
-        ApiResponse response = teamTodoUserService.getMyTeamListAndTodoList(userId);
+        ApiResponse response = teamTodoUserService.getMyTeamListAndTodoList(teamId, userId);
 
         // Then
         assertEquals(Result.FAIL, response.getResult());
-        assertEquals(NOT_FOUND_MY_TEAMLIST, response.getMessage());
-        assertNull(response.getData());
+        assertEquals(GET_MY_TEAM_AND_TODO_LIST_FAIL, response.getMessage()); // 일반적인 실패 메시지
 
-        verify(userTeamMapper, times(1)).getMyTeamList(userId);
-        verify(teamTodoMapper, never()).getTeamTodoList(any());
-        verify(myMapper, never()).getMyTeamTodoDetail(any(), any());
+        // 메서드 호출 검증
+        verify(teamTodoMapper, times(1)).existTeamTodoByTeamId(eq(teamId));
+        verify(userTeamMapper, never()).getMyTeamList(anyString()); // 팀 투두가 없으므로 이 메서드는 호출되지 않음
+        verify(myMapper, never()).getMyTeamTodoList(anyString(), anyString()); // 팀 투두가 없으므로 이 메서드는 호출되지 않음
+    }
+
+    // 3. getMyTeamListAndTodoList 테스트 - 내 팀 리스트가 없는 경우
+    @Test
+    void testGetMyTeamListAndTodoListNoMyTeamList() {
+        // Given
+        // 팀 투두 존재하지만 내 팀 리스트 없음 모킹
+        when(teamTodoMapper.existTeamTodoByTeamId(eq(teamId))).thenReturn(1); // 팀 투두 존재
+        when(userTeamMapper.getMyTeamList(eq(userId))).thenReturn(null); // 내 팀 리스트 없음
+
+        // When
+        ApiResponse response = teamTodoUserService.getMyTeamListAndTodoList(teamId, userId);
+
+        // Then
+        assertEquals(Result.FAIL, response.getResult());
+        assertEquals(GET_MY_TEAM_AND_TODO_LIST_FAIL, response.getMessage()); // 일반적인 실패 메시지
+
+        // 메서드 호출 검증
+        verify(teamTodoMapper, times(1)).existTeamTodoByTeamId(eq(teamId));
+        verify(userTeamMapper, times(1)).getMyTeamList(eq(userId));
+        verify(myMapper, never()).getMyTeamTodoList(anyString(), anyString()); // 내 팀 리스트가 없으므로 이 메서드는 호출되지 않음
+    }
+
+    // 4. getMyTeamListAndTodoList 테스트 - 팀 투두 목록 조회 시 예외 발생
+    @Test
+    void testGetMyTeamListAndTodoListExceptionOnFetchingTodoList() {
+        // Given
+        // 팀 투두 존재 및 내 팀 리스트 존재 모킹
+        when(teamTodoMapper.existTeamTodoByTeamId(eq(teamId))).thenReturn(1); // 팀 투두 존재
+        when(userTeamMapper.getMyTeamList(eq(userId))).thenReturn(Arrays.asList(new UserTeamDto())); // 내 팀 리스트 존재
+
+        // 팀 투두 목록 조회 시 예외 발생 모킹
+        when(myMapper.getMyTeamTodoList(eq(teamId), eq(userId)))
+                .thenThrow(new RuntimeException("데이터베이스 오류"));
+
+        // When
+        ApiResponse response = teamTodoUserService.getMyTeamListAndTodoList(teamId, userId);
+
+        // Then
+        assertEquals(Result.FAIL, response.getResult());
+        assertEquals(GET_MY_TEAM_AND_TODO_LIST_FAIL, response.getMessage());
+
+        // 메서드 호출 검증
+        verify(teamTodoMapper, times(1)).existTeamTodoByTeamId(eq(teamId));
+        verify(userTeamMapper, times(1)).getMyTeamList(eq(userId));
+        verify(myMapper, times(1)).getMyTeamTodoList(eq(teamId), eq(userId));
+    }
+
+    // 5. getMyTeamListAndTodoList 테스트 - 빈 투두 리스트 반환
+    @Test
+    void testGetMyTeamListAndTodoListEmptyTodoList() {
+        // Given
+        // 팀 투두 존재 및 내 팀 리스트 존재 모킹
+        when(teamTodoMapper.existTeamTodoByTeamId(eq(teamId))).thenReturn(1); // 팀 투두 존재
+        when(userTeamMapper.getMyTeamList(eq(userId))).thenReturn(Arrays.asList(new UserTeamDto())); // 내 팀 리스트 존재
+
+        // 빈 투두 리스트 반환 모킹
+        when(myMapper.getMyTeamTodoList(eq(teamId), eq(userId))).thenReturn(Collections.emptyList());
+
+        // When
+        ApiResponse response = teamTodoUserService.getMyTeamListAndTodoList(teamId, userId);
+
+        // Then
+        assertEquals(Result.SUCCESS, response.getResult());
+        assertEquals(GET_MY_TEAM_AND_TODO_LIST_SUCCESS, response.getMessage());
+        assertNotNull(response.getData());
+
+        // 응답 데이터 검증 - 빈 리스트
+        MyTeamTodoListResponseDto responseData = (MyTeamTodoListResponseDto) response.getData();
+        assertTrue(responseData.getMyTeamTodoStatus().isEmpty());
+
+        // 메서드 호출 검증
+        verify(teamTodoMapper, times(1)).existTeamTodoByTeamId(eq(teamId));
+        verify(userTeamMapper, times(1)).getMyTeamList(eq(userId));
+        verify(myMapper, times(1)).getMyTeamTodoList(eq(teamId), eq(userId));
     }
 
     // 3. getMyTeamTodoDetail 테스트 - 성공 케이스
@@ -240,17 +344,5 @@ public class TeamTodoUserServiceImplTest {
 
         verify(teamTodoMapper, times(1)).getTeamTodoById(teamTodoId);
         verify(myMapper, never()).updateMyTeamTodo(any(TeamTodoUserDto.class));
-    }
-
-    // 7. updateStatus 메서드 테스트
-    @Test
-    void testUpdateStatus() {
-        // Given & When
-        boolean result1 = teamTodoUserService.updateStatus(true);
-        boolean result2 = teamTodoUserService.updateStatus(false);
-
-        // Then
-        assertFalse(result1);
-        assertTrue(result2);
     }
 }
