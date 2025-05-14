@@ -22,8 +22,6 @@ public interface FriendMapper {
 
     void updateStatus(@Param("friendId") String friendId, @Param("status") String status);
 
-    void autoCancelOppositePending(@Param("oppositeRequesterId") String oppositeRequesterId,
-                                   @Param("oppositeReceiverId") String oppositeReceiverId);
     void delete(String friendId);
 
     FriendDto findById(String friendId);

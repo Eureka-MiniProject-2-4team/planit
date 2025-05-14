@@ -182,19 +182,7 @@ public class FriendServiceImpl implements FriendService {
     @Transactional
     public ApiResponse updateStatus(String friendId, FriendUpdateStatusDto dto) {
         try {
-            // 친구 상태 변경
             mapper.updateStatus(friendId, dto.getStatus().name());
-
-            // 친구 수락 시 상대방의 대기 중인 요청을 자동 취소
-            if (dto.getStatus() == FriendStatus.ACCEPTED) {
-                FriendDto acceptedRequest = mapper.findById(friendId);
-
-                String oppositeRequesterId = acceptedRequest.getReceiverId();
-                String oppositeReceiverId = acceptedRequest.getRequesterId();
-
-                // 상대방의 대기 상태를 'AUTO_CANCELLED'로 변경
-                mapper.autoCancelOppositePending(oppositeRequesterId, oppositeReceiverId);
-            }
 
             return ApiResponse.builder()
                     .result(Result.SUCCESS)

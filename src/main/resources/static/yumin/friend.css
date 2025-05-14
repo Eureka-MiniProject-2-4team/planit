@@ -1,4 +1,4 @@
-/* Body styling */
+/* Body Styling */
 body {
     background-color: #f8f9fa;
     font-family: Arial, sans-serif;
@@ -65,4 +65,25 @@ input:focus {
 
 .list-group-item .btn {
     margin-left: 10px;
+}
+
+/* Modal Styling */
+.modal-content {
+    border-radius: 8px;
+}
+
+.modal-header {
+    background-color: #007bff;
+    color: white;
+}
+
+.modal-footer {
+    background-color: #f8f9fa;
+}
+
+.list-group-item {
+    padding: 15px;
+    background-color: #f1f1f1;
+    margin-bottom: 10px;
+    border-radius: 5px;
 }
