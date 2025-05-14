@@ -1,8 +1,6 @@
 package com.eureka.mp2.team4.planit.auth.controller;
 
-import com.eureka.mp2.team4.planit.auth.dto.request.FindEmailRequestDto;
-import com.eureka.mp2.team4.planit.auth.dto.request.UserRegisterRequestDto;
-import com.eureka.mp2.team4.planit.auth.dto.request.VerifyPasswordRequestDto;
+import com.eureka.mp2.team4.planit.auth.dto.request.*;
 import com.eureka.mp2.team4.planit.auth.security.PlanitUserDetails;
 import com.eureka.mp2.team4.planit.auth.service.AuthService;
 import com.eureka.mp2.team4.planit.common.ApiResponse;
@@ -60,4 +58,17 @@ public class AuthController {
         ApiResponse response = authService.findEmail(requestDto);
         return ResponseEntity.ok().body(response);
     }
+
+    @PostMapping("/find-password")
+    public ResponseEntity<?> findPassword(@RequestBody FindPasswordRequestDto requestDto) {
+        ApiResponse response = authService.findPassword(requestDto);
+        return ResponseEntity.ok().body(response);
+    }
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<?> resetPassword(@RequestBody ResetPasswordRequestDto requestDto) {
+        ApiResponse response = authService.resetPassword(requestDto);
+        return ResponseEntity.ok().body(response);
+    }
+
 }

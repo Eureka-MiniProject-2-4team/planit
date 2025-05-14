@@ -353,12 +353,10 @@ public class UserServiceImplTest {
 
         when(userMapper.findByNickName(value)).thenReturn(null);
 
-        // when
-        ApiResponse<?> response = userService.getUserInfo(currentUserId, value, teamId);
-
-        // then
-        assertEquals(Result.FAIL, response.getResult());
-        assertEquals(NOT_FOUND_USER, response.getMessage());
+        NotFoundException ex = assertThrows(NotFoundException.class, () -> {
+            userService.getUserInfo(currentUserId, value, teamId);
+        });
+        assertEquals(NOT_FOUND_USER, ex.getMessage());
     }
 
     @Test

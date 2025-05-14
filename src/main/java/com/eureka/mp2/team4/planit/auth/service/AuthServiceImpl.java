@@ -1,14 +1,12 @@
 package com.eureka.mp2.team4.planit.auth.service;
 
-import com.eureka.mp2.team4.planit.auth.dto.request.FindEmailRequestDto;
-import com.eureka.mp2.team4.planit.auth.dto.request.UserRegisterRequestDto;
-import com.eureka.mp2.team4.planit.auth.dto.request.VerifyPasswordRequestDto;
+import com.eureka.mp2.team4.planit.auth.dto.request.*;
 import com.eureka.mp2.team4.planit.auth.dto.response.FindEmailResponseDto;
 import com.eureka.mp2.team4.planit.common.ApiResponse;
 import com.eureka.mp2.team4.planit.common.Result;
-import com.eureka.mp2.team4.planit.common.exception.DatabaseException;
-import com.eureka.mp2.team4.planit.common.exception.DuplicateFieldException;
-import com.eureka.mp2.team4.planit.common.exception.NotFoundException;
+import com.eureka.mp2.team4.planit.common.email.EmailService;
+import com.eureka.mp2.team4.planit.common.exception.*;
+import com.eureka.mp2.team4.planit.common.token.ResetPasswordTokenService;
 import com.eureka.mp2.team4.planit.user.dto.UserDto;
 import com.eureka.mp2.team4.planit.user.enums.UserRole;
 import com.eureka.mp2.team4.planit.user.mapper.UserMapper;
@@ -20,6 +18,7 @@ import org.springframework.stereotype.Service;
 import java.util.UUID;
 
 import static com.eureka.mp2.team4.planit.auth.constants.Messages.*;
+import static com.eureka.mp2.team4.planit.auth.constants.Messages.UPDATE_PASSWORD_SUCCESS;
 import static com.eureka.mp2.team4.planit.common.utils.MaskingUtil.maskEmail;
 import static com.eureka.mp2.team4.planit.user.constants.Messages.*;
 
@@ -28,6 +27,8 @@ import static com.eureka.mp2.team4.planit.user.constants.Messages.*;
 public class AuthServiceImpl implements AuthService {
     private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
+    private final EmailService emailService;
+    private final ResetPasswordTokenService passwordTokenService;
 
     @Override
     public ApiResponse register(UserRegisterRequestDto requestDto) {
@@ -117,10 +118,7 @@ public class AuthServiceImpl implements AuthService {
         UserDto userDto = getUserByNameAndPhone(requestDto.getName(), requestDto.getPhoneNumber());
 
         if (userDto == null) {
-            return ApiResponse.builder()
-                    .result(Result.FAIL)
-                    .message(NOT_FOUND_USER)
-                    .build();
+            throw new NotFoundException(NOT_FOUND_USER);
         }
 
         String maskedEmail = maskEmail(userDto.getEmail());
@@ -130,6 +128,56 @@ public class AuthServiceImpl implements AuthService {
                 .message(FOUND_EMAIL_SUCCESS)
                 .data(FindEmailResponseDto.builder().email(maskedEmail).build())
                 .build();
+    }
+
+    @Override
+    public ApiResponse findPassword(FindPasswordRequestDto requestDto) {
+        UserDto userDto;
+        try {
+            userDto = userMapper.findUserByNameAndEmail(requestDto.getUserName(),requestDto.getEmail());
+            if(userDto==null){
+                throw new NotFoundException(NOT_FOUND_USER);
+            }
+            String token = UUID.randomUUID().toString();
+            passwordTokenService.saveToken(token, userDto.getId());
+            emailService.sendPasswordResetEmail(userDto.getEmail(),token);
+            return ApiResponse.builder()
+                    .result(Result.SUCCESS)
+                    .message(SEND_RESET_PASSWORD_EMAIL)
+                    .build();
+        }catch (DataAccessException e) {
+            throw new DatabaseException(FOUND_PASSWORD_FAIL);
+        }catch (NotFoundException e){
+            throw e;
+        }catch (Exception e){
+            throw new InternalServerErrorException();
+        }
+    }
+
+    @Override
+    public ApiResponse resetPassword(ResetPasswordRequestDto requestDto) {
+        try {
+            String userId = passwordTokenService.getUserIdByToken(requestDto.getToken());
+            if (userId == null) {
+                throw new TokenInvalidException();
+            }
+
+            String encodedPassword = passwordEncoder.encode(requestDto.getNewPassword());
+            userMapper.updatePassword(userId, encodedPassword);
+            passwordTokenService.removeToken(requestDto.getToken());
+
+            return ApiResponse.builder()
+                    .result(Result.SUCCESS)
+                    .message(UPDATE_PASSWORD_SUCCESS)
+                    .build();
+
+        } catch (DataAccessException e) {
+            throw new DatabaseException(UPDATE_PASSWORD_FAIL);
+        } catch (TokenInvalidException e){
+            throw e;
+        }catch (Exception e){
+            throw new InternalServerErrorException();
+        }
     }
 
     private UserDto getUserByNameAndPhone(String name, String phoneNumber) {

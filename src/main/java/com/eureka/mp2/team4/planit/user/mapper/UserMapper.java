@@ -30,4 +30,6 @@ public interface UserMapper {
     UserDto findUserByNameAndPhoneNumber(@Param("name") String name, @Param("phoneNumber") String phoneNumber);
 
     UserDto findByNickName(String nickName);
+
+    UserDto findUserByNameAndEmail(@Param("name") String userName, @Param("email") String email);
 }
