@@ -1,6 +1,6 @@
 const baseUrl = '/api/friend';
 
-// JWT 헤더 생성
+// JWT 헤더 생성 (로그인 여부 관계없이 헤더만 포함)
 function authHeaders() {
     const raw = localStorage.getItem('accessToken') || '';
     const token = raw.replace(/^Bearer\s+/i, '');
@@ -10,12 +10,12 @@ function authHeaders() {
     };
 }
 
-// 로그인 사용자 ID (localStorage에 저장되어 있다고 가정)
-function getMyId() {
-    return localStorage.getItem('userId');
+// 메시지 알림 함수
+function showAlert(message) {
+    alert(message);
 }
 
-// ✅ 친구 요청 보내기
+// 친구 요청 보내기
 async function sendFriendRequestById(receiverId) {
     const response = await fetch(baseUrl, {
         method: 'POST',
@@ -24,45 +24,63 @@ async function sendFriendRequestById(receiverId) {
     });
 
     const result = await response.json();
-    alert(result.message);
+    showAlert(result.message);
     getSentRequests();
 }
 
-// ✅ 친구 목록 조회
+// 친구 목록 조회
 async function getFriends() {
-    const response = await fetch(baseUrl, {
-        method: 'GET',
-        headers: authHeaders()
-    });
+    try {
+        const response = await fetch(baseUrl, {
+            method: 'GET',
+            headers: authHeaders()
+        });
 
-    const result = await response.json();
-    const list = document.getElementById('friendList');
-    list.innerHTML = '';
+        const result = await response.json();
 
-    result.data.friends.forEach(f => {
-        const isMeRequester = f.requesterId === getMyId();
-        const friendNick = isMeRequester ? f.receiverNickName : f.requesterNickName;
-        const friendEmail = isMeRequester ? f.receiverEmail : f.requesterEmail;
+        // 예기치 않은 오류가 발생한 경우 처리
+        if (result.result === 'FAIL') {
+            showAlert(result.message || '친구 목록을 불러오는 데 실패했습니다.');
+            return;
+        }
 
-        const item = document.createElement('li');
-        item.className = 'list-group-item d-flex justify-content-between align-items-center';
-        item.innerHTML = `
-            <div>
-                <strong>${friendNick}</strong> (${friendEmail})
-            </div>
-        `;
+        const list = document.getElementById('friendList');
+        list.innerHTML = '';
 
-        const delBtn = document.createElement('button');
-        delBtn.className = 'btn btn-sm btn-danger';
-        delBtn.textContent = '삭제';
-        delBtn.onclick = () => deleteFriend(f.id);
+        // 응답 데이터 확인
+        if (!result || !result.data || !result.data.friends || result.data.friends.length === 0) {
+            showAlert('친구 목록이 비어있거나 잘못된 응답이 왔습니다.');
+            return;
+        }
 
-        item.appendChild(delBtn);
-        list.appendChild(item);
-    });
+        result.data.friends.forEach(f => {
+            const friendNick = f.receiverNickName;  // receiverNickName으로 수정
+            const friendEmail = f.receiverEmail;   // receiverEmail으로 수정
+            const friendStatus = f.status;         // status 가져오기
+
+            const item = document.createElement('li');
+            item.className = 'list-group-item d-flex justify-content-between align-items-center';
+            item.innerHTML = `
+                <div>
+                    <strong>${friendNick}</strong> (${friendEmail}) [${friendStatus}]
+                </div>
+            `;
+
+            const delBtn = document.createElement('button');
+            delBtn.className = 'btn btn-sm btn-danger';
+            delBtn.textContent = '삭제';
+            delBtn.onclick = () => deleteFriend(f.id);
+
+            item.appendChild(delBtn);
+            list.appendChild(item);
+        });
+    } catch (error) {
+        // 네트워크 오류 처리
+        showAlert('네트워크 오류가 발생했습니다. 잠시 후 다시 시도해주세요.');
+    }
 }
 
-// ✅ 받은 친구 요청 조회
+// 받은 친구 요청 조회
 async function getReceivedRequests() {
     const response = await fetch(`${baseUrl}/pending`, {
         method: 'GET',
@@ -100,7 +118,7 @@ async function getReceivedRequests() {
     });
 }
 
-// ✅ 보낸 친구 요청 조회
+// 보낸 친구 요청 조회
 async function getSentRequests() {
     const response = await fetch(`${baseUrl}/sent`, {
         method: 'GET',
@@ -119,7 +137,7 @@ async function getSentRequests() {
     });
 }
 
-// ✅ 상태 변경 (수락/거절)
+// 상태 변경 (수락/거절)
 async function updateStatus(friendId, status) {
     const response = await fetch(`${baseUrl}/${friendId}`, {
         method: 'PATCH',
@@ -128,12 +146,12 @@ async function updateStatus(friendId, status) {
     });
 
     const result = await response.json();
-    alert(result.message);
+    showAlert(result.message);
     getReceivedRequests();
     getFriends();
 }
 
-// ✅ 친구 삭제
+// 친구 삭제
 async function deleteFriend(friendId) {
     const response = await fetch(`${baseUrl}/${friendId}`, {
         method: 'DELETE',
@@ -141,11 +159,11 @@ async function deleteFriend(friendId) {
     });
 
     const result = await response.json();
-    alert(result.message);
+    showAlert(result.message);
     getFriends();
 }
 
-// ✅ 유저 검색 + 요청 버튼 노출
+// 유저 검색 + 요청 버튼 노출
 async function searchUser() {
     const value = document.getElementById('searchValue').value;
 
@@ -193,7 +211,7 @@ async function searchUser() {
     container.appendChild(btn);
 }
 
-// ✅ 초기 로딩 시 자동 호출
+// 초기 로딩 시 자동 호출
 getFriends();
 getReceivedRequests();
 getSentRequests();
