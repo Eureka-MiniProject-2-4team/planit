@@ -9,8 +9,10 @@ import java.util.List;
 public interface TeamTodoMapper {
     void createTeamTodo(TeamTodoDto teamTodoDto);
 
+    // 팀 자체의 투두 리스트 가져오기
     List<TeamTodoDto> getTeamTodoList(String teamId);
     TeamTodoDto getTeamTodoById(String teamTodoId);
+    Integer existTeamTodoByTeamId(String teamId);
 
     void updateTeamTodo(TeamTodoDto teamTodoDto);
 
