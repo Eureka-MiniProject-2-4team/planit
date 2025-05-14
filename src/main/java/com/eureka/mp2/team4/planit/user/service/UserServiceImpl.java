@@ -130,10 +130,7 @@ public class UserServiceImpl implements UserService {
         UserDto targetUser = findUserByValue(value);
 
         if (targetUser == null) {
-            return ApiResponse.builder()
-                    .result(Result.FAIL)
-                    .message(NOT_FOUND_USER)
-                    .build();
+            throw new NotFoundException(NOT_FOUND_USER);
         }
 
         if (targetUser.getId().equals(currentUserId)) {

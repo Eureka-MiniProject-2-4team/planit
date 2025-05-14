@@ -117,10 +117,7 @@ public class AuthServiceImpl implements AuthService {
         UserDto userDto = getUserByNameAndPhone(requestDto.getName(), requestDto.getPhoneNumber());
 
         if (userDto == null) {
-            return ApiResponse.builder()
-                    .result(Result.FAIL)
-                    .message(NOT_FOUND_USER)
-                    .build();
+            throw new NotFoundException(NOT_FOUND_USER);
         }
 
         String maskedEmail = maskEmail(userDto.getEmail());

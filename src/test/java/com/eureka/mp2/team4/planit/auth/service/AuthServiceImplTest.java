@@ -277,11 +277,13 @@ public class AuthServiceImplTest {
         when(userMapper.findUserByNameAndPhoneNumber("홍길순", "01000000000")).thenReturn(null);
 
         // when
-        ApiResponse<?> response = authService.findEmail(request);
 
         // then
-        assertEquals(Result.FAIL, response.getResult());
-        assertEquals(NOT_FOUND_USER, response.getMessage());
+        NotFoundException ex = assertThrows(NotFoundException.class, () -> {
+            authService.findEmail(request);
+        });
+
+        assertEquals(NOT_FOUND_USER, ex.getMessage());
 
         verify(userMapper).findUserByNameAndPhoneNumber("홍길순", "01000000000");
     }
