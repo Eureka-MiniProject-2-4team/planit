@@ -16,8 +16,6 @@ public interface UserTeamMapper {
     void registerTeamMember(UserTeamDto userTeamDto); // 팀에 멤버를 등록 ( 팀장 포함 ), 서비스에서 팀장과 팀원 구분
 
     // READ
-    UserTeamResponseDto getTeamMember(String userId);
-
     List<UserTeamDto> getTeamMemberList(String teamId);
 
     List<UserTeamDto> getMyTeamList(String userId);

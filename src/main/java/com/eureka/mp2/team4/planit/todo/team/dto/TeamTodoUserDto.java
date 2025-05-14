@@ -14,7 +14,11 @@ import java.sql.Timestamp;
 public class TeamTodoUserDto {
     private String teamTodoId;
     private String userId;
+    private String title;
+    private String content;
     private boolean isCompleted;
     private Timestamp createdAt;
     private Timestamp updatedAt;
+
+
 }

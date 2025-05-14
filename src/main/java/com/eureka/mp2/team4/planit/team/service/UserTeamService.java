@@ -10,7 +10,6 @@ public interface UserTeamService {
 
     // 팀원
     // READ
-    ApiResponse getTeamMember(String userId); // user 테이블 건드려야함
     ApiResponse getTeamMemberList(String teamId); // user 테이블 건드려야함
     ApiResponse getMyTeamList(String userId);
     ApiResponse getMyInvitedList(String userId);

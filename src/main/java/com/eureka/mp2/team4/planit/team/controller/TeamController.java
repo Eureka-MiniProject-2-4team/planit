@@ -48,14 +48,14 @@ public class TeamController {
         return ResponseEntity.ok(teamService.getTeamById(id));
     }
 
-    // 팀원 ( 팀장도 팀원이자 팀장이라서 가능 )
-    @Operation(summary = "팀원 상세 조회", description = "특정 팀원(타인) 상세 조회")
-    @TeamCheck
-    @GetMapping("/{teamId}/member/{userId}")
-    public ResponseEntity<ApiResponse> getTeamMember(@PathVariable("teamId") String teamId,
-                                                     @PathVariable("userId") String userId) {
-        return ResponseEntity.ok(userTeamService.getTeamMember(userId));
-    }
+//    // 팀원 ( 팀장도 팀원이자 팀장이라서 가능 )
+//    @Operation(summary = "팀원 상세 조회", description = "특정 팀원(타인) 상세 조회")
+//    @TeamCheck
+//    @GetMapping("/{teamId}/member/{userId}")
+//    public ResponseEntity<ApiResponse> getTeamMember(@PathVariable("teamId") String teamId,
+//                                                     @PathVariable("userId") String userId) {
+//        return ResponseEntity.ok(userTeamService.getTeamMember(userId));
+//    }
 
     @Operation(summary = "팀원 전체 조회", description = "팀의 모든 구성원 리스트 조회")
     @TeamCheck

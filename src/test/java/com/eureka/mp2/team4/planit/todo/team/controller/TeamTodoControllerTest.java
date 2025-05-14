@@ -261,7 +261,7 @@ class TeamTodoControllerTest {
                 .data(responseList)
                 .build();
 
-        when(myTeamTodoService.getMyTeamListAndTodoList(eq("test-user-id")))
+        when(myTeamTodoService.getMyTeamListAndTodoList(eq(teamId), eq("test-user-id")))
                 .thenReturn(successResponse);
 
         // When & Then
@@ -282,7 +282,7 @@ class TeamTodoControllerTest {
                 .andExpect(jsonPath("$.data.teams[0].todos[0].completed").value(false));
 
         // 서비스 메서드 호출 검증
-        verify(myTeamTodoService, times(1)).getMyTeamListAndTodoList(eq("test-user-id"));
+        verify(myTeamTodoService, times(1)).getMyTeamListAndTodoList(eq(teamId),eq("test-user-id"));
     }
 
     @Test
