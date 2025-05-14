@@ -1,14 +1,12 @@
 package com.eureka.mp2.team4.planit.auth.service;
 
-import com.eureka.mp2.team4.planit.auth.dto.request.FindEmailRequestDto;
-import com.eureka.mp2.team4.planit.auth.dto.request.UserRegisterRequestDto;
-import com.eureka.mp2.team4.planit.auth.dto.request.VerifyPasswordRequestDto;
+import com.eureka.mp2.team4.planit.auth.dto.request.*;
 import com.eureka.mp2.team4.planit.auth.dto.response.FindEmailResponseDto;
 import com.eureka.mp2.team4.planit.common.ApiResponse;
 import com.eureka.mp2.team4.planit.common.Result;
-import com.eureka.mp2.team4.planit.common.exception.DatabaseException;
-import com.eureka.mp2.team4.planit.common.exception.DuplicateFieldException;
-import com.eureka.mp2.team4.planit.common.exception.NotFoundException;
+import com.eureka.mp2.team4.planit.common.email.EmailService;
+import com.eureka.mp2.team4.planit.common.exception.*;
+import com.eureka.mp2.team4.planit.common.token.ResetPasswordTokenService;
 import com.eureka.mp2.team4.planit.user.dto.UserDto;
 import com.eureka.mp2.team4.planit.user.enums.UserRole;
 import com.eureka.mp2.team4.planit.user.mapper.UserMapper;
@@ -20,6 +18,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.dao.DataAccessException;
+import org.springframework.dao.DataAccessResourceFailureException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import static com.eureka.mp2.team4.planit.auth.constants.Messages.*;
@@ -37,6 +36,12 @@ public class AuthServiceImplTest {
 
     @Mock
     private PasswordEncoder passwordEncoder;
+
+    @Mock
+    private ResetPasswordTokenService passwordTokenService;
+
+    @Mock
+    private EmailService emailService;
 
     @InjectMocks
     private AuthServiceImpl authService;
@@ -305,5 +310,97 @@ public class AuthServiceImplTest {
 
         assertEquals(FOUND_EMAIL_FAIL, ex.getMessage());
         verify(userMapper).findUserByNameAndPhoneNumber("홍길동", "01012345678");
+    }
+
+    @Test
+    @DisplayName("비밀번호 찾기 성공 → 토큰 저장 및 이메일 전송")
+    void testFindPasswordSuccess() {
+        FindPasswordRequestDto dto = new FindPasswordRequestDto("홍길동","test@planit.com");
+
+
+        when(userMapper.findUserByNameAndEmail("홍길동", "test@planit.com")).thenReturn(mockUser);
+
+        ApiResponse response = authService.findPassword(dto);
+
+        verify(passwordTokenService).saveToken(anyString(), eq("test-user-id"));
+        verify(emailService).sendPasswordResetEmail(eq("test@planit.com"), anyString());
+
+        assertEquals(Result.SUCCESS, response.getResult());
+    }
+
+    @Test
+    @DisplayName("등록되지 않은 사용자 → NotFoundException 발생")
+    void testFindPassword_NotFound() {
+        FindPasswordRequestDto dto = new FindPasswordRequestDto("홍길동","test@planit.com");
+
+        when(userMapper.findUserByNameAndEmail(anyString(), anyString())).thenReturn(null);
+
+        assertThrows(NotFoundException.class, () -> authService.findPassword(dto));
+    }
+
+    @Test
+    @DisplayName("DB 오류 → DatabaseException 발생")
+    void testFindPassword_DataAccessException() {
+        FindPasswordRequestDto dto = new FindPasswordRequestDto("홍길동","test@planit.com");
+
+        when(userMapper.findUserByNameAndEmail(anyString(), anyString()))
+                .thenThrow(new DataAccessResourceFailureException("DB 오류"));
+
+        assertThrows(DatabaseException.class, () -> authService.findPassword(dto));
+    }
+
+    private final String token = "test-token";
+
+    @Test
+    @DisplayName("비밀번호 재설정 성공")
+    void testResetPasswordSuccess() {
+        ResetPasswordRequestDto dto = new ResetPasswordRequestDto("newPass1231", token);
+
+        when(passwordTokenService.getUserIdByToken(token)).thenReturn("user-id-123");
+        when(passwordEncoder.encode("newPass1231")).thenReturn("encoded-password"); // ← 여기 수정
+
+        ApiResponse response = authService.resetPassword(dto);
+
+        verify(userMapper).updatePassword("user-id-123", "encoded-password");
+        verify(passwordTokenService).removeToken(token);
+
+        assertEquals(Result.SUCCESS, response.getResult());
+    }
+
+    @Test
+    @DisplayName("유효하지 않은 토큰 → TokenInvalidException 발생")
+    void testResetPassword_InvalidToken() {
+        ResetPasswordRequestDto dto = new ResetPasswordRequestDto("newPass123!", "invalid-token");
+
+        when(passwordTokenService.getUserIdByToken("invalid-token")).thenReturn(null);
+
+        assertThrows(TokenInvalidException.class, () -> authService.resetPassword(dto));
+    }
+
+    @Test
+    @DisplayName("DB 오류 → DatabaseException 발생")
+    void testResetPassword_DataAccessException() {
+        ResetPasswordRequestDto dto = new ResetPasswordRequestDto("newPass123!", "valid-token");
+
+        when(passwordTokenService.getUserIdByToken("valid-token")).thenReturn("user-id-123");
+        when(passwordEncoder.encode(anyString())).thenReturn("encoded-password");
+
+        doThrow(new DataAccessResourceFailureException("DB fail"))
+                .when(userMapper).updatePassword(anyString(), anyString());
+
+        assertThrows(DatabaseException.class, () -> authService.resetPassword(dto));
+    }
+
+    @Test
+    @DisplayName("기타 예외 → InternalServerErrorException 발생")
+    void testResetPassword_UnexpectedException() {
+        ResetPasswordRequestDto dto = new ResetPasswordRequestDto("newPass123!", "valid-token");
+
+        when(passwordTokenService.getUserIdByToken("valid-token")).thenReturn("user-id-123");
+
+        // 여기서 RuntimeException 던짐 (예: 인코딩 중 에러)
+        when(passwordEncoder.encode(anyString())).thenThrow(new RuntimeException("Unexpected"));
+
+        assertThrows(InternalServerErrorException.class, () -> authService.resetPassword(dto));
     }
 }
