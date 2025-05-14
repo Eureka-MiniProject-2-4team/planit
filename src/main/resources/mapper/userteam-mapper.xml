@@ -17,6 +17,7 @@
                  JOIN
              users u ON ut.user_id = u.id
         WHERE team_id = #{teamId}
+        AND u.is_active = true
     </select>
 
 
