@@ -1,27 +1,37 @@
 const baseUrl = '/api/friend';
 
-async function sendFriendRequest() {
-    const requesterId = document.getElementById('requesterId').value;
-    const receiverId = document.getElementById('receiverId').value;
+function authHeaders() {
+    const raw = localStorage.getItem('accessToken') || '';
+    const token = raw.replace(/^Bearer\s+/i, '');
+    return {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + token
+    };
+}
 
+// ✅ 친구 요청 (검색 기반)
+async function sendFriendRequestById(receiverId) {
     const response = await fetch(baseUrl, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ requesterId, receiverId })
+        headers: authHeaders(),
+        body: JSON.stringify({ receiverId })  // requesterId는 로그인 사용자 기준
     });
 
     const result = await response.json();
     alert(result.message);
 }
 
+// ✅ 내 친구 목록
 async function getFriends() {
-    const userId = document.getElementById('userIdForFriends').value;
+    const response = await fetch(baseUrl, {
+        method: 'GET',
+        headers: authHeaders()
+    });
 
-    const response = await fetch(`${baseUrl}?userId=${userId}`);
     const result = await response.json();
-
     const list = document.getElementById('friendList');
     list.innerHTML = '';
+
     result.data.friends.forEach(f => {
         const item = document.createElement('li');
         item.textContent = `${f.requesterId} ↔ ${f.receiverId} (${f.status})`;
@@ -33,14 +43,17 @@ async function getFriends() {
     });
 }
 
+// ✅ 받은 친구 요청
 async function getReceivedRequests() {
-    const userId = document.getElementById('userIdForPending').value;
+    const response = await fetch(`${baseUrl}/pending`, {
+        method: 'GET',
+        headers: authHeaders()
+    });
 
-    const response = await fetch(`${baseUrl}/pending?userId=${userId}`);
     const result = await response.json();
-
     const list = document.getElementById('pendingList');
     list.innerHTML = '';
+
     result.data.friends.forEach(f => {
         const item = document.createElement('li');
         item.textContent = `${f.requesterId} → 나`;
@@ -59,14 +72,17 @@ async function getReceivedRequests() {
     });
 }
 
+// ✅ 보낸 친구 요청
 async function getSentRequests() {
-    const userId = document.getElementById('userIdForSent').value;
+    const response = await fetch(`${baseUrl}/sent`, {
+        method: 'GET',
+        headers: authHeaders()
+    });
 
-    const response = await fetch(`${baseUrl}/sent?userId=${userId}`);
     const result = await response.json();
-
     const list = document.getElementById('sentList');
     list.innerHTML = '';
+
     result.data.friends.forEach(f => {
         const item = document.createElement('li');
         item.textContent = `나 → ${f.receiverId} (${f.status})`;
@@ -74,21 +90,73 @@ async function getSentRequests() {
     });
 }
 
+// ✅ 상태 변경
 async function updateStatus(friendId, status) {
     const response = await fetch(`${baseUrl}/${friendId}`, {
         method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
+        headers: authHeaders(),
         body: JSON.stringify({ status })
     });
 
     const result = await response.json();
     alert(result.message);
-    getReceivedRequests(); // 자동 새로고침
+    getReceivedRequests();
 }
 
+// ✅ 삭제
 async function deleteFriend(friendId) {
-    const response = await fetch(`${baseUrl}/${friendId}`, { method: 'DELETE' });
+    const response = await fetch(`${baseUrl}/${friendId}`, {
+        method: 'DELETE',
+        headers: authHeaders()
+    });
+
     const result = await response.json();
     alert(result.message);
-    getFriends(); // 자동 새로고침
+    getFriends();
+}
+
+// ✅ 유저 검색 + 요청 버튼 노출
+async function searchUser() {
+    const value = document.getElementById('searchValue').value;
+
+    const response = await fetch(`/api/users/${value}`, {
+        method: 'GET',
+        headers: authHeaders()
+    });
+
+    const result = await response.json();
+    const container = document.getElementById('searchResult');
+    container.innerHTML = '';
+
+    if (!result.data) {
+        container.textContent = '사용자를 찾을 수 없습니다.';
+        return;
+    }
+
+    const { id, nickName, email, isMe, friendStatus } = result.data;
+
+    const info = document.createElement('div');
+    info.innerHTML = `
+        <p>닉네임: ${nickName} (${email})</p>
+        <p>친구 상태: ${friendStatus ?? '없음'}</p>
+    `;
+
+    const btn = document.createElement('button');
+
+    if (isMe) {
+        btn.textContent = '본인입니다.';
+        btn.disabled = true;
+    } else if (friendStatus === 'PENDING' || friendStatus === 'ACCEPTED') {
+        btn.textContent = '이미 친구 요청이 존재합니다.';
+        btn.disabled = true;
+    } else if (friendStatus === 'REJECTED' || friendStatus === 'AUTO_CANCELLED') {
+        btn.textContent = '친구 요청 불가';
+        btn.disabled = true;
+    } else {
+        btn.textContent = '친구 요청 보내기';
+        btn.onclick = () => sendFriendRequestById(id);
+    }
+
+    container.appendChild(info);
+    container.appendChild(btn);
 }
