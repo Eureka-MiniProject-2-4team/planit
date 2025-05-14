@@ -3,6 +3,7 @@ package com.eureka.mp2.team4.planit.todo.team.service;
 import com.eureka.mp2.team4.planit.common.ApiResponse;
 import com.eureka.mp2.team4.planit.common.Result;
 import com.eureka.mp2.team4.planit.common.exception.NotFoundException;
+import com.eureka.mp2.team4.planit.team.mapper.UserTeamMapper;
 import com.eureka.mp2.team4.planit.todo.team.dto.TeamTodoDto;
 import com.eureka.mp2.team4.planit.todo.team.dto.request.TeamTodoRequestDto;
 import com.eureka.mp2.team4.planit.todo.team.dto.response.TeamTodoListResponseDto;
@@ -20,6 +21,7 @@ import static com.eureka.mp2.team4.planit.todo.team.constants.TeamTodoMessages.*
 public class TeamTodoServiceImpl implements TeamTodoService {
 
     private final TeamTodoMapper teamTodoMapper;
+    private final UserTeamMapper userTeamMapper;
 
     @Override
     public ApiResponse createTeamTodo(TeamTodoRequestDto teamTodoRequestDto) {
@@ -33,6 +35,7 @@ public class TeamTodoServiceImpl implements TeamTodoService {
                     .build();
 
             teamTodoMapper.createTeamTodo(teamTodoDto);
+            // 팀 유저들에게도 모두 등록해주는 로직 필요
 
             return ApiResponse.builder()
                     .result(Result.SUCCESS)

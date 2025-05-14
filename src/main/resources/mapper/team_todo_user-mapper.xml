@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.eureka.mp2.team4.planit.todo.team.mapper.TeamTodoUserMapper">
+    <select id="getMyTeamTodoDetail" parameterType="java.lang.String" resultType="com.eureka.mp2.team4.planit.todo.team.dto.TeamTodoUserDto">
+        SELECT *
+        FROM team_todo_user
+        WHERE team_todo_id = #{teamTodoId}
+          AND user_id = #{userId}
+    </select>
+
+    <update id="updateMyTeamTodo" parameterType="com.eureka.mp2.team4.planit.todo.team.dto.TeamTodoUserDto">
+        UPDATE team_todo_user
+        SET status     = #{status},
+            updated_at = CURRENT_TIMESTAMP
+        WHERE team_todo_id = #{teamTodoId}
+          AND user_id = #{userId}
+    </update>
+</mapper>

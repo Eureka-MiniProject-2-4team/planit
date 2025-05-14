@@ -23,6 +23,13 @@
         WHERE id=#{id};
     </select>
 
+    <select id="existTeamTodoByTeamId" parameterType="java.lang.String" resultType="java.lang.Integer">
+        SELECT EXISTS(SELECT 1
+                      FROM team_todo
+                      WHERE team_id = #{teamId}
+                      )
+    </select>
+
     <!--UPDATE-->
     <update id="updateTeamTodo" parameterType="com.eureka.mp2.team4.planit.todo.team.dto.TeamTodoDto">
         UPDATE team_todo
