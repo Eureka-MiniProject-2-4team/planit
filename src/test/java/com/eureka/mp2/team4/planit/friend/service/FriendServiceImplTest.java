@@ -2,6 +2,7 @@ package com.eureka.mp2.team4.planit.friend.service;
 
 import com.eureka.mp2.team4.planit.common.ApiResponse;
 import com.eureka.mp2.team4.planit.common.Result;
+import com.eureka.mp2.team4.planit.common.exception.NotFoundException;
 import com.eureka.mp2.team4.planit.friend.FriendStatus;
 import com.eureka.mp2.team4.planit.friend.constants.FriendMessages;
 import com.eureka.mp2.team4.planit.friend.dto.FriendDto;
@@ -122,13 +123,19 @@ class FriendServiceImplTest {
     @DisplayName("친구 목록 조회 실패")
     @Test
     void getFriends_fail() {
+        // given
         when(mapper.findAllByUserId("user1"))
                 .thenThrow(new DataAccessResourceFailureException("DB 오류"));
 
+        // when
         ApiResponse<FriendListResponseDto> response = service.getFriends("user1");
 
+        // then
         assertEquals(Result.FAIL, response.getResult());
-        assertEquals(FriendMessages.GET_FRIENDS_FAIL, response.getMessage());
+        assertEquals(
+                "친구 목록을 조회하는 데 실패했습니다. 데이터베이스 오류가 발생했습니다.",
+                response.getMessage()
+        );
     }
 
     @DisplayName("받은 친구 요청 조회 성공")
@@ -176,7 +183,6 @@ class FriendServiceImplTest {
         assertEquals(Result.SUCCESS, response.getResult());
         assertEquals(FriendMessages.UPDATE_STATUS_SUCCESS, response.getMessage());
         verify(mapper).updateStatus("f1", "ACCEPTED");
-        verify(mapper).autoCancelOppositePending("user2", "user1");
     }
 
     @DisplayName("친구 요청 상태 업데이트 실패")
@@ -275,4 +281,70 @@ class FriendServiceImplTest {
 
         assertNull(result);
     }
+
+    @DisplayName("친구 요청 실패 - receiverId가 null일 경우 예외 발생")
+    @Test
+    void sendRequest_receiverIsNull() {
+        NotFoundException ex = assertThrows(NotFoundException.class, () ->
+                service.sendRequest("user1", null)
+        );
+
+        assertEquals(FriendMessages.RECEIVER_NOT_FOUND, ex.getMessage());
+    }
+
+    @DisplayName("친구 목록 조회 실패 - 친구 목록 비어 있음")
+    @Test
+    void getFriends_emptyList() {
+        when(mapper.findAllByUserId("user1")).thenReturn(List.of());
+
+        ApiResponse<FriendListResponseDto> response = service.getFriends("user1");
+
+        assertEquals(Result.FAIL, response.getResult());
+        assertEquals("친구 목록이 비어있습니다.", response.getMessage());
+        assertNull(response.getData());
+    }
+
+    @DisplayName("보낸 친구 요청 조회 성공")
+    @Test
+    void getSentRequests_success() {
+        when(mapper.findAskedByRequesterId("user1")).thenReturn(List.of(
+                FriendDto.builder().id("f1").requesterId("user1").receiverId("user2").status(FriendStatus.PENDING).build()
+        ));
+
+        ApiResponse<FriendListResponseDto> response = service.getSentRequests("user1");
+
+        assertEquals(Result.SUCCESS, response.getResult());
+        assertEquals(FriendMessages.GET_SENT_SUCCESS, response.getMessage());
+        assertEquals(1, response.getData().getFriends().size());
+    }
+
+    @DisplayName("받은 친구 요청 조회 실패 - DB 오류")
+    @Test
+    void getReceivedRequests_fail() {
+        when(mapper.findPendingByReceiverId("user2")).thenThrow(
+                new DataAccessResourceFailureException("DB 오류")
+        );
+
+        ApiResponse<FriendListResponseDto> response = service.getReceivedRequests("user2");
+
+        assertEquals(Result.FAIL, response.getResult());
+        assertEquals(FriendMessages.GET_PENDING_FAIL, response.getMessage());
+    }
+
+    @DisplayName("친구 요청 상태 업데이트 실패 - friendId 존재하지 않음")
+    @Test
+    void updateStatus_invalidId_graceful() {
+        FriendUpdateStatusDto dto = FriendUpdateStatusDto.builder()
+                .status(FriendStatus.ACCEPTED)
+                .build();
+
+        when(mapper.findById("invalid")).thenReturn(null);
+        doNothing().when(mapper).updateStatus("invalid", "ACCEPTED");
+
+        ApiResponse response = service.updateStatus("invalid", dto);
+
+        assertEquals(Result.SUCCESS, response.getResult());
+        assertEquals(FriendMessages.UPDATE_STATUS_SUCCESS, response.getMessage());
+    }
+
 }

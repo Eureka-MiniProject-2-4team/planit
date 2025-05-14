@@ -16,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import static com.eureka.mp2.team4.planit.friend.constants.FriendMessages.*;
 
@@ -76,22 +77,65 @@ public class FriendServiceImpl implements FriendService {
                     .build();
         }
     }
-
     @Override
     public ApiResponse<FriendListResponseDto> getFriends(String userId) {
         try {
             List<FriendDto> friends = mapper.findAllByUserId(userId);
-            FriendListResponseDto list = FriendListResponseDto.builder().friends(friends).build();
+
+            if (friends == null || friends.isEmpty()) {
+                return ApiResponse.<FriendListResponseDto>builder()
+                        .result(Result.FAIL)
+                        .message("친구 목록이 비어있습니다.")
+                        .build();
+            }
+
+            List<FriendDto> connectedFriends = friends.stream()
+                    .filter(friend -> friend.getRequesterId().equals(userId) || friend.getReceiverId().equals(userId)) // 내가 포함된 친구 관계만 필터링
+                    .map(friend -> {
+                        if (friend.getRequesterId().equals(userId)) {
+                            return new FriendDto(
+                                    friend.getId(),
+                                    friend.getRequesterId(),
+                                    friend.getRequesterNickName(),
+                                    friend.getRequesterEmail(),
+                                    friend.getReceiverId(),
+                                    friend.getReceiverNickName(),
+                                    friend.getReceiverEmail(),
+                                    friend.getStatus(),
+                                    friend.getCreatedAt(),
+                                    friend.getAcceptedAt()
+                            );
+                        } else {
+                            return new FriendDto(
+                                    friend.getId(),
+                                    friend.getReceiverId(),
+                                    friend.getReceiverNickName(),
+                                    friend.getReceiverEmail(),
+                                    friend.getRequesterId(),
+                                    friend.getRequesterNickName(),
+                                    friend.getRequesterEmail(),
+                                    friend.getStatus(),
+                                    friend.getCreatedAt(),
+                                    friend.getAcceptedAt()
+                            );
+                        }
+                    })
+                    .collect(Collectors.toList());
+
+            FriendListResponseDto list = FriendListResponseDto.builder()
+                    .friends(connectedFriends)
+                    .build();
 
             return ApiResponse.<FriendListResponseDto>builder()
                     .result(Result.SUCCESS)
                     .message(GET_FRIENDS_SUCCESS)
                     .data(list)
                     .build();
+
         } catch (DataAccessException e) {
             return ApiResponse.<FriendListResponseDto>builder()
                     .result(Result.FAIL)
-                    .message(GET_FRIENDS_FAIL)
+                    .message("친구 목록을 조회하는 데 실패했습니다. 데이터베이스 오류가 발생했습니다.")
                     .build();
         }
     }
@@ -139,15 +183,6 @@ public class FriendServiceImpl implements FriendService {
     public ApiResponse updateStatus(String friendId, FriendUpdateStatusDto dto) {
         try {
             mapper.updateStatus(friendId, dto.getStatus().name());
-
-            if (dto.getStatus() == FriendStatus.ACCEPTED) {
-                FriendDto acceptedRequest = mapper.findById(friendId);
-
-                String oppositeRequesterId = acceptedRequest.getReceiverId();
-                String oppositeReceiverId = acceptedRequest.getRequesterId();
-
-                mapper.autoCancelOppositePending(oppositeRequesterId, oppositeReceiverId);
-            }
 
             return ApiResponse.builder()
                     .result(Result.SUCCESS)

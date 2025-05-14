@@ -78,14 +78,6 @@
         WHERE id = #{friendId}
     </update>
 
-    <!-- 친구 수락 시 상대방이 보낸 대기 상태 요청 자동 취소 -->
-    <update id="autoCancelOppositePending">
-        UPDATE friend
-        SET status = 'AUTO_CANCELLED'
-        WHERE requester_id = #{oppositeRequesterId}
-          AND receiver_id = #{oppositeReceiverId}
-          AND status = 'PENDING'
-    </update>
 
     <!-- ID로 친구 요청 조회 -->
     <select id="findById" resultType="com.eureka.mp2.team4.planit.friend.dto.FriendDto">
