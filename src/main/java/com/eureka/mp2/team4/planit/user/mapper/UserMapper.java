@@ -15,7 +15,9 @@ public interface UserMapper {
 
     boolean isExistNickName(String nickName);
 
-    UserDto findByEmail(String email);
+    UserDto findUserByEmail(String email);
+
+    UserDto findActiveUserByEmail(String email);
 
     UserDto findById(String userId);
 

@@ -181,7 +181,7 @@ public class UserServiceImpl implements UserService {
     private UserDto findUserByValue(String value) {
         try {
             if (value.contains("@")) {
-                return userMapper.findByEmail(value);
+                return userMapper.findActiveUserByEmail(value);
             } else {
                 return userMapper.findByNickName(value);
             }

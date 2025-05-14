@@ -28,10 +28,17 @@
                        WHERE nickname = #{nickname})
     </select>
 
-    <select id="findByEmail" parameterType="string" resultType="com.eureka.mp2.team4.planit.user.dto.UserDto">
+    <select id="findUserByEmail" parameterType="string" resultType="com.eureka.mp2.team4.planit.user.dto.UserDto">
         SELECT *
         FROM users
         WHERE email = #{email}
+    </select>
+
+    <select id="findActiveUserByEmail" parameterType="string" resultType="com.eureka.mp2.team4.planit.user.dto.UserDto">
+        SELECT *
+        FROM users
+        WHERE email = #{email}
+        and is_active = true
     </select>
 
     <select id="findById" parameterType="string" resultType="com.eureka.mp2.team4.planit.user.dto.UserDto">
@@ -75,6 +82,7 @@
         SELECT *
         FROM users
         WHERE nickName = #{nickName}
+        AND isActive = true
     </select>
 
     <select id="findUserByNameAndEmail" resultType="com.eureka.mp2.team4.planit.user.dto.UserDto">

@@ -298,7 +298,7 @@ public class UserServiceImplTest {
                 UserRole.ROLE_USER, null, null, true, "01012341234"
         );
 
-        when(userMapper.findByEmail(value)).thenReturn(foundUser);
+        when(userMapper.findActiveUserByEmail(value)).thenReturn(foundUser);
         when(friendQueryService.areFriends(currentUserId, foundUser.getId()))
                 .thenReturn(FriendStatus.ACCEPTED);
 
@@ -367,7 +367,7 @@ public class UserServiceImplTest {
         String value = "test@planit.com"; // 이메일 → findByEmail() 호출됨
         String teamId = null;
 
-        when(userMapper.findByEmail(value))
+        when(userMapper.findActiveUserByEmail(value))
                 .thenThrow(new DataAccessException("DB 오류") {
                 });
 
@@ -388,14 +388,14 @@ public class UserServiceImplTest {
         String teamId = null;
 
         UserDto mockUser = new UserDto("id", value, "유저", "pw", "닉", UserRole.ROLE_USER, null, null, true, "010");
-        when(userMapper.findByEmail(value)).thenReturn(mockUser);
+        when(userMapper.findActiveUserByEmail(value)).thenReturn(mockUser);
         when(friendQueryService.areFriends(currentUserId, "id")).thenReturn(FriendStatus.ACCEPTED);
 
         // when
         userService.getUserInfo(currentUserId, value, teamId);
 
         // then
-        verify(userMapper).findByEmail(value);
+        verify(userMapper).findActiveUserByEmail(value);
         verify(userMapper, never()).findByNickName(any());
     }
 
@@ -416,7 +416,7 @@ public class UserServiceImplTest {
 
         // then
         verify(userMapper).findByNickName(value);
-        verify(userMapper, never()).findByEmail(any());
+        verify(userMapper, never()).findActiveUserByEmail(any());
     }
 
     @Test
@@ -439,7 +439,7 @@ public class UserServiceImplTest {
                 "01012345678"
         );
 
-        when(userMapper.findByEmail(value)).thenReturn(selfUser);
+        when(userMapper.findActiveUserByEmail(value)).thenReturn(selfUser);
 
         // when
         ApiResponse<?> response = userService.getUserInfo(currentUserId, value, teamId);
@@ -453,7 +453,7 @@ public class UserServiceImplTest {
         assertNull(data.getFriendStatus());
         assertNull(data.getTeamMembershipStatus());
 
-        verify(userMapper).findByEmail(value);
+        verify(userMapper).findActiveUserByEmail(value);
         verifyNoInteractions(friendQueryService, userTeamQueryService);
     }
 
