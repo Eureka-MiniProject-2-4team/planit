@@ -68,7 +68,7 @@ class JwtAuthenticationFilterUnitTest {
 
         when(jwtService.validateToken(token)).thenReturn(true);
         when(jwtService.getUserId(token)).thenReturn("1234");
-        when(userMapper.findById("1234")).thenReturn(mockUser);
+        when(userMapper.findUserById("1234")).thenReturn(mockUser);
 
         filter.doFilterInternal(request, response, chain);
 

@@ -192,7 +192,7 @@ public class AuthServiceImplTest {
         // given
         VerifyPasswordRequestDto dto = new VerifyPasswordRequestDto("password123");
 
-        when(userMapper.findById(userId)).thenReturn(mockUser);
+        when(userMapper.findUserById(userId)).thenReturn(mockUser);
         when(passwordEncoder.matches("password123", "encodedOldPass")).thenReturn(true);
 
         // when
@@ -209,7 +209,7 @@ public class AuthServiceImplTest {
         // given
         VerifyPasswordRequestDto dto = new VerifyPasswordRequestDto("wrong-password");
 
-        when(userMapper.findById(userId)).thenReturn(mockUser);
+        when(userMapper.findUserById(userId)).thenReturn(mockUser);
         when(passwordEncoder.matches("wrong-password", "encodedOldPass")).thenReturn(false);
 
         // when
@@ -225,7 +225,7 @@ public class AuthServiceImplTest {
     void verifyPassword_notFoundUser() {
         // given
         VerifyPasswordRequestDto dto = new VerifyPasswordRequestDto("password");
-        when(userMapper.findById(userId)).thenReturn(null);
+        when(userMapper.findUserById(userId)).thenReturn(null);
 
         // when & then
         NotFoundException ex = assertThrows(NotFoundException.class, () -> {
@@ -240,7 +240,7 @@ public class AuthServiceImplTest {
     void verifyPassword_dataAccessException() {
         // given
         VerifyPasswordRequestDto dto = new VerifyPasswordRequestDto("password");
-        when(userMapper.findById(userId)).thenThrow(new DataAccessException("DB 오류") {
+        when(userMapper.findUserById(userId)).thenThrow(new DataAccessException("DB 오류") {
         });
 
         // when & then

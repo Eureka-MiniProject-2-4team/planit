@@ -33,7 +33,7 @@ class PlanitUserDetailServiceTest {
                 "01012345678"
         );
 
-        when(userMapper.findByEmail("user@example.com")).thenReturn(userDto);
+        when(userMapper.findUserByEmail("user@example.com")).thenReturn(userDto);
 
         UserDetails result = service.loadUserByUsername("user@example.com");
 
@@ -44,7 +44,7 @@ class PlanitUserDetailServiceTest {
     @Test
     @DisplayName("[단위] 존재하지 않는 이메일 - 예외 발생")
     void loadUserByUsername_userNotFound_throws() {
-        when(userMapper.findByEmail("notfound@example.com")).thenReturn(null);
+        when(userMapper.findUserByEmail("notfound@example.com")).thenReturn(null);
 
         assertThatThrownBy(() -> service.loadUserByUsername("notfound@example.com"))
                 .isInstanceOf(UsernameNotFoundException.class)

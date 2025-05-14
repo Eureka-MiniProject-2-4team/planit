@@ -69,18 +69,18 @@ public class UserServiceImplTest {
     @Test
     @DisplayName("성공 - 유저 정보 조회")
     void getMyPageDataSuccess() {
-        when(userMapper.findById(userId)).thenReturn(userDto);
+        when(userMapper.findUserById(userId)).thenReturn(userDto);
 
         UserResponseDto result = userService.getMyPageData(userId);
 
         assertThat(result.getEmail()).isEqualTo(userDto.getEmail());
-        verify(userMapper, times(1)).findById(userId);
+        verify(userMapper, times(1)).findUserById(userId);
     }
 
     @Test
     @DisplayName("실패 - 유저 정보 없음")
     void getMyPageDataUserNotFound() {
-        when(userMapper.findById(userId)).thenReturn(null);
+        when(userMapper.findUserById(userId)).thenReturn(null);
 
         NotFoundException exception = assertThrows(NotFoundException.class,
                 () -> userService.getMyPageData(userId));
@@ -91,7 +91,7 @@ public class UserServiceImplTest {
     @Test
     @DisplayName("실패 - 내부 서버 에러 발생")
     void getMyPageDataInternalServerError() {
-        when(userMapper.findById(userId)).thenThrow(RuntimeException.class);
+        when(userMapper.findUserById(userId)).thenThrow(RuntimeException.class);
 
         assertThrows(InternalServerErrorException.class,
                 () -> userService.getMyPageData(userId));
@@ -146,7 +146,7 @@ public class UserServiceImplTest {
                 "01012341234"
         );
 
-        when(userMapper.findById(userId)).thenReturn(user);
+        when(userMapper.findUserById(userId)).thenReturn(user);
         when(passwordEncoder.encode("newPassword")).thenReturn("encodedPassword");
 
         // when
@@ -163,7 +163,7 @@ public class UserServiceImplTest {
     void updatePassword_userNotFound() {
         // given
         UpdatePasswordRequestDto dto = new UpdatePasswordRequestDto("newPassword");
-        when(userMapper.findById(userId)).thenReturn(null);
+        when(userMapper.findUserById(userId)).thenReturn(null);
 
         // when & then
         NotFoundException ex = assertThrows(NotFoundException.class, () -> {
@@ -192,7 +192,7 @@ public class UserServiceImplTest {
                 "01012341234"
         );
 
-        when(userMapper.findById(userId)).thenReturn(user);
+        when(userMapper.findUserById(userId)).thenReturn(user);
         when(passwordEncoder.encode("newPassword")).thenReturn("encodedPassword");
         doThrow(new DataAccessException("DB 오류") {
         }).when(userMapper).updatePassword(userId, "encodedPassword");
@@ -250,7 +250,7 @@ public class UserServiceImplTest {
         // then
         assertEquals(Result.SUCCESS, response.getResult());
         assertEquals(DELETE_USER_SUCCESS, response.getMessage());
-        verify(userMapper).deleteById(userId);
+        verify(userMapper).deleteUserById(userId);
     }
 
     @Test
@@ -265,7 +265,7 @@ public class UserServiceImplTest {
         // then
         assertEquals(Result.FAIL, response.getResult());
         assertEquals(LEADER_CAN_NOT_DELETE, response.getMessage());
-        verify(userMapper, never()).deleteById(any());
+        verify(userMapper, never()).deleteUserById(any());
     }
 
     @Test
@@ -274,7 +274,7 @@ public class UserServiceImplTest {
         // given
         when(userTeamQueryService.isUserTeamLeader(userId)).thenReturn(false);
         doThrow(new DataAccessException("DB 오류") {
-        }).when(userMapper).deleteById(userId);
+        }).when(userMapper).deleteUserById(userId);
 
         // when & then
         DatabaseException ex = assertThrows(DatabaseException.class, () -> {
@@ -282,7 +282,7 @@ public class UserServiceImplTest {
         });
 
         assertEquals(DELETE_USER_FAIL, ex.getMessage());
-        verify(userMapper).deleteById(userId);
+        verify(userMapper).deleteUserById(userId);
     }
 
     @Test
@@ -298,7 +298,7 @@ public class UserServiceImplTest {
                 UserRole.ROLE_USER, null, null, true, "01012341234"
         );
 
-        when(userMapper.findByEmail(value)).thenReturn(foundUser);
+        when(userMapper.findActiveUserByEmail(value)).thenReturn(foundUser);
         when(friendQueryService.areFriends(currentUserId, foundUser.getId()))
                 .thenReturn(FriendStatus.ACCEPTED);
 
@@ -327,7 +327,7 @@ public class UserServiceImplTest {
                 UserRole.ROLE_USER, null, null, true, "01011112222"
         );
 
-        when(userMapper.findByNickName(value)).thenReturn(foundUser);
+        when(userMapper.findActiveUserByNickName(value)).thenReturn(foundUser);
         when(userTeamQueryService.getTeamMemberShipStatus(teamId, foundUser.getId()))
                 .thenReturn("MEMBER");
 
@@ -351,7 +351,7 @@ public class UserServiceImplTest {
         String value = "없는유저";
         String teamId = null;
 
-        when(userMapper.findByNickName(value)).thenReturn(null);
+        when(userMapper.findActiveUserByNickName(value)).thenReturn(null);
 
         NotFoundException ex = assertThrows(NotFoundException.class, () -> {
             userService.getUserInfo(currentUserId, value, teamId);
@@ -367,7 +367,7 @@ public class UserServiceImplTest {
         String value = "test@planit.com"; // 이메일 → findByEmail() 호출됨
         String teamId = null;
 
-        when(userMapper.findByEmail(value))
+        when(userMapper.findActiveUserByEmail(value))
                 .thenThrow(new DataAccessException("DB 오류") {
                 });
 
@@ -388,15 +388,15 @@ public class UserServiceImplTest {
         String teamId = null;
 
         UserDto mockUser = new UserDto("id", value, "유저", "pw", "닉", UserRole.ROLE_USER, null, null, true, "010");
-        when(userMapper.findByEmail(value)).thenReturn(mockUser);
+        when(userMapper.findActiveUserByEmail(value)).thenReturn(mockUser);
         when(friendQueryService.areFriends(currentUserId, "id")).thenReturn(FriendStatus.ACCEPTED);
 
         // when
         userService.getUserInfo(currentUserId, value, teamId);
 
         // then
-        verify(userMapper).findByEmail(value);
-        verify(userMapper, never()).findByNickName(any());
+        verify(userMapper).findActiveUserByEmail(value);
+        verify(userMapper, never()).findActiveUserByNickName(any());
     }
 
     @Test
@@ -408,15 +408,15 @@ public class UserServiceImplTest {
         String teamId = null;
 
         UserDto mockUser = new UserDto("id", "email", "유저", "pw", value, UserRole.ROLE_USER, null, null, true, "010");
-        when(userMapper.findByNickName(value)).thenReturn(mockUser);
+        when(userMapper.findActiveUserByNickName(value)).thenReturn(mockUser);
         when(friendQueryService.areFriends(currentUserId, "id")).thenReturn(FriendStatus.ACCEPTED);
 
         // when
         userService.getUserInfo(currentUserId, value, teamId);
 
         // then
-        verify(userMapper).findByNickName(value);
-        verify(userMapper, never()).findByEmail(any());
+        verify(userMapper).findActiveUserByNickName(value);
+        verify(userMapper, never()).findActiveUserByEmail(any());
     }
 
     @Test
@@ -439,7 +439,7 @@ public class UserServiceImplTest {
                 "01012345678"
         );
 
-        when(userMapper.findByEmail(value)).thenReturn(selfUser);
+        when(userMapper.findActiveUserByEmail(value)).thenReturn(selfUser);
 
         // when
         ApiResponse<?> response = userService.getUserInfo(currentUserId, value, teamId);
@@ -453,7 +453,7 @@ public class UserServiceImplTest {
         assertNull(data.getFriendStatus());
         assertNull(data.getTeamMembershipStatus());
 
-        verify(userMapper).findByEmail(value);
+        verify(userMapper).findActiveUserByEmail(value);
         verifyNoInteractions(friendQueryService, userTeamQueryService);
     }
 

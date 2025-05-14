@@ -17,7 +17,7 @@ public class PlanitUserDetailService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        UserDto userDto = userMapper.findByEmail(email);
+        UserDto userDto = userMapper.findUserByEmail(email);
         if (userDto == null)
             throw new UsernameNotFoundException(INVALID_CREDENTIALS);
         return new PlanitUserDetails(userDto);

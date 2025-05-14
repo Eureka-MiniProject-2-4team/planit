@@ -57,7 +57,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private void handleToken(HttpServletRequest request, String token) {
         String userId = jwtService.getUserId(token);
-        UserDto userDto = userMapper.findById(userId);
+        UserDto userDto = userMapper.findUserById(userId);
         if (userDto != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             PlanitUserDetails userDetails = new PlanitUserDetails(userDto);
             UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());

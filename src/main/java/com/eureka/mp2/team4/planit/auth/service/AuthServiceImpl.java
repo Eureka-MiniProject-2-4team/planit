@@ -190,7 +190,7 @@ public class AuthServiceImpl implements AuthService {
 
 
     private UserDto getUserDto(String userId) {
-        UserDto userDto = userMapper.findById(userId);
+        UserDto userDto = userMapper.findUserById(userId);
         if (userDto == null) {
             throw new NotFoundException(NOT_FOUND_USER);
         }

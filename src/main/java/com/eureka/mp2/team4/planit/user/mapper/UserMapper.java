@@ -15,9 +15,11 @@ public interface UserMapper {
 
     boolean isExistNickName(String nickName);
 
-    UserDto findByEmail(String email);
+    UserDto findUserByEmail(String email);
 
-    UserDto findById(String userId);
+    UserDto findActiveUserByEmail(String email);
+
+    UserDto findUserById(String userId);
 
     void updateNickName(@Param("userId") String userId, @Param("newNickName") String newNickName);
 
@@ -25,11 +27,11 @@ public interface UserMapper {
 
     void updateIsActive(@Param("userId") String userId, @Param("isActive") Boolean isActive);
 
-    void deleteById(String userId);
+    void deleteUserById(String userId);
 
     UserDto findUserByNameAndPhoneNumber(@Param("name") String name, @Param("phoneNumber") String phoneNumber);
 
-    UserDto findByNickName(String nickName);
+    UserDto findActiveUserByNickName(String nickName);
 
     UserDto findUserByNameAndEmail(@Param("name") String userName, @Param("email") String email);
 }
