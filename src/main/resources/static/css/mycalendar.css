@@ -97,6 +97,12 @@ body {
     background: rgba(106, 176, 238, 0.1);
     padding: 12px 15px;
     border-radius: 30px;
+    gap: 10px;
+}
+
+.month-controls {
+    display: flex;
+    align-items: center;
 }
 
 .month-display {
@@ -118,11 +124,37 @@ body {
     align-items: center;
     justify-content: center;
     border-radius: 50%;
+    margin: 0 5px;
 }
 
 .nav-btn:hover {
     background: rgba(106, 176, 238, 0.2);
     transform: scale(1.1);
+}
+
+.today-btn {
+    background: rgba(106, 176, 238, 0.2);
+    color: #fff;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 30px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+    display: flex;
+    align-items: center;
+    margin-left: 15px;
+}
+
+.today-btn i {
+    margin-right: 5px;
+    font-size: 12px;
+}
+
+.today-btn:hover {
+    background: rgba(106, 176, 238, 0.4);
+    transform: translateY(-2px);
 }
 
 .calendar-days, .calendar-dates {
@@ -190,30 +222,52 @@ body {
     flex-direction: column;
     flex: 2;
     max-width: calc(100% - 650px - 30px);
+    position: relative; /* Added for absolute positioning of add button */
 }
 
 .user-info {
     display: flex;
-    justify-content: space-between;
+    justify-content: center;
     align-items: center;
-    margin-bottom: 20px;
+    margin-bottom: 30px;
     background: rgba(106, 176, 238, 0.1);
-    padding: 12px 15px;
+    padding: 16px 15px;
     border-radius: 30px;
 }
 
-.profile-name, .date-display {
-    font-size: 16px;
-    font-weight: 600;
-}
-
-.profile-icon {
-    margin-right: 8px;
-    color: #6ab0ee;
-}
-
+/* Enhanced date display */
 .date-display {
+    font-size: 28px !important; /* 크게 표시 */
+    font-weight: 700 !important;
+    display: flex;
+    align-items: center;
+    justify-content: center; /* 가운데 정렬 */
+    background: rgba(106, 176, 238, 0.15);
+    padding: 12px 25px;
+    border-radius: 30px;
+    transition: all 0.3s;
+    width: 100%;
+    text-align: center;
+    letter-spacing: 1px;
+    font-family: 'Orbitron', sans-serif;
+}
+
+.date-display i {
+    margin-right: 12px;
     color: #6ab0ee;
+    font-size: 24px;
+}
+
+.date-display.today {
+    background: rgba(106, 176, 238, 0.3);
+    box-shadow: 0 0 15px rgba(106, 176, 238, 0.2);
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% { box-shadow: 0 0 0 0 rgba(106, 176, 238, 0.4); }
+    70% { box-shadow: 0 0 0 10px rgba(106, 176, 238, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(106, 176, 238, 0); }
 }
 
 .task-list {
@@ -294,12 +348,13 @@ body {
 }
 .time-icon { margin-right: 5px; font-size: 10px; }
 
+/* Repositioned add button */
 .add-task-btn {
-    position: fixed;
-    bottom: 90px;
-    right: 30px;
-    width: 60px;
-    height: 60px;
+    position: absolute;
+    bottom: 20px;
+    right: 20px;
+    width: 56px;
+    height: 56px;
     border-radius: 50%;
     background: linear-gradient(135deg, #6ab0ee, #4a90da);
     color: white;
@@ -388,158 +443,370 @@ body {
     .header { padding: 10px 0; }
     .logo { font-size: 24px; }
     .logo-icon { font-size: 26px; }
+
+    .date-display {
+        font-size: 20px !important;
+    }
+
+    .date-display i {
+        font-size: 18px;
+    }
 }
 
-/* 우주 테마 모달 스타일 */
-.modal {
+/* Space-themed Todo Modal */
+.todo-modal {
+    display: none;
     position: fixed;
     z-index: 999;
     top: 0;
     left: 0;
     width: 100vw;
     height: 100vh;
-    background: rgba(0, 0, 0, 0.5); /* 어두운 반투명 배경 */
-    display: flex;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(8px);
     align-items: center;
     justify-content: center;
-    backdrop-filter: blur(3px); /* 전체 블러 효과 */
-}
-
-.modal-content {
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    border-radius: 16px;
-    padding: 30px 25px;
-    color: #fff;
-    width: 500px;
-    font-family: 'Orbitron', sans-serif;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
-    backdrop-filter: blur(15px);
     animation: fadeIn 0.3s ease-out;
 }
 
-.modal-content h3 {
-    font-size: 22px;
-    margin-bottom: 20px;
-    color: #6ab0ee;
-}
-
-.modal-content p {
-    margin: 10px 0;
-    font-size: 15px;
-    line-height: 1.6;
-}
-
-.modal-content button {
-    margin-top: 20px;
-    padding: 10px 16px;
-    border: none;
-    border-radius: 8px;
-    background: linear-gradient(135deg, #6ab0ee, #4a90da);
+.todo-modal-content {
+    background: linear-gradient(135deg, rgba(27, 38, 59, 0.9), rgba(15, 32, 39, 0.95));
+    border: 2px solid rgba(106, 176, 238, 0.3);
+    border-radius: 20px;
+    padding: 30px;
+    width: 450px;
+    max-width: 90vw;
     color: #fff;
-    font-weight: bold;
-    cursor: pointer;
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.5), 0 0 25px rgba(106, 176, 238, 0.2);
+    position: relative;
+    overflow: visible;
+    animation: slideUp 0.4s ease-out;
+}
+
+.todo-modal-content::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(106, 176, 238, 0.1) 0%, transparent 70%);
+    z-index: -1;
+}
+
+.todo-modal-header {
+    margin-bottom: 25px;
+    text-align: center;
+    position: relative;
+}
+
+.todo-modal-title {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 24px;
+    font-weight: 700;
+    color: #6ab0ee;
+    margin: 0;
+    letter-spacing: 1px;
+    text-shadow: 0 0 10px rgba(106, 176, 238, 0.5);
+}
+
+.todo-form-group {
+    margin-bottom: 20px;
+    position: relative;
+}
+
+.todo-form-group label {
+    display: block;
+    font-size: 14px;
+    color: #a3b1de;
+    margin-bottom: 6px;
+    font-weight: 600;
+}
+
+.todo-input, .todo-textarea, .date-input-display, .time-input-display {
+    width: 100%;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(106, 176, 238, 0.2);
+    border-radius: 12px;
+    padding: 12px 15px;
+    color: #fff;
+    font-family: 'Nunito', sans-serif;
+    font-size: 16px;
     transition: all 0.3s;
 }
 
-.modal-content button:hover {
-    transform: scale(1.05);
-    box-shadow: 0 4px 15px rgba(106, 176, 238, 0.6);
+.todo-input:focus, .todo-textarea:focus, .date-input-display:focus, .time-input-display:focus {
+    outline: none;
+    border-color: rgba(106, 176, 238, 0.6);
+    box-shadow: 0 0 15px rgba(106, 176, 238, 0.2);
+    background: rgba(255, 255, 255, 0.08);
 }
 
-.modal-content input,
-.modal-content textarea,
-.modal-content select {
+.todo-textarea {
+    min-height: 100px;
+    resize: vertical;
+}
+
+/* Improved date-time picker */
+.datetime-picker {
+    display: flex;
+    gap: 10px;
+}
+
+.datetime-picker .date-input-container,
+.datetime-picker .time-input-container {
+    flex: 1;
+    position: relative;
+}
+
+.input-with-icon {
+    position: relative;
     width: 100%;
+}
+
+.input-with-icon i {
+    position: absolute;
+    left: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #6ab0ee;
+    font-size: 16px;
+    z-index: 1;
+}
+
+.date-input-display, .time-input-display {
+    width: 100%;
+    padding-left: 40px;
+    text-align: center;
+    font-family: 'Orbitron', sans-serif;
+    letter-spacing: 1px;
+    cursor: pointer;
+    user-select: none;
+}
+
+/* jQuery UI Datepicker Customization */
+.ui-datepicker {
+    background: linear-gradient(135deg, rgba(27, 38, 59, 0.95), rgba(15, 32, 39, 0.98));
+    border: 2px solid rgba(106, 176, 238, 0.3);
+    border-radius: 15px;
+    padding: 15px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    font-family: 'Nunito', sans-serif;
+    width: 320px;
+    z-index: 9999 !important;
+}
+
+.ui-datepicker-header {
+    background: rgba(106, 176, 238, 0.15);
+    border: none;
+    border-radius: 10px;
+    padding: 8px;
+    margin-bottom: 10px;
+}
+
+.ui-datepicker-title {
+    color: #fff;
+    font-weight: bold;
+    font-family: 'Orbitron', sans-serif;
+}
+
+.ui-datepicker-prev, .ui-datepicker-next {
+    background: rgba(255, 255, 255, 0.1) !important;
+    border-radius: 50%;
+    cursor: pointer;
+    color: #fff;
+}
+
+.ui-datepicker-calendar th {
+    color: #a3b1de;
+    font-weight: 600;
+    padding: 7px;
+}
+
+.ui-datepicker-calendar td {
+    padding: 3px;
+}
+
+.ui-datepicker-calendar td a {
+    text-align: center;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.05) !important;
+    border: none !important;
+    color: #fff !important;
+    padding: 8px;
+    transition: all 0.2s;
+}
+
+.ui-datepicker-calendar td a:hover {
+    background: rgba(106, 176, 238, 0.3) !important;
+    color: #fff !important;
+}
+
+.ui-datepicker-calendar td a.ui-state-active {
+    background: rgba(106, 176, 238, 0.4) !important;
+    box-shadow: 0 0 10px rgba(106, 176, 238, 0.3);
+}
+
+.ui-datepicker-calendar td a.ui-state-highlight {
+    background: rgba(240, 198, 116, 0.3) !important;
+    box-shadow: 0 0 10px rgba(240, 198, 116, 0.2);
+}
+
+/* 커스텀 시간 선택기 스타일 */
+.custom-time-picker {
+    position: relative;
+    width: 100%;
+    overflow: visible;
+}
+
+.time-dropdown {
+    display: none;
+    position: absolute;
+    top: calc(100% + 5px);
+    left: 0;
+    width: 100%;
+    background: linear-gradient(135deg, rgba(27, 38, 59, 0.95), rgba(15, 32, 39, 0.98));
+    border: 2px solid rgba(106, 176, 238, 0.3);
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    z-index: 9999;
+    overflow: auto;
+    max-height: 250px;
+    animation: fadeIn 0.2s ease-out;
+}
+
+.time-dropdown.open {
+    display: block;
+}
+
+.time-columns {
+    display: flex;
+    height: 200px;
+}
+
+.time-column {
+    flex: 1;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(106, 176, 238, 0.5) rgba(27, 38, 59, 0.8);
+    border-right: 1px solid rgba(106, 176, 238, 0.2);
+    max-height: 200px;
+}
+
+.period-column {
+    flex: 0.7; /* 오전/오후 컬럼은 좀 더 좁게 */
+}
+
+.time-column:last-child {
+    border-right: none;
+}
+
+.time-column::-webkit-scrollbar {
+    width: 6px;
+}
+
+.time-column::-webkit-scrollbar-track {
+    background: rgba(27, 38, 59, 0.8);
+}
+
+.time-column::-webkit-scrollbar-thumb {
+    background-color: rgba(106, 176, 238, 0.5);
+    border-radius: 3px;
+}
+
+.time-option {
     padding: 10px;
-    margin-top: 4px;
-    margin-bottom: 15px;
-    background: rgba(255, 255, 255, 0.08);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    border-radius: 8px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s;
     color: #fff;
     font-family: 'Nunito', sans-serif;
 }
 
+.time-option:hover {
+    background: rgba(106, 176, 238, 0.2);
+}
+
+.time-option.selected {
+    background: rgba(106, 176, 238, 0.4);
+    font-weight: bold;
+}
+
+.todo-btn-group {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-top: 30px;
+}
+
+.todo-btn {
+    padding: 12px 24px;
+    border: none;
+    border-radius: 30px;
+    font-family: 'Nunito', sans-serif;
+    font-weight: 700;
+    font-size: 16px;
+    cursor: pointer;
+    transition: all 0.3s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.todo-btn i {
+    margin-right: 8px;
+}
+
+.todo-save-btn {
+    background: linear-gradient(135deg, #6ab0ee, #4a90da);
+    color: white;
+    box-shadow: 0 5px 15px rgba(106, 176, 238, 0.3);
+}
+
+.todo-save-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(106, 176, 238, 0.5);
+}
+
+.todo-cancel-btn {
+    background: rgba(255, 255, 255, 0.1);
+    color: #a3b1de;
+    border: 1px solid rgba(163, 177, 222, 0.2);
+}
+
+.todo-cancel-btn:hover {
+    background: rgba(255, 255, 255, 0.15);
+    color: #fff;
+}
+
+.delete-btn {
+    background: linear-gradient(135deg, #ff5c5c, #d9534f);
+    color: white;
+    border: none;
+}
+
+.delete-btn:hover {
+    background: linear-gradient(135deg, #ff7a7a, #e74c3c);
+    box-shadow: 0 8px 20px rgba(255, 92, 92, 0.5);
+}
 
 @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(-10px); }
-    to { opacity: 1; transform: translateY(0); }
+    from { opacity: 0; }
+    to { opacity: 1; }
 }
 
-
-.modal-button-group {
-    display: flex;
-    justify-content: flex-start;
-    gap: 10px;
-    margin-top: 20px;
+@keyframes slideUp {
+    from { transform: translateY(30px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
 }
 
-.modal-button-group button {
-    padding: 10px 16px;
-    border: none;
-    border-radius: 8px;
-    background: linear-gradient(135deg, #6ab0ee, #4a90da);
-    color: #fff;
-    font-weight: bold;
-    cursor: pointer;
-    transition: all 0.3s;
+/* 캘린더에 표시되는 할 일 표시 */
+.todo-indicator {
+    position: absolute;
+    bottom: 5px;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background-color: #6ab0ee;
+    box-shadow: 0 0 5px rgba(106, 176, 238, 0.5);
 }
-
-.modal-button-group button:hover {
-    transform: scale(1.05);
-    box-shadow: 0 4px 15px rgba(106, 176, 238, 0.6);
-}
-
-.modal-button-group .danger {
-    background: linear-gradient(135deg, #ff5c5c, #d9534f);
-}
-
-.modal-button-group .danger:hover {
-    box-shadow: 0 4px 15px rgba(255, 92, 92, 0.6);
-}
-.modal-footer {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-top: 20px;
-}
-
-.left-buttons {
-    display: flex;
-    gap: 10px;
-}
-
-.right-button {
-    display: flex;
-    justify-content: flex-end;
-}
-
-.modal-footer button {
-    padding: 10px 16px;
-    border: none;
-    border-radius: 8px;
-    background: linear-gradient(135deg, #6ab0ee, #4a90da);
-    color: #fff;
-    font-weight: bold;
-    cursor: pointer;
-    transition: all 0.3s;
-}
-
-.modal-footer .danger {
-    background: linear-gradient(135deg, #ff5c5c, #d9534f);
-}
-
-.modal-footer .danger:hover {
-    box-shadow: 0 4px 15px rgba(255, 92, 92, 0.6);
-}
-
-.modal-footer button:hover {
-    transform: scale(1.05);
-    box-shadow: 0 4px 15px rgba(106, 176, 238, 0.6);
-}
-
-
-
-
-
