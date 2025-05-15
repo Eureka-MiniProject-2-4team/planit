@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>PLAN!T - 친구 목록</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap"/>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&display=swap"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <link rel="stylesheet" href="/css/friend/friend.css" />
+</head>
+<body>
+<div class="stars" id="stars"></div>
+
+<div class="container">
+    <header class="header">
+        <div class="logo">
+            <i class="fas fa-rocket logo-icon"></i>
+            PLAN!T
+        </div>
+    </header>
+
+    <div class="friends-panel">
+        <div class="panel-header">
+            <i class="fas fa-users panel-icon"></i>
+            <div class="panel-title">친구 목록</div>
+        </div>
+
+        <div class="search-box">
+            <i class="fas fa-search search-icon"></i>
+            <input type="text" class="search-input" placeholder="친구 검색..." />
+        </div>
+
+        <div class="friends-list" id="friends-list">
+            <!-- JS로 렌더링되는 친구 아이템 영역 -->
+        </div>
+
+        <div class="bottom-controls">
+            <button class="control-btn" id="refresh-btn">
+                <i class="fas fa-sync-alt"></i> 새로고침
+            </button>
+            <button class="control-btn add-btn" id="add-friend-btn">
+                <i class="fas fa-user-plus"></i> 친구 추가
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- 친구 추가 모달 -->
+<div class="friend-modal" id="friend-modal" style="display: none;">
+    <div class="modal-content">
+        <button class="close-modal" id="close-modal">
+            <i class="fas fa-times"></i>
+        </button>
+        <div class="modal-header">
+            <div class="modal-title">친구 추가</div>
+            <div class="modal-subtitle">새로운 친구의 사용자 이름을 입력하세요</div>
+        </div>
+        <form class="friend-form" id="search-friend-form">
+            <div class="form-group">
+                <label class="form-label">사용자 이름</label>
+                <input type="text" class="form-input" id="username-input" placeholder="username" />
+            </div>
+            <div class="form-actions">
+                <button type="button" class="control-btn" id="cancel-btn">취소</button>
+                <button type="button" class="control-btn add-btn" id="search-btn">검색</button>
+            </div>
+        </form>
+
+        <div id="search-results" class="search-results">
+            <!-- 검색 결과가 여기에 표시됩니다 -->
+        </div>
+    </div>
+</div>
+
+<nav class="navbar">
+    <div class="nav-container">
+        <div class="nav-logo">P!T</div>
+        <a href="#" class="nav-item">
+            <i class="fas fa-user nav-icon"></i>
+            <span class="nav-text">나</span>
+        </a>
+        <a href="#" class="nav-item active">
+            <i class="fas fa-users nav-icon"></i>
+            <span class="nav-text">친구</span>
+        </a>
+        <a href="#" class="nav-item">
+            <i class="fas fa-user-tie nav-icon"></i>
+            <span class="nav-text">팀</span>
+        </a>
+        <a href="#" class="nav-item">
+            <i class="fas fa-user-astronaut nav-icon"></i>
+            <span class="nav-text">마이페이지</span>
+        </a>
+    </div>
+</nav>
+
+<script src="/js/friend/friend.js"></script>
+</body>
+</html>
