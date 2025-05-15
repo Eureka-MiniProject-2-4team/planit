@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>PLAN!T - 팀 관리 페이지</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap"/>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&display=swap"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Nunito', sans-serif;
+      background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+      color: #fff;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    /* 우주 배경 스타일 */
+    .stars {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .star {
+      position: absolute;
+      background-color: #fff;
+      border-radius: 50%;
+      opacity: 0.8;
+      animation: twinkle 4s infinite;
+    }
+
+    @keyframes twinkle {
+      0%, 100% { opacity: 0.3; transform: scale(1); }
+      50% { opacity: 1; transform: scale(1.2); }
+    }
+
+    .container {
+      max-width: 600px;
+      width: 100%;
+      z-index: 1;
+      position: relative;
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 20px;
+      font-family: 'Orbitron', sans-serif;
+    }
+
+    .title {
+      font-size: 24px;
+      margin-bottom: 5px;
+      font-weight: 700;
+      color: #6ab0ee;
+      text-shadow: 0 0 10px rgba(106, 176, 238, 0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .title-icon {
+      margin-right: 10px;
+    }
+
+    .subtitle {
+      font-size: 14px;
+      color: #a3b1de;
+    }
+
+    .management-panel {
+      background: rgba(27, 38, 59, 0.8);
+      border-radius: 20px;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+      padding: 25px;
+      border: 2px solid rgba(106, 176, 238, 0.2);
+      animation: fadeIn 0.5s ease-out;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    .form-label {
+      font-weight: 600;
+      margin-bottom: 8px;
+      display: block;
+    }
+
+    .form-input {
+      width: 100%;
+      background: rgba(106, 176, 238, 0.1);
+      border: 1px solid rgba(106, 176, 238, 0.3);
+      border-radius: 10px;
+      padding: 12px 15px;
+      color: white;
+      font-family: 'Nunito', sans-serif;
+      transition: all 0.3s;
+    }
+
+    .form-input:focus {
+      outline: none;
+      border-color: #6ab0ee;
+      background: rgba(106, 176, 238, 0.15);
+      box-shadow: 0 0 10px rgba(106, 176, 238, 0.2);
+    }
+
+    .form-input::placeholder {
+      color: rgba(255, 255, 255, 0.5);
+    }
+
+    textarea.form-input {
+      min-height: 100px;
+      resize: vertical;
+    }
+
+    .section-divider {
+      display: flex;
+      align-items: center;
+      margin: 25px 0;
+      color: #6ab0ee;
+    }
+
+    .divider-line {
+      flex: 1;
+      height: 1px;
+      background: rgba(106, 176, 238, 0.3);
+      margin: 0 15px;
+    }
+
+    .section-title {
+      font-weight: 700;
+      font-size: 16px;
+      white-space: nowrap;
+    }
+
+    .section-icon {
+      margin-right: 8px;
+    }
+
+    .member-list {
+      max-height: 200px;
+      overflow-y: auto;
+      margin-bottom: 20px;
+      background: rgba(106, 176, 238, 0.05);
+      border-radius: 10px;
+      padding: 8px;
+    }
+
+    .member-list::-webkit-scrollbar {
+      width: 5px;
+    }
+
+    .member-list::-webkit-scrollbar-track {
+      background: rgba(106, 176, 238, 0.05);
+      border-radius: 5px;
+    }
+
+    .member-list::-webkit-scrollbar-thumb {
+      background: rgba(106, 176, 238, 0.2);
+      border-radius: 5px;
+    }
+
+    .member-list::-webkit-scrollbar-thumb:hover {
+      background: rgba(106, 176, 238, 0.3);
+    }
+
+    .member-item {
+      display: flex;
+      align-items: center;
+      padding: 10px;
+      margin-bottom: 8px;
+      background: rgba(106, 176, 238, 0.08);
+      border-radius: 8px;
+      transition: all 0.3s;
+    }
+
+    .member-item:hover {
+      background: rgba(106, 176, 238, 0.15);
+    }
+
+    .member-item:last-child {
+      margin-bottom: 0;
+    }
+
+    .member-avatar {
+      width: 35px;
+      height: 35px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #6ab0ee, #4a90da);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      margin-right: 12px;
+      font-size: 14px;
+    }
+
+    .member-info {
+      flex: 1;
+    }
+
+    .member-name {
+      font-weight: 600;
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+    }
+
+    .member-actions {
+      display: flex;
+      gap: 8px;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .member-item:hover .member-actions {
+      opacity: 1;
+    }
+
+    .member-action-btn {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      background: rgba(106, 176, 238, 0.15);
+      border: none;
+      color: white;
+      font-size: 13px;
+      cursor: pointer;
+      transition: all 0.3s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .member-action-btn:hover {
+      background: rgba(106, 176, 238, 0.3);
+      transform: scale(1.1);
+    }
+
+    .view-btn:hover {
+      background: rgba(106, 176, 238, 0.4);
+    }
+
+    .kick-btn {
+      background: rgba(255, 87, 87, 0.15);
+    }
+
+    .kick-btn:hover {
+      background: rgba(255, 87, 87, 0.3);
+    }
+
+    .leader-badge {
+      margin-left: 8px;
+      background: #f0c674;
+      color: #333;
+      padding: 2px 6px;
+      border-radius: 10px;
+      font-size: 10px;
+      font-weight: 700;
+    }
+
+    .invite-form {
+      display: flex;
+      margin-bottom: 15px;
+      gap: 10px;
+    }
+
+    .invite-input {
+      flex: 1;
+      background: rgba(106, 176, 238, 0.1);
+      border: 1px solid rgba(106, 176, 238, 0.3);
+      border-radius: 10px;
+      padding: 10px 15px;
+      color: white;
+      font-family: 'Nunito', sans-serif;
+    }
+
+    .invite-input:focus {
+      outline: none;
+      border-color: #6ab0ee;
+      background: rgba(106, 176, 238, 0.15);
+    }
+
+    .invite-button {
+      background: linear-gradient(135deg, #6ab0ee, #4a90da);
+      border: none;
+      border-radius: 10px;
+      color: white;
+      padding: 0 15px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.3s;
+    }
+
+    .invite-button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 3px 10px rgba(106, 176, 238, 0.3);
+    }
+
+    .buttons {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 30px;
+    }
+
+    .left-buttons {
+      display: flex;
+      align-items: center;
+    }
+
+    .danger-btn {
+      background: rgba(255, 87, 87, 0.15);
+      border: 1px solid rgba(255, 87, 87, 0.3);
+      color: rgba(255, 87, 87, 0.9);
+      padding: 8px 15px;
+      border-radius: 8px;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.3s;
+      font-family: 'Nunito', sans-serif;
+    }
+
+    .danger-btn:hover {
+      background: rgba(255, 87, 87, 0.25);
+      color: white;
+    }
+
+    .right-buttons {
+      display: flex;
+      gap: 10px;
+    }
+
+    .btn {
+      padding: 12px 20px;
+      border-radius: 10px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+      font-family: 'Nunito', sans-serif;
+      border: none;
+    }
+
+    .btn-cancel {
+      background: rgba(255, 255, 255, 0.1);
+      color: white;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .btn-cancel:hover {
+      background: rgba(255, 255, 255, 0.15);
+    }
+
+    .btn-save {
+      background: linear-gradient(135deg, #6ab0ee, #4a90da);
+      color: white;
+    }
+
+    .btn-save:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 5px 15px rgba(106, 176, 238, 0.3);
+    }
+
+    .back-button {
+      position: absolute;
+      top: -50px;
+      left: 0;
+      background: none;
+      border: none;
+      color: #6ab0ee;
+      font-size: 16px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      transition: all 0.3s;
+    }
+
+    .back-button:hover {
+      transform: translateX(-5px);
+      color: white;
+    }
+
+    .back-icon {
+      margin-right: 5px;
+    }
+
+    /* 반응형 */
+    @media (max-width: 500px) {
+      .buttons {
+        flex-direction: column;
+        gap: 10px;
+      }
+
+      .btn {
+        width: 100%;
+      }
+
+      .invite-form {
+        flex-direction: column;
+      }
+
+      .invite-button {
+        padding: 10px;
+      }
+    }
+  </style>
+</head>
+<body>
+<div class="stars" id="stars"></div>
+
+<div class="container">
+  <button class="back-button" id="back-button">
+    <i class="fas fa-arrow-left back-icon"></i> 팀 목록으로 돌아가기
+  </button>
+
+  <div class="header">
+    <div class="title">
+      <i class="fas fa-user-cog title-icon"></i>
+      팀 관리 페이지
+    </div>
+    <div class="subtitle">팀장 전용 메뉴</div>
+  </div>
+
+  <div class="management-panel">
+    <div class="form-group">
+      <label for="team-name" class="form-label">팀 이름</label>
+      <input type="text" id="team-name" class="form-input" value="우주 탐험대" placeholder="팀 이름을 입력하세요">
+    </div>
+
+    <div class="form-group">
+      <label for="team-info" class="form-label">팀 정보</label>
+      <textarea id="team-info" class="form-input" placeholder="팀에 대한 설명을 입력하세요">우주 탐사 프로젝트를 함께 계획하고 실행하는 팀입니다. 별자리 관측과 천체 탐구에 관심 있는 분들의 모임입니다.</textarea>
+    </div>
+
+    <div class="section-divider">
+      <i class="fas fa-users section-icon"></i>
+      <span class="section-title">팀원 관리</span>
+      <div class="divider-line"></div>
+    </div>
+
+    <div class="member-list">
+      <div class="member-item">
+        <div class="member-avatar">YJ</div>
+        <div class="member-info">
+          <div class="member-name">
+            yunmijeong
+            <span class="leader-badge">팀장</span>
+          </div>
+        </div>
+        <div class="member-actions">
+          <button class="member-action-btn view-btn" title="일정 보기">
+            <i class="fas fa-calendar-alt"></i>
+          </button>
+        </div>
+      </div>
+
+      <div class="member-item">
+        <div class="member-avatar">JH</div>
+        <div class="member-info">
+          <div class="member-name">jeonghyun</div>
+        </div>
+        <div class="member-actions">
+          <button class="member-action-btn view-btn" title="일정 보기">
+            <i class="fas fa-calendar-alt"></i>
+          </button>
+          <button class="member-action-btn kick-btn" title="팀에서 내보내기">
+            <i class="fas fa-user-minus"></i>
+          </button>
+        </div>
+      </div>
+
+      <div class="member-item">
+        <div class="member-avatar">SY</div>
+        <div class="member-info">
+          <div class="member-name">sonyerim</div>
+        </div>
+        <div class="member-actions">
+          <button class="member-action-btn view-btn" title="일정 보기">
+            <i class="fas fa-calendar-alt"></i>
+          </button>
+          <button class="member-action-btn kick-btn" title="팀에서 내보내기">
+            <i class="fas fa-user-minus"></i>
+          </button>
+        </div>
+      </div>
+
+      <div class="member-item">
+        <div class="member-avatar">MS</div>
+        <div class="member-info">
+          <div class="member-name">minseok</div>
+        </div>
+        <div class="member-actions">
+          <button class="member-action-btn view-btn" title="일정 보기">
+            <i class="fas fa-calendar-alt"></i>
+          </button>
+          <button class="member-action-btn kick-btn" title="팀에서 내보내기">
+            <i class="fas fa-user-minus"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-divider">
+      <i class="fas fa-user-plus section-icon"></i>
+      <span class="section-title">초대</span>
+      <div class="divider-line"></div>
+    </div>
+
+    <div class="invite-form">
+      <input type="text" class="invite-input" placeholder="사용자 이름 또는 이메일">
+      <button class="invite-button">초대하기</button>
+    </div>
+
+    <div class="buttons">
+      <div class="left-buttons">
+        <button class="danger-btn" id="delete-team-button">
+          <i class="fas fa-trash-alt"></i> 팀 삭제
+        </button>
+      </div>
+
+      <div class="right-buttons">
+        <button class="btn btn-cancel" id="cancel-button">취소</button>
+        <button class="btn btn-save" id="save-button">저장</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // 멤버 액션 설정
+  function setupMemberActions() {
+// 일정 보기 버튼
+    const viewButtons = document.querySelectorAll('.view-btn');
+    viewButtons.forEach(button => {
+      button.addEventListener('click', function() {
+        const memberItem = this.closest('.member-item');
+        const memberName = memberItem.querySelector('.member-name').textContent.trim().split('\n')[0];
+        alert(`${memberName}의 일정을 확인합니다.`);
+// 실제 구현 시 해당 멤버의 캘린더 페이지로 이동
+// window.location.href = `calendar.html?user=${memberName}`;
+      });
+    });
+
+// 내보내기 버튼
+    const kickButtons = document.querySelectorAll('.kick-btn');
+    kickButtons.forEach(button => {
+      button.addEventListener('click', function() {
+        const memberItem = this.closest('.member-item');
+        const memberName = memberItem.querySelector('.member-name').textContent.trim();
+
+        if (confirm(`정말로 ${memberName}님을 팀에서 내보내시겠습니까?`)) {
+// 애니메이션 효과와 함께 삭제
+          memberItem.style.opacity = '0';
+          memberItem.style.height = '0';
+          memberItem.style.padding = '0';
+          memberItem.style.margin = '0';
+          memberItem.style.overflow = 'hidden';
+
+          setTimeout(() => {
+            memberItem.remove();
+          }, 300);
+
+          alert(`${memberName}님을 팀에서 내보냈습니다.`);
+        }
+      });
+    });
+  }
+
+  // 별 생성 함수
+  function createStars() {
+    const starsContainer = document.getElementById('stars');
+    const numberOfStars = 150;
+
+    for (let i = 0; i < numberOfStars; i++) {
+      const star = document.createElement('div');
+      star.classList.add('star');
+
+      const size = Math.random() * 3 + 1;
+      star.style.width = `${size}px`;
+      star.style.height = `${size}px`;
+
+      const posX = Math.random() * 100;
+      const posY = Math.random() * 100;
+      star.style.left = `${posX}%`;
+      star.style.top = `${posY}%`;
+
+      const delay = Math.random() * 5;
+      star.style.animationDelay = `${delay}s`;
+
+      starsContainer.appendChild(star);
+    }
+  }
+
+  // 버튼 이벤트 설정
+  function setupButtons() {
+    const backButton = document.getElementById('back-button');
+    const cancelButton = document.getElementById('cancel-button');
+    const saveButton = document.getElementById('save-button');
+    const deleteTeamButton = document.getElementById('delete-team-button');
+
+    backButton.addEventListener('click', function() {
+      if (confirm('변경 사항이 저장되지 않습니다. 팀 목록으로 돌아가시겠습니까?')) {
+        alert('팀 목록 페이지로 이동합니다.');
+        // window.location.href = 'teams.html'; // 실제 구현 시 활성화
+      }
+    });
+
+    cancelButton.addEventListener('click', function() {
+      if (confirm('변경 사항이 저장되지 않습니다. 취소하시겠습니까?')) {
+        alert('팀 관리를 취소합니다.');
+        // window.location.href = 'teams.html'; // 실제 구현 시 활성화
+      }
+    });
+
+    saveButton.addEventListener('click', function() {
+      alert('팀 정보가 저장되었습니다.');
+      // 저장 로직 실행 후 이동
+      // window.location.href = 'teams.html'; // 실제 구현 시 활성화
+    });
+
+    deleteTeamButton.addEventListener('click', function() {
+      if (confirm('정말로 팀을 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.')) {
+        if (confirm('모든 팀 데이터가 영구적으로 삭제됩니다. 계속하시겠습니까?')) {
+          alert('팀이 삭제되었습니다.');
+          // window.location.href = 'teams.html'; // 실제 구현 시 활성화
+        }
+      }
+    });
+  }
+
+  // 초대 기능 설정
+  function setupInvite() {
+    const inviteForm = document.querySelector('.invite-form');
+    const inviteInput = document.querySelector('.invite-input');
+    const inviteButton = document.querySelector('.invite-button');
+
+    inviteButton.addEventListener('click', function() {
+      const userInput = inviteInput.value.trim();
+
+      if (userInput) {
+        alert(`${userInput}에게 초대 메시지가 전송되었습니다.`);
+        inviteInput.value = '';
+      } else {
+        alert('사용자 이름 또는 이메일을 입력해주세요.');
+      }
+    });
+  }
+
+  // 페이지 로드 시 실행
+  window.onload = function() {
+    createStars();
+    setupButtons();
+    setupInvite();
+    setupMemberActions();
+  };
+</script>
+</body>
+</html>
