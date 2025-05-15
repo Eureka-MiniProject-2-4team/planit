@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>PLAN!T - 당신의 계획 행성</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600&display=swap"/>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Orbitron', sans-serif;
+      background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      text-align: center;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .stars {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .star {
+      position: absolute;
+      background-color: #fff;
+      border-radius: 50%;
+      opacity: 0.8;
+      animation: twinkle 4s infinite;
+    }
+
+    @keyframes twinkle {
+      0%, 100% { opacity: 0.3; transform: scale(1); }
+      50% { opacity: 1; transform: scale(1.2); }
+    }
+
+    .content {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .logo-image {
+      width: 600px; /* 기존 200px에서 확대 */
+      height: auto;
+      margin-bottom: 0px; /* 여백도 살짝 조정 */
+      animation: float 3s ease-in-out infinite;
+    }
+
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+
+    h1 {
+      font-size: 48px;
+      margin-bottom: 10px;
+      margin-top: 0px;
+      color: #ffffff;
+    }
+
+    p {
+      font-size: 18px;
+      color: #ccc;
+      margin-bottom: 40px;
+    }
+
+    .btn-group {
+      display: flex;
+      gap: 20px;
+    }
+
+    .btn {
+      padding: 12px 24px;
+      background-color: #00c9a7;
+      border: none;
+      border-radius: 30px;
+      color: #fff;
+      font-size: 16px;
+      cursor: pointer;
+      text-decoration: none;
+      transition: background 0.3s;
+    }
+
+    .btn:hover {
+      background-color: #009e84;
+    }
+  </style>
+</head>
+<body>
+<div class="stars" id="stars"></div>
+
+<div class="content">
+  <img src="./img/logo_only_planit.png" alt="PLAN!T 로고" class="logo-image"/>
+  <h1>PLAN!T</h1>
+  <p>당신의 하루를 우주처럼 확장하세요.<br />계획의 중심이 되는 나만의 공간, PLAN!T</p>
+  <div class="btn-group">
+    <a href="/auth/login.html" class="btn">로그인</a>
+    <a href="/auth/signup.html" class="btn">회원가입</a>
+  </div>
+</div>
+
+<script>
+  function createStars() {
+    const starsContainer = document.getElementById('stars');
+    const numberOfStars = 100;
+
+    for (let i = 0; i < numberOfStars; i++) {
+      const star = document.createElement('div');
+      star.classList.add('star');
+
+      const size = Math.random() * 3 + 1;
+      star.style.width = `${size}px`;
+      star.style.height = `${size}px`;
+
+      const posX = Math.random() * 100;
+      const posY = Math.random() * 100;
+      star.style.left = `${posX}%`;
+      star.style.top = `${posY}%`;
+
+      const delay = Math.random() * 5;
+      star.style.animationDelay = `${delay}s`;
+
+      starsContainer.appendChild(star);
+    }
+  }
+
+  window.onload = function () {
+    createStars();
+  };
+</script>
+</body>
+</html>
