@@ -1,15 +1,14 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-    <meta charset="UTF-8">
+    <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>PLAN!T - 이메일 찾기</title>
+    <title>PLAN!T - 로그인</title>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600&display=swap" />
     <style>
         * {
             box-sizing: border-box;
         }
-
 
         body {
             margin: 0;
@@ -101,15 +100,15 @@
             margin: 0 6px;
         }
 
-        .success-message {
-            color: #00c9a7;
+        .error-message {
+            color: #ff6666;
             margin-top: 10px;
             font-size: 14px;
         }
 
-        .planet {
-            width: 60px;
-            height: 60px;
+        .logo {
+            width: 80px;
+            height: 80px;
             margin-bottom: 20px;
             animation: float 3s ease-in-out infinite;
         }
@@ -124,18 +123,15 @@
 <div class="stars" id="stars"></div>
 
 <div class="container">
-    <h2>이메일 찾기</h2>
-    <div>
-        <input type="text" id="name" placeholder="이름">
-        <input type="text" id="phoneNumber" placeholder="전화번호">
-        <button class="btn" onclick="findEmail()">이메일 찾기</button>
-        <p id="result-message" class="success-message"></p>
-        <p id="error-message" class="error-message"></p>
-    </div>
+    <h2>PLAN!T 로그인</h2>
+    <input type="email" id="email" placeholder="이메일" />
+    <input type="password" id="password" placeholder="비밀번호" />
+    <button class="btn" onclick="login()">로그인</button>
+    <p id="error-message" class="error-message"></p>
     <div class="links">
-        <a href="/auth/login.html">로그인</a> |
-        <a href="/auth/find-password.html">비밀번호 찾기</a> |
-        <a href="/auth/signup.html">회원가입</a>
+        <a href="/html/auth/find-email.html">이메일 찾기</a> |
+        <a href="/html/auth/find-password.html">비밀번호 찾기</a> |
+        <a href="/html/auth/signup.html">회원가입</a>
     </div>
 </div>
 
@@ -155,30 +151,31 @@
 
     window.onload = createStars;
 
-    async function findEmail() {
-        const name = document.getElementById('name').value;
-        const phoneNumber = document.getElementById('phoneNumber').value;
-        const result = document.getElementById('result-message');
-        const error = document.getElementById('error-message');
-        result.textContent = '';
-        error.textContent = '';
+    async function login() {
+        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
+        const errorMessage = document.getElementById('error-message');
+        errorMessage.textContent = '';
 
         try {
-            const response = await fetch('/auth/find-email', {
+            const response = await fetch('/auth/login', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({name, phoneNumber})
+                body: JSON.stringify({email, password})
             });
 
-            const data = await response.json();
-            if (response.ok && data.result === 'SUCCESS') {
-                result.textContent = `가입된 이메일: ${data.data.email}`;
+            const result = await response.json();
+
+            if (response.ok && result.data && result.data.accessToken) {
+                localStorage.setItem('accessToken', 'Bearer ' + result.data.accessToken);
+                alert('로그인 성공!');
+                window.location.href = '../user/mypage_2.html';
             } else {
-                error.textContent = data.message || '일치하는 사용자를 찾을 수 없습니다.';
+                errorMessage.textContent = result.message || '로그인 실패';
             }
-        } catch (e) {
-            console.error(e);
-            error.textContent = '서버 오류';
+        } catch (error) {
+            console.error(error);
+            errorMessage.textContent = '서버 오류';
         }
     }
 </script>

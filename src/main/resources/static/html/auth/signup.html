@@ -232,7 +232,7 @@
     </form>
 
     <div class="links">
-        <a href="/auth/login.html">이미 계정이 있으신가요? 로그인하기</a>
+        <a href="/html/auth/login.html">이미 계정이 있으신가요? 로그인하기</a>
     </div>
 </div>
 
@@ -394,7 +394,7 @@
             .then(data => {
                 alert(data.message || "회원가입 성공");
                 if (data.result === 'SUCCESS') {
-                    window.location.href = '/auth/login.html';
+                    window.location.href = 'login.html';
                 }
             })
             .catch(() => alert("회원가입 실패"));
