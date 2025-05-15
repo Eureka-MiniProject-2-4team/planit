@@ -182,31 +182,31 @@
     }
 
     /* 친구 리스트 */
-    .friends-list {
+    .team-list {
       max-height: 400px;
       overflow-y: auto;
       padding-right: 5px;
     }
 
-    .friends-list::-webkit-scrollbar {
+    .team-list::-webkit-scrollbar {
       width: 6px;
     }
 
-    .friends-list::-webkit-scrollbar-track {
+    .team-list::-webkit-scrollbar-track {
       background: rgba(255, 255, 255, 0.1);
       border-radius: 10px;
     }
 
-    .friends-list::-webkit-scrollbar-thumb {
+    .team-list::-webkit-scrollbar-thumb {
       background: rgba(106, 176, 238, 0.3);
       border-radius: 10px;
     }
 
-    .friends-list::-webkit-scrollbar-thumb:hover {
+    .team-list::-webkit-scrollbar-thumb:hover {
       background: rgba(106, 176, 238, 0.5);
     }
 
-    .friend-item {
+    .team-item {
       display: flex;
       align-items: center;
       padding: 15px;
@@ -218,7 +218,7 @@
       overflow: hidden;
     }
 
-    .friend-item::before {
+    .team-item::before {
       content: '';
       position: absolute;
       left: 0;
@@ -230,16 +230,16 @@
       transition: all 0.3s;
     }
 
-    .friend-item:hover {
+    .team-item:hover {
       transform: translateX(5px);
       background: rgba(106, 176, 238, 0.15);
     }
 
-    .friend-item:hover::before {
+    .team-item:hover::before {
       opacity: 1;
     }
 
-    .friend-avatar {
+    .team-avatar {
       width: 50px;
       height: 50px;
       border-radius: 50%;
@@ -253,42 +253,22 @@
       font-weight: bold;
     }
 
-    .friend-info {
+    .team-info {
       flex: 1;
     }
 
-    .friend-name {
+    .team-name {
       font-size: 16px;
       font-weight: 700;
       margin-bottom: 5px;
     }
 
-    .friend-status {
-      font-size: 12px;
-      color: #a3b1de;
-      display: flex;
-      align-items: center;
-    }
-
-    .status-icon {
-      margin-right: 5px;
-      font-size: 10px;
-    }
-
-    .online {
-      color: #80ed99;
-    }
-
-    .offline {
-      color: #a3b1de;
-    }
-
-    .friend-actions {
+    .team-actions {
       display: flex;
       gap: 10px;
     }
 
-    .action-btn {
+    .team-action-btn {
       width: 40px;
       height: 40px;
       border-radius: 50%;
@@ -302,23 +282,31 @@
       transition: all 0.3s;
     }
 
-    .action-btn:hover {
+    .team-action-btn:hover {
       background: rgba(106, 176, 238, 0.3);
       transform: scale(1.1);
     }
 
-    .action-btn.view-btn {
+    .team-action-btn.view-btn {
       background: rgba(106, 176, 238, 0.3);
     }
 
-    .action-btn.view-btn:hover {
+    .team-action-btn.view-btn:hover {
       background: rgba(106, 176, 238, 0.5);
+    }
+
+    .kick-btn {
+      background: rgba(255, 87, 87, 0.15);
+    }
+
+    .kick-btn:hover {
+      background: rgba(255, 87, 87, 0.3);
     }
 
     /* 하단 컨트롤 */
     .bottom-controls {
       display: flex;
-      justify-content: space-between;
+      justify-content: center;
       margin-top: 20px;
     }
 
@@ -572,16 +560,16 @@
       animation: slideIn 0.6s ease-out;
     }
 
-    .friend-item {
+    .team-item {
       animation: slideIn 0.4s ease-out;
       animation-fill-mode: both;
     }
 
-    .friend-item:nth-child(1) { animation-delay: 0.1s; }
-    .friend-item:nth-child(2) { animation-delay: 0.2s; }
-    .friend-item:nth-child(3) { animation-delay: 0.3s; }
-    .friend-item:nth-child(4) { animation-delay: 0.4s; }
-    .friend-item:nth-child(5) { animation-delay: 0.5s; }
+    .team-item:nth-child(1) { animation-delay: 0.1s; }
+    .team-item:nth-child(2) { animation-delay: 0.2s; }
+    .team-item:nth-child(3) { animation-delay: 0.3s; }
+    .team-item:nth-child(4) { animation-delay: 0.4s; }
+    .team-item:nth-child(5) { animation-delay: 0.5s; }
 
     /* 미디어 쿼리 */
     @media (max-width: 768px) {
@@ -637,154 +625,29 @@
   <div class="friends-panel">
     <div class="panel-header">
       <i class="fas fa-users panel-icon"></i>
-      <div class="panel-title">친구 목록</div>
+      <div class="panel-title">팀 목록</div>
     </div>
 
     <div class="friends-menu">
       <div class="menu-slider" id="menu-slider"></div>
-      <div class="menu-option active" data-index="0">전체</div>
-      <div class="menu-option" data-index="1">유저</div>
-      <div class="menu-option" data-index="2">친구</div>
-      <div class="menu-option" data-index="3">차단</div>
+      <div class="menu-option active" data-index="0">나의 팀</div>
+      <div class="menu-option" data-index="1">받은 초대</div>
     </div>
 
     <div class="search-box">
       <i class="fas fa-search search-icon"></i>
-      <input type="text" class="search-input" placeholder="친구 검색..." />
+      <input type="text" class="search-input" placeholder="팀 검색..." />
     </div>
 
-    <div class="friends-list">
-      <div class="friend-item">
-        <div class="friend-avatar">YJ</div>
-        <div class="friend-info">
-          <div class="friend-name">yunmijeong</div>
-          <div class="friend-status">
-            <i class="fas fa-circle status-icon online"></i>
-            접속 중
-          </div>
-        </div>
-        <div class="friend-actions">
-          <button class="action-btn view-btn">
-            <i class="fas fa-calendar-alt"></i>
-          </button>
-          <button class="action-btn">
-            <i class="fas fa-comment"></i>
-          </button>
-        </div>
-      </div>
-
-      <div class="friend-item">
-        <div class="friend-avatar">SY</div>
-        <div class="friend-info">
-          <div class="friend-name">sonyerim</div>
-          <div class="friend-status">
-            <i class="fas fa-circle status-icon online"></i>
-            접속 중
-          </div>
-        </div>
-        <div class="friend-actions">
-          <button class="action-btn view-btn">
-            <i class="fas fa-calendar-alt"></i>
-          </button>
-          <button class="action-btn">
-            <i class="fas fa-comment"></i>
-          </button>
-        </div>
-      </div>
-
-      <div class="friend-item">
-        <div class="friend-avatar">JH</div>
-        <div class="friend-info">
-          <div class="friend-name">jeonghyun</div>
-          <div class="friend-status">
-            <i class="fas fa-circle status-icon offline"></i>
-            10분 전
-          </div>
-        </div>
-        <div class="friend-actions">
-          <button class="action-btn view-btn">
-            <i class="fas fa-calendar-alt"></i>
-          </button>
-          <button class="action-btn">
-            <i class="fas fa-comment"></i>
-          </button>
-        </div>
-      </div>
-
-      <div class="friend-item">
-        <div class="friend-avatar">MS</div>
-        <div class="friend-info">
-          <div class="friend-name">minseok</div>
-          <div class="friend-status">
-            <i class="fas fa-circle status-icon offline"></i>
-            1시간 전
-          </div>
-        </div>
-        <div class="friend-actions">
-          <button class="action-btn view-btn">
-            <i class="fas fa-calendar-alt"></i>
-          </button>
-          <button class="action-btn">
-            <i class="fas fa-comment"></i>
-          </button>
-        </div>
-      </div>
-
-      <div class="friend-item">
-        <div class="friend-avatar">JY</div>
-        <div class="friend-info">
-          <div class="friend-name">jiyeon</div>
-          <div class="friend-status">
-            <i class="fas fa-circle status-icon offline"></i>
-            어제
-          </div>
-        </div>
-        <div class="friend-actions">
-          <button class="action-btn view-btn">
-            <i class="fas fa-calendar-alt"></i>
-          </button>
-          <button class="action-btn">
-            <i class="fas fa-comment"></i>
-          </button>
-        </div>
-      </div>
+    <div class="team-list">
+      <!--    동적 생성 구간    -->
     </div>
 
     <div class="bottom-controls">
       <button class="control-btn">
         <i class="fas fa-sync-alt"></i> 새로고침
       </button>
-      <button class="control-btn add-btn" id="add-friend-btn">
-        <i class="fas fa-user-plus"></i> 친구 추가
-      </button>
     </div>
-  </div>
-</div>
-
-<!-- 친구 추가 모달 -->
-<div class="friend-modal" id="friend-modal" style="display: none;">
-  <div class="modal-content">
-    <button class="close-modal" id="close-modal">
-      <i class="fas fa-times"></i>
-    </button>
-    <div class="modal-header">
-      <div class="modal-title">친구 추가</div>
-      <div class="modal-subtitle">새로운 친구의 사용자 이름을 입력하세요</div>
-    </div>
-    <form class="friend-form">
-      <div class="form-group">
-        <label class="form-label">사용자 이름</label>
-        <input type="text" class="form-input" placeholder="username" />
-      </div>
-      <div class="form-group">
-        <label class="form-label">메시지 (선택사항)</label>
-        <input type="text" class="form-input" placeholder="간단한 인사 메시지..." />
-      </div>
-      <div class="form-actions">
-        <button type="button" class="control-btn" id="cancel-btn">취소</button>
-        <button type="button" class="control-btn add-btn">요청 보내기</button>
-      </div>
-    </form>
   </div>
 </div>
 
@@ -811,6 +674,366 @@
 </nav>
 
 <script>
+  // 멤버 이니셜 생성 함수
+  function getInitials(name) {
+    if (!name) return '??';
+
+    // 공백으로 분리하여 각 단어의 첫 글자 가져오기
+    const words = name.split(' ');
+    if (words.length >= 2) {
+      return (words[0][0] + words[1][0]).toUpperCase();
+    }
+
+    // 한 단어인 경우 첫 두 글자 또는 첫 글자만 반환
+    return name.length > 1 ? name.substring(0, 2).toUpperCase() : name[0].toUpperCase();
+  }
+
+
+  // 탭 전환 관련 변수
+  let currentTab = 0; // 초기값은 '나의 팀' 탭 (인덱스 0)
+
+  // 팀 목록 컨테이너 - 한 번만 정의
+  const teamListContainer = document.querySelector('.team-list');
+
+  // 탭 메뉴 옵션 선택
+  const menuOptions = document.querySelectorAll('.menu-option');
+
+  // 탭 버튼 이벤트 설정
+  menuOptions.forEach(option => {
+    option.addEventListener('click', function() {
+      const index = parseInt(this.getAttribute('data-index'));
+
+      if (currentTab !== index) {
+        currentTab = index;
+
+        // 활성 탭 표시 업데이트
+        menuOptions.forEach(opt => opt.classList.remove('active'));
+        this.classList.add('active');
+
+        // 메뉴 슬라이더 위치 업데이트 (있는 경우)
+        const menuSlider = document.getElementById('menu-slider');
+        if (menuSlider) {
+          const optionWidth = this.offsetWidth;
+          const optionLeft = this.offsetLeft;
+          menuSlider.style.width = optionWidth + 'px';
+          menuSlider.style.transform = `translateX(${optionLeft}px)`;
+        }
+
+        // 해당 탭의 콘텐츠 로드
+        if (index === 0) {
+          loadMyTeams(); // 나의 팀 목록 로드
+        } else if (index === 1) {
+          loadTeamInvites(); // 팀 초대 목록 로드
+        }
+      }
+    });
+  });
+
+  // 탭 버튼 이벤트 설정
+  document.getElementById('my-teams-tab').addEventListener('click', function() {
+    if (currentTab !== 'my') {
+      currentTab = 'my';
+      this.classList.add('active');
+      document.getElementById('invites-tab').classList.remove('active');
+      loadMyTeams(); // 내 팀 목록 로드
+    }
+  });
+
+  document.getElementById('invites-tab').addEventListener('click', function() {
+    if (currentTab !== 'invites') {
+      currentTab = 'invites';
+      this.classList.add('active');
+      document.getElementById('my-teams-tab').classList.remove('active');
+      loadTeamInvites(); // 팀 초대 목록 로드
+    }
+  });
+
+  // 검색 기능 구현
+  const searchInput = document.querySelector('.search-input');
+  searchInput.addEventListener('input', function() {
+    const searchTerm = this.value.toLowerCase().trim();
+
+    // 현재 표시된 팀 아이템들을 필터링
+    const teamItems = document.querySelectorAll('.team-item');
+
+    teamItems.forEach(item => {
+      const teamName = item.querySelector('.team-name')?.textContent.toLowerCase() || '';
+      if (teamName.includes(searchTerm)) {
+        item.style.display = 'flex';
+      } else {
+        item.style.display = 'none';
+      }
+    });
+  });
+
+  // 내 팀 목록을 불러오는 함수
+  function loadMyTeams() {
+    // 로딩 표시
+    teamListContainer.innerHTML = '<div class="loading">로딩 중...</div>';
+
+    // API 호출
+    fetch('/api/team/myteamlist', {
+      method: 'GET',
+      headers: {
+        'Authorization': localStorage.getItem('accessToken')
+      }
+    })
+            .then(response => {
+              if (!response.ok) {
+                throw new Error('팀 목록을 불러오는데 실패했습니다.');
+              }
+              return response.json();
+            })
+            .then(data => {
+              if (data.result === 'SUCCESS') {
+                renderTeams(data.data); // API 응답 데이터 처리
+              } else {
+                teamListContainer.innerHTML = '<div class="error">팀 목록을 불러오는데 실패했습니다.</div>';
+              }
+            })
+            .catch(error => {
+              console.error('오류 발생:', error);
+              teamListContainer.innerHTML = '<div class="error">서버 오류가 발생했습니다.</div>';
+            });
+  }
+
+  // 팀 초대 목록 로드 함수
+  function loadTeamInvites() {
+    // 로딩 표시
+    teamListContainer.innerHTML = '<div class="loading">로딩 중...</div>';
+
+    // API 호출
+    fetch('/api/team/invitelist', {
+      method: 'GET',
+      headers: {
+        'Authorization': localStorage.getItem('accessToken')
+      }
+    })
+            .then(response => response.json())
+            .then(data => {
+              if (data.result === 'SUCCESS') {
+                displayTeamInvites(data.data);
+              } else {
+                // 오류 처리
+                teamListContainer.innerHTML = '<div class="error">초대 목록을 불러오는데 실패했습니다.</div>';
+              }
+            })
+            .catch(error => {
+              console.error('초대 목록 로드 중 오류:', error);
+              teamListContainer.innerHTML = '<div class="error">서버 오류가 발생했습니다.</div>';
+            });
+  }
+
+  // 팀 목록 렌더링 함수
+  function renderTeams(teams) {
+    // 컨테이너 비우기
+    teamListContainer.innerHTML = '';
+
+    if (teams.length === 0) {
+      teamListContainer.innerHTML = '<div class="empty-list">소속된 팀이 없습니다.</div>';
+      return;
+    }
+
+    // 각 팀 렌더링
+    teams.forEach(teamData => {
+      // 팀 이니셜 생성
+      const team = teamData.myTeam;
+      const userTeam = teamData.myUserTeam;
+      const initials = getInitials(team.teamName);
+
+      // HTML 생성
+      const teamItem = document.createElement('div');
+      teamItem.className = 'team-item';
+      teamItem.innerHTML = `
+      <div class="team-avatar">${initials}</div>
+      <div class="team-info">
+        <div class="team-name">
+          ${team.teamName}
+        </div>
+      </div>
+      <div class="team-actions">
+        <button class="team-action-btn view-btn" title="선택" data-team-id="${team.id}">
+          <i class="fas fa-check"></i>
+        </button>
+        <button class="team-action-btn kick-btn" title="탈퇴" data-team-id="${team.id}">
+          <i class="fas fa-sign-out-alt"></i>
+        </button>
+      </div>
+    `;
+
+      teamListContainer.appendChild(teamItem);
+    });
+
+    // 버튼 이벤트 리스너 추가
+    setupMemberActionButtons();
+  }
+
+  // 팀 초대 목록 표시 함수
+  function displayTeamInvites(invites) {
+    // 컨테이너 비우기
+    teamListContainer.innerHTML = '';
+
+    if (invites.length === 0) {
+      teamListContainer.innerHTML = '<div class="empty-list">받은 초대가 없습니다.</div>';
+      return;
+    }
+
+    // 각 초대 렌더링
+    invites.forEach(invite => {
+      // HTML 생성
+      const team = invite.myTeam;
+      const userTeam = invite.myUserTeam;
+      const teamItem = document.createElement('div');
+
+      teamItem.className = 'team-item';
+      teamItem.innerHTML = `
+      <div class="invite-item" data-invite-id="${userTeam.id}">
+        <div class="team-avatar">${getInitials(team.teamName)}</div>
+        <div class="team-info">
+          <div class="team-name">${team.teamName}</div>
+          <div class="invite-from">
+            <i class="fas fa-user"></i> ${team.teamName}님이 초대함
+          </div>
+        </div>
+        <div class="invite-actions">
+          <button class="invite-action-btn accept-invite" title="수락" data-invite-id="${userTeam.id}">
+            <i class="fas fa-check"></i>
+          </button>
+          <button class="invite-action-btn decline-invite" title="거절" data-invite-id="${userTeam.id}">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+      </div>
+    `;
+
+      teamListContainer.appendChild(teamItem);
+    });
+
+    // 초대 버튼 이벤트 설정
+    setupMemberActionButtons();
+  }
+
+  // 멤버 액션 버튼 이벤트 설정
+  function setupMemberActionButtons() {
+    // 프로필 보기 버튼
+    document.querySelectorAll('.view-btn').forEach(button => {
+      button.addEventListener('click', function () {
+        const teamId = this.getAttribute('data-team-id');
+        window.location.href = `/html/todo/calendar.html?teamId=${teamId}`;
+      });
+    });
+
+      // 강퇴 버튼
+      document.querySelectorAll('.kick-btn').forEach(button => {
+        button.addEventListener('click', function () {
+          const teamId = this.getAttribute('data-team-id');
+          const teamItem = this.closest('.team-item');
+          const teamName = teamItem.querySelector('.team-name').textContent.trim();
+
+          if (!teamId) {
+            alert('팀 ID를 찾을 수 없습니다.');
+            return;
+          }
+
+          if (confirm(`정말로 ${teamName} 팀에서 탈퇴 하시겠습니까?`)) {
+            // API 호출로 팀원 강퇴
+            fetch(`/api/team/${teamId}/member`, {
+              method: 'DELETE',
+              headers: {
+                'Authorization': localStorage.getItem('accessToken')
+              }
+            })
+                    .then(response => {
+                      if (!response.ok) {
+                        throw new Error('팀 탈퇴에 실패했습니다.');
+                      }
+                      return response.json();
+                    })
+                    .then(data => {
+                      console.log('API 응답:', data);
+
+                      // 성공 시 UI에서 멤버 제거 (애니메이션 효과)
+                      teamItem.style.transition = 'all 0.3s ease';
+                      teamItem.style.opacity = '0';
+                      teamItem.style.height = '0';
+                      teamItem.style.padding = '0';
+                      teamItem.style.margin = '0';
+                      teamItem.style.overflow = 'hidden';
+
+                      setTimeout(() => {
+                        teamItem.remove();
+                      }, 300);
+
+                      alert(`${teamName}팀에서 탈퇴했습니다.`);
+                    })
+                    .catch(error => {
+                      console.error('오류 발생:', error);
+                      alert(`오류가 발생했습니다: ${error.message}`);
+                    });
+          }
+        });
+      });
+
+    // 수락 버튼
+    document.querySelectorAll('.accept-invite').forEach(button => {
+      button.addEventListener('click', function() {
+        const teamId = this.closest('.invite-item').dataset.teamId;
+
+        fetch(`/api/teams/${teamId}/member`, {
+          method: 'PUT', // PutMapping 사용
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': localStorage.getItem('accessToken')
+          }
+        })
+                .then(response => response.json())
+                .then(data => {
+                  if (data.result === 'SUCCESS') {
+                    alert('팀 초대를 수락했습니다.');
+                    loadTeamInvites(); // 초대 목록 새로고침
+                  } else {
+                    alert(data.message || '초대 수락에 실패했습니다.');
+                  }
+                })
+                .catch(error => {
+                  console.error('초대 수락 중 오류:', error);
+                  alert('서버 오류가 발생했습니다.');
+                });
+      });
+    });
+
+// 거절 버튼
+    document.querySelectorAll('.decline-invite').forEach(button => {
+      button.addEventListener('click', function() {
+        const teamId = this.closest('.invite-item').dataset.teamId;
+
+        // 팀 가입 거절 API 호출
+        fetch(`/api/teams/${teamId}/member`, {
+          method: 'DELETE', // DeleteMapping 사용
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': localStorage.getItem('accessToken')
+          }
+        })
+                .then(response => response.json())
+                .then(data => {
+                  if (data.result === 'SUCCESS') {
+                    alert('팀 초대를 거절했습니다.');
+                    // 초대 목록 새로고침 또는 페이지 이동
+                    location.reload();
+                  } else {
+                    alert(data.message || '초대 거절에 실패했습니다.');
+                  }
+                })
+                .catch(error => {
+                  console.error('초대 거절 중 오류:', error);
+                  alert('서버 오류가 발생했습니다.');
+                });
+      });
+    });
+
+  }
+
   // Create stars background
   function createStars() {
     const starsContainer = document.getElementById('stars');
@@ -884,48 +1107,48 @@
     });
   }
 
-  // Set up friend modal
-  function setupFriendModal() {
-    const modal = document.getElementById('friend-modal');
-    const addFriendBtn = document.getElementById('add-friend-btn');
-    const closeModalBtn = document.getElementById('close-modal');
-    const cancelBtn = document.getElementById('cancel-btn');
-
-    function openModal() {
-      modal.style.display = 'flex';
+  // 초기화 함수 - 메뉴 슬라이더 및 데이터 로드
+  function initTeamPanel() {
+    // 초기 탭에 맞는 슬라이더 위치 설정
+    const activeOption = document.querySelector('.menu-option.active');
+    if (activeOption) {
+      const menuSlider = document.getElementById('menu-slider');
+      if (menuSlider) {
+        const optionWidth = activeOption.offsetWidth;
+        const optionLeft = activeOption.offsetLeft;
+        menuSlider.style.width = optionWidth + 'px';
+        menuSlider.style.transform = `translateX(${optionLeft}px)`;
+      }
     }
 
-    function closeModal() {
-      modal.style.display = 'none';
+    // 데이터 로드
+    if (currentTab === 0) {
+      loadMyTeams();
+    } else {
+      loadTeamInvites();
     }
-
-    addFriendBtn.addEventListener('click', openModal);
-    closeModalBtn.addEventListener('click', closeModal);
-    cancelBtn.addEventListener('click', closeModal);
   }
 
-  // Set up calendar view redirection
-  function setupCalendarView() {
-    const viewButtons = document.querySelectorAll('.view-btn');
-
-    viewButtons.forEach(button => {
-      button.addEventListener('click', function() {
-        // Get friend name
-        const friendItem = this.closest('.friend-item');
-        const friendName = friendItem.querySelector('.friend-name').textContent;
-
-        // In a real application, this would redirect to the friend's calendar
-        alert(`${friendName}의 캘린더 보기`);
+  // 새로고침 버튼 이벤트 추가 함수
+  function setupRefreshButton() {
+    const refreshBtn = document.querySelector('.control-btn');
+    if (refreshBtn) {
+      refreshBtn.addEventListener('click', function() {
+        // 현재 탭에 따라 데이터 새로고침
+        if (currentTab === 0) {
+          loadMyTeams();
+        } else {
+          loadTeamInvites();
+        }
       });
-    });
+    }
   }
 
   window.onload = function () {
     createStars();
     setupMenuSlider();
     setupNavbar();
-    setupFriendModal();
-    setupCalendarView();
+    initTeamPanel();
   };
 </script>
 </body>
