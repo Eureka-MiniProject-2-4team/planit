@@ -3,6 +3,8 @@ package com.eureka.mp2.team4.planit.todo.team.dto.request;
 import lombok.Data;
 
 import java.sql.Timestamp;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Data
 public class TeamTodoRequestDto {
@@ -13,4 +15,5 @@ public class TeamTodoRequestDto {
     private boolean isCompleted;
     private Timestamp createAt;
     private Timestamp updateAt;
+    private LocalDateTime targetDate;
 }

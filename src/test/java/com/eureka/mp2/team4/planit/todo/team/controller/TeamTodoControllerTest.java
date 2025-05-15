@@ -24,10 +24,14 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
+import static com.eureka.mp2.team4.planit.todo.team.constants.TeamTodoMessages.GET_TEAMTODO_LIST_FAIL;
+import static com.eureka.mp2.team4.planit.todo.team.constants.TeamTodoMessages.GET_TEAMTODO_LIST_SUCCESS;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
@@ -52,6 +56,7 @@ class TeamTodoControllerTest {
     private String teamId;
     private String todoId;
     private String teamTodoUserId;
+    private LocalDateTime targetDate;
 
     // 다양한 요청 DTO
     private TeamRequestDto teamRequestDto;
@@ -73,6 +78,7 @@ class TeamTodoControllerTest {
         teamId = UUID.randomUUID().toString();
         todoId = UUID.randomUUID().toString();
         teamTodoUserId = UUID.randomUUID().toString();
+        targetDate = LocalDateTime.of(2025, 5, 15, 0, 0);
 
         // TeamRequestDto 설정
         teamRequestDto = new TeamRequestDto();
@@ -246,6 +252,105 @@ class TeamTodoControllerTest {
 
         // 서비스 메서드 호출 검증
         verify(teamTodoService, times(1)).getTeamTodoById(eq(todoId));
+    }
+
+    @Test
+    @DisplayName("날짜별 팀 투두 조회 성공 테스트")
+    @WithMockPlanitUser(username = "test-user-id", role = "ROLE_USER")
+    void testGetTeamTodoByTargetDateSuccess() throws Exception {
+        // Given
+        List<TeamTodoResponseDto> todoList = Arrays.asList(
+                TeamTodoResponseDto.builder()
+                        .title("테스트 할 일 1")
+                        .content("테스트 내용 1")
+                        .isCompleted(false)
+                        .targetDate(targetDate)
+                        .createdAt(Timestamp.valueOf(LocalDateTime.now()))
+                        .updatedAt(Timestamp.valueOf(LocalDateTime.now()))
+                        .build(),
+                TeamTodoResponseDto.builder()
+                        .title("테스트 할 일 2")
+                        .content("테스트 내용 2")
+                        .isCompleted(true)
+                        .targetDate(targetDate)
+                        .createdAt(Timestamp.valueOf(LocalDateTime.now()))
+                        .updatedAt(Timestamp.valueOf(LocalDateTime.now()))
+                        .build()
+        );
+
+        ApiResponse successResponse = ApiResponse.builder()
+                .result(Result.SUCCESS)
+                .message(GET_TEAMTODO_LIST_SUCCESS)
+                .data(todoList)
+                .build();
+
+        // 서비스 메서드 모킹
+        when(teamTodoService.getTeamTodoByTargetDate(eq(teamId), eq(targetDate)))
+                .thenReturn(successResponse);
+
+        // When & Then
+        // LocalDateTime 형식을 URL에서 사용할 수 있는 형식으로 변환
+        String formattedDate = targetDate.format(DateTimeFormatter.ISO_DATE_TIME);
+
+        mockMvc.perform(get("/api/team/{teamId}/todo/date/{targetDate}", teamId, formattedDate)
+                        .with(csrf()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.result").value("SUCCESS"))
+                .andExpect(jsonPath("$.message").value(GET_TEAMTODO_LIST_SUCCESS))
+                .andExpect(jsonPath("$.data").isArray())
+                .andExpect(jsonPath("$.data.length()").value(2))
+                .andExpect(jsonPath("$.data[0].title").value("테스트 할 일 1"))
+                .andExpect(jsonPath("$.data[0].content").value("테스트 내용 1"))
+                .andExpect(jsonPath("$.data[0].completed").value(false))
+                .andExpect(jsonPath("$.data[1].title").value("테스트 할 일 2"))
+                .andExpect(jsonPath("$.data[1].content").value("테스트 내용 2"))
+                .andExpect(jsonPath("$.data[1].completed").value(true));
+
+        // 서비스 메서드 호출 검증
+        verify(teamTodoService, times(1)).getTeamTodoByTargetDate(eq(teamId), eq(targetDate));
+    }
+
+    @Test
+    @DisplayName("날짜별 팀 투두 조회 실패 테스트")
+    @WithMockPlanitUser(username = "test-user-id", role = "ROLE_USER")
+    void testGetTeamTodoByTargetDateFail() throws Exception {
+        // Given
+        ApiResponse failResponse = ApiResponse.builder()
+                .result(Result.FAIL)
+                .message(GET_TEAMTODO_LIST_FAIL)
+                .build();
+
+        // 서비스 메서드 모킹
+        when(teamTodoService.getTeamTodoByTargetDate(eq(teamId), eq(targetDate)))
+                .thenReturn(failResponse);
+
+        // When & Then
+        // LocalDateTime 형식을 URL에서 사용할 수 있는 형식으로 변환
+        String formattedDate = targetDate.format(DateTimeFormatter.ISO_DATE_TIME);
+
+        mockMvc.perform(get("/api/team/{teamId}/todo/date/{targetDate}", teamId, formattedDate)
+                        .with(csrf()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.result").value("FAIL"))
+                .andExpect(jsonPath("$.message").value(GET_TEAMTODO_LIST_FAIL))
+                .andExpect(jsonPath("$.data").doesNotExist());
+
+        // 서비스 메서드 호출 검증
+        verify(teamTodoService, times(1)).getTeamTodoByTargetDate(eq(teamId), eq(targetDate));
+    }
+
+    @Test
+    @DisplayName("날짜별 팀 투두 조회 - 인증되지 않은 사용자 테스트")
+    void testGetTeamTodoByTargetDateUnauthenticated() throws Exception {
+        // When & Then - 인증 없이 접근
+        String formattedDate = targetDate.format(DateTimeFormatter.ISO_DATE_TIME);
+
+        mockMvc.perform(get("/api/team/{teamId}/todo/date/{targetDate}", teamId, formattedDate)
+                        .with(csrf()))
+                .andExpect(status().isUnauthorized()); // 401 Unauthorized 응답 기대
+
+        // 서비스 메서드 호출되지 않음 검증
+        verify(teamTodoService, never()).getTeamTodoByTargetDate(any(), any());
     }
 
     @Test

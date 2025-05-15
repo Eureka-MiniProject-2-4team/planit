@@ -14,6 +14,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/team")
@@ -45,6 +47,13 @@ public class TeamTodoController {
     @GetMapping("{teamId}/todo/{teamTodoId}")
     public ResponseEntity<ApiResponse> getTeamTodoById(@PathVariable("teamId") String teamId, @PathVariable("teamTodoId") String teamTodoId) {
         return ResponseEntity.ok(teamTodoService.getTeamTodoById(teamTodoId));
+    }
+
+    @Operation(summary = "팀 투두 날짜로 조회", description = "캘린더에서 클릭한 날짜에 해당하는 팀 투두 리스트 조회")
+    @TeamCheck
+    @GetMapping("{teamId}/todo/date/{targetDate}")
+    public ResponseEntity<ApiResponse> getTeamTodoByTargetDate(@PathVariable("teamId") String teamId, @PathVariable("targetDate") LocalDateTime targetDate){
+        return ResponseEntity.ok(teamTodoService.getTeamTodoByTargetDate(teamId, targetDate ));
     }
 
     // 캘린더 페이지 로드 시 실행
