@@ -34,8 +34,6 @@ window.addEventListener('DOMContentLoaded', () => {
     setupFriendModal();
     setupTodoModal();
     setupSentRequestsModal();
-    setupRefreshButton();
-    setupSentRequestsButton();
     setupFriendSearch();
     getFriends();
     getFriendRequests();
@@ -280,15 +278,7 @@ async function getSentRequests() {
     }
 }
 
-// 14. 보낸 요청 버튼 셋업
-function setupSentRequestsButton() {
-    const btn = document.getElementById('sent-requests-btn');
-    if (btn) {
-        btn.addEventListener('click', () => {
-            getSentRequests();
-        });
-    }
-}
+
 
 // 15. 받은 친구 요청 목록 조회 & 렌더링
 async function getFriendRequests() {
@@ -515,14 +505,5 @@ function setupTodoDetailButtons() {
                 alert('할 일 상세 정보를 불러오는 중 오류가 발생했습니다.');
             }
         });
-    });
-}
-
-// 21. 새로고침 버튼 셋업
-function setupRefreshButton() {
-    const btn = document.getElementById('refresh-btn');
-    if (btn) btn.addEventListener('click', () => {
-        getFriends();
-        getFriendRequests();
     });
 }

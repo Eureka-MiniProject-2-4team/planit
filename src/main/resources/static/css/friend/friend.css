@@ -105,11 +105,32 @@ body {
     margin-left: 10px;
     font-family: 'Orbitron', sans-serif;
     letter-spacing: 1px;
+    flex: 1;
 }
 
 .panel-icon {
     font-size: 20px;
     color: #6ab0ee;
+}
+
+.header-btn {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: rgba(106, 176, 238, 0.2);
+    border: none;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s;
+    font-size: 16px;
+}
+
+.header-btn:hover {
+    background: rgba(106, 176, 238, 0.4);
+    transform: scale(1.1);
 }
 
 .search-box {
