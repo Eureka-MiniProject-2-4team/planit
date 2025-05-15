@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>PLAN!T - 회원가입</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600&display=swap"/>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Orbitron', sans-serif;
+            background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+            color: #fff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            text-align: center;
+            overflow-x: hidden;
+            position: relative;
+            padding: 20px 0;
+        }
+
+        .stars {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .star {
+            position: absolute;
+            background-color: #fff;
+            border-radius: 50%;
+            opacity: 0.8;
+            animation: twinkle 4s infinite;
+        }
+
+        @keyframes twinkle {
+            0%, 100% {
+                opacity: 0.3;
+                transform: scale(1);
+            }
+            50% {
+                opacity: 1;
+                transform: scale(1.2);
+            }
+        }
+
+        .container {
+            position: relative;
+            z-index: 1;
+            width: 90%;
+            max-width: 500px;
+            padding: 40px;
+            background-color: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+            margin: 20px 0;
+        }
+
+        h2 {
+            margin-bottom: 30px;
+            font-size: 28px;
+            color: #fff;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+            text-align: left;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-size: 14px;
+            color: #ccc;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 5px;
+        }
+
+        .input-group input {
+            flex: 1;
+        }
+
+        .check-btn {
+            background-color: #00c9a7;
+            border: none;
+            border-radius: 8px;
+            color: #fff;
+            padding: 0 15px;
+            cursor: pointer;
+            font-size: 12px;
+            white-space: nowrap;
+        }
+
+        .check-btn:hover {
+            background-color: #009e84;
+        }
+
+        .validation-message {
+            font-size: 12px;
+            margin-top: 5px;
+            height: 15px;
+        }
+
+        .success {
+            color: #00c9a7;
+        }
+
+        .error {
+            color: #ff6666;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 12px;
+            margin-top: 20px;
+            background-color: #00c9a7;
+            border: none;
+            border-radius: 30px;
+            color: #fff;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .btn:hover {
+            background-color: #009e84;
+        }
+
+        .btn:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+
+        .links {
+            margin-top: 20px;
+            font-size: 14px;
+        }
+
+        .links a {
+            color: #00c9a7;
+            text-decoration: none;
+        }   
+
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="stars" id="stars"></div>
+
+<div class="container">
+
+    <h2>회원가입</h2>
+
+    <form onsubmit="submitForm(event)">
+        <div class="form-group">
+            <label>이름</label>
+            <input type="text" id="userName" required minlength="2" maxlength="20" style="text-transform: lowercase;">
+        </div>
+
+        <div class="form-group">
+            <label>이메일</label>
+            <div class="input-group">
+                <input type="email" id="email" required oninput="resetDuplicate('email')"
+                       style="text-transform: lowercase;">
+                <button type="button" class="check-btn" onclick="checkDuplicate('email')">중복 확인</button>
+            </div>
+            <div id="emailChecked" class="validation-message"></div>
+        </div>
+
+        <div class="form-group">
+            <label>전화번호</label>
+            <div class="input-group">
+                <input type="text" id="phoneNumber" required oninput="resetDuplicate('phoneNumber')">
+                <button type="button" class="check-btn" onclick="checkDuplicate('phoneNumber')">중복 확인</button>
+            </div>
+            <div id="phoneNumberChecked" class="validation-message"></div>
+        </div>
+
+        <div class="form-group">
+            <label>비밀번호</label>
+            <input type="password" id="password" required oninput="validatePassword()">
+            <div id="pwMsg" class="validation-message"></div>
+        </div>
+
+        <div class="form-group">
+            <label>비밀번호 확인</label>
+            <input type="password" id="passwordConfirm" required oninput="validatePassword()">
+            <div id="pwCheckMsg" class="validation-message"></div>
+        </div>
+
+        <div class="form-group">
+            <label>닉네임</label>
+            <div class="input-group">
+                <input type="text" id="nickName" required minlength="2" maxlength="12"
+                       oninput="resetDuplicate('nickName')" style="text-transform: lowercase;">
+                <button type="button" class="check-btn" onclick="checkDuplicate('nickName')">중복 확인</button>
+            </div>
+            <div id="nickNameChecked" class="validation-message"></div>
+        </div>
+
+        <button type="submit" id="submitBtn" class="btn" disabled>회원가입</button>
+    </form>
+
+    <div class="links">
+        <a href="/auth/login.html">이미 계정이 있으신가요? 로그인하기</a>
+    </div>
+</div>
+
+<script>
+    const duplicateFlags = {
+        email: false,
+        phoneNumber: false,
+        nickName: false
+    };
+
+    function createStars() {
+        const starsContainer = document.getElementById('stars');
+        for (let i = 0; i < 100; i++) {
+            const star = document.createElement('div');
+            star.classList.add('star');
+            star.style.width = star.style.height = `${Math.random() * 3 + 1}px`;
+            star.style.left = `${Math.random() * 100}%`;
+            star.style.top = `${Math.random() * 100}%`;
+            star.style.animationDelay = `${Math.random() * 5}s`;
+            starsContainer.appendChild(star);
+        }
+    }
+
+    window.onload = function () {
+        createStars();
+
+        const inputs = document.querySelectorAll('input');
+        inputs.forEach(input => {
+            input.addEventListener('input', function () {
+                if (['email', 'phoneNumber', 'nickName'].includes(this.id)) {
+                    resetDuplicate(this.id);
+                }
+                checkFormValidity();
+            });
+        });
+    };
+
+    function checkDuplicate(type) {
+        const input = document.getElementById(type);
+        const value = input.value;
+
+        if (!value) {
+            alert(`${type === 'email' ? '이메일' : type === 'phoneNumber' ? '전화번호' : '닉네임'}을 입력해주세요.`);
+            return;
+        }
+
+        fetch(`/auth/check-${type}?value=${encodeURIComponent(value)}`)
+            .then(res => res.json())
+            .then(data => {
+                const msg = document.getElementById(`${type}Checked`);
+                if (data.result === 'SUCCESS') {
+                    duplicateFlags[type] = true;
+                    msg.textContent = "사용 가능한 값입니다.";
+                    msg.className = "validation-message success";
+                } else {
+                    duplicateFlags[type] = false;
+                    msg.textContent = "이미 사용 중입니다.";
+                    msg.className = "validation-message error";
+                }
+                checkFormValidity();
+            })
+            .catch(() => alert("중복 확인 중 오류 발생"));
+    }
+
+    function resetDuplicate(type) {
+        duplicateFlags[type] = false;
+        document.getElementById(`${type}Checked`).textContent = "";
+        checkFormValidity();
+    }
+
+    function validatePassword() {
+        const pw = document.getElementById('password').value;
+        const pwConfirm = document.getElementById('passwordConfirm').value;
+        const pwMsg = document.getElementById('pwMsg');
+        const pwCheckMsg = document.getElementById('pwCheckMsg');
+
+        const pwValid = pw.length >= 8 && /[!@#$%^&*(),.?":{}|<>_]/.test(pw);
+
+        if (!pw) {
+            pwMsg.textContent = "";
+            pwMsg.className = "validation-message";
+        } else if (pwValid) {
+            pwMsg.textContent = "사용 가능한 비밀번호입니다.";
+            pwMsg.className = "validation-message success";
+        } else {
+            pwMsg.textContent = "비밀번호는 8자 이상이며 특수문자를 포함해야 합니다.";
+            pwMsg.className = "validation-message error";
+        }
+
+        if (!pwConfirm) {
+            pwCheckMsg.textContent = "";
+            pwCheckMsg.className = "validation-message";
+        } else if (pw === pwConfirm) {
+            pwCheckMsg.textContent = "비밀번호가 일치합니다.";
+            pwCheckMsg.className = "validation-message success";
+        } else {
+            pwCheckMsg.textContent = "비밀번호가 일치하지 않습니다.";
+            pwCheckMsg.className = "validation-message error";
+        }
+
+        checkFormValidity();
+    }
+
+    function checkFormValidity() {
+        const userName = document.getElementById('userName').value;
+        const email = document.getElementById('email').value;
+        const phoneNumber = document.getElementById('phoneNumber').value;
+        const password = document.getElementById('password').value;
+        const passwordConfirm = document.getElementById('passwordConfirm').value;
+        const nickName = document.getElementById('nickName').value;
+
+        const pwValid = password.length >= 8 && /[!@#$%^&*(),.?":{}|<>_]/.test(password);
+        const allFieldsFilled = userName && email && phoneNumber && password && passwordConfirm && nickName;
+        const passwordsMatch = password === passwordConfirm;
+        const allDuplicatesChecked = duplicateFlags.email && duplicateFlags.phoneNumber && duplicateFlags.nickName;
+
+        document.getElementById('submitBtn').disabled = !(allFieldsFilled && pwValid && passwordsMatch && allDuplicatesChecked);
+    }
+
+    function submitForm(event) {
+        event.preventDefault();
+
+        const requiredChecks = ['email', 'phoneNumber', 'nickName'];
+        for (const field of requiredChecks) {
+            if (!duplicateFlags[field]) {
+                alert(`모든 중복 확인을 완료해주세요.`);
+                return;
+            }
+        }
+
+        const pw = document.getElementById('password').value;
+        const pwConfirm = document.getElementById('passwordConfirm').value;
+        const pwValid = pw.length >= 8 && /[!@#$%^&*(),.?":{}|<>_]/.test(pw);
+
+        if (!pwValid) {
+            alert("비밀번호는 8자 이상이며 특수문자를 포함해야 합니다.");
+            return;
+        }
+
+        if (pw !== pwConfirm) {
+            alert("비밀번호가 일치하지 않습니다.");
+            return;
+        }
+
+        const payload = {
+            userName: document.getElementById('userName').value,
+            email: document.getElementById('email').value,
+            phoneNumber: document.getElementById('phoneNumber').value,
+            password: pw,
+            nickName: document.getElementById('nickName').value
+        };
+
+        fetch('/auth/signup', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(payload)
+        })
+            .then(res => res.json())
+            .then(data => {
+                alert(data.message || "회원가입 성공");
+                if (data.result === 'SUCCESS') {
+                    window.location.href = '/auth/login.html';
+                }
+            })
+            .catch(() => alert("회원가입 실패"));
+    }
+</script>
+</body>
+</html>
