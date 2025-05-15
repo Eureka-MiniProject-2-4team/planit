@@ -10,4 +10,6 @@ public class UserTeamRequestDto {
     private String teamId;
     private Timestamp joinedAt;
     private String status;
+
+    private String search;
 }

@@ -33,12 +33,13 @@ public class TeamController {
     // 팀장
     @Operation(summary = "팀원 초대", description = "팀장만 가능, 권한 미적용")
     @TeamCheck(onlyLeader = true)
-    @PostMapping("/{teamId}/member/{userId}")
+    @PostMapping("/{teamId}/member/{search}")
     public ResponseEntity<ApiResponse> inviteMember(@PathVariable("teamId") String teamId,
                                                     @RequestBody UserTeamRequestDto userTeamRequestDto,
-                                                    @PathVariable("userId") String userId) {
+                                                    @PathVariable("search") String search) {
+
         userTeamRequestDto.setTeamId(teamId);
-        userTeamRequestDto.setUserId(userId);
+        userTeamRequestDto.setSearch(search);
         return ResponseEntity.ok(userTeamService.inviteTeamMember(userTeamRequestDto));
     }
 
