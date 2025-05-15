@@ -24,5 +24,5 @@ public class MailTemplates {
     }
 
     public static String PASSWORD_RESET_SUBJECT = "비밀번호 재설정 링크입니다";
-    public static String PASSWORD_RESET_LINK = "http://localhost:8080/auth/reset-password.html?token=";
+    public static String PASSWORD_RESET_LINK = "http://localhost:8080/html/auth/reset-password.html?token=";
 }

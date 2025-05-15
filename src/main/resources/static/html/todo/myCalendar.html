@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>PLAN!T - 우주 플래너</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap"/>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&display=swap"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <link rel="stylesheet" href="/css/navbar.css" />
+  <link rel="stylesheet" href="/css/mycalendar.css"/>
+<body>
+<div class="stars" id="stars"></div>
+
+<div class="container">
+  <header class="header">
+    <div class="logo">
+      <i class="fas fa-rocket logo-icon"></i>
+      PLAN!T
+    </div>
+  </header>
+
+  <div class="dashboard">
+    <div class="panel calendar-panel">
+      <div class="panel-header">
+        <i class="fas fa-calendar-alt panel-icon"></i>
+        <div class="panel-title">캘린더</div>
+      </div>
+
+      <div class="month-nav">
+        <button class="nav-btn" id="prev-month"><i class="fas fa-chevron-left"></i></button>
+        <div class="month-display">2025년 5월</div>
+        <button class="nav-btn" id="next-month"><i class="fas fa-chevron-right"></i></button>
+      </div>
+
+      <div class="calendar">
+        <div class="calendar-days">
+          <div class="day-label">일</div>
+          <div class="day-label">월</div>
+          <div class="day-label">화</div>
+          <div class="day-label">수</div>
+          <div class="day-label">목</div>
+          <div class="day-label">금</div>
+          <div class="day-label">토</div>
+        </div>
+
+        <div class="calendar-dates" id="calendar-grid">
+          <!-- Calendar dates will be inserted here by JavaScript -->
+        </div>
+      </div>
+    </div>
+
+    <div class="panel task-panel">
+      <div class="panel-header">
+        <i class="fas fa-tasks panel-icon"></i>
+        <div class="panel-title">할 일</div>
+      </div>
+
+      <div class="user-info">
+        <div class="profile-name">
+          <i class="fas fa-rocket profile-icon"></i>
+          개인 todo 리스트
+        </div>
+        <div class="date-display">
+          <i class="fas fa-star-half-alt"></i>
+          2025년 5월 15일
+        </div>
+      </div>
+
+      <div class="task-list">
+        <div class="task-item">
+          <input type="checkbox" class="task-checkbox">
+          <div class="task-content">
+            <div class="task-title">우주선 도면 검토하기</div>
+            <div class="task-time">
+              <i class="fas fa-clock time-icon"></i>
+              09:00 - 10:30
+            </div>
+          </div>
+        </div>
+
+        <div class="task-item">
+          <input type="checkbox" class="task-checkbox">
+          <div class="task-content">
+            <div class="task-title">행성 탐사 계획 회의</div>
+            <div class="task-time">
+              <i class="fas fa-clock time-icon"></i>
+              11:00 - 12:00
+            </div>
+          </div>
+        </div>
+
+        <div class="task-item">
+          <input type="checkbox" class="task-checkbox">
+          <div class="task-content">
+            <div class="task-title">우주 정거장 운동하기</div>
+            <div class="task-time">
+              <i class="fas fa-clock time-icon"></i>
+              18:00 - 19:00
+            </div>
+          </div>
+        </div>
+
+        <div class="task-item">
+          <input type="checkbox" class="task-checkbox">
+          <div class="task-content">
+            <div class="task-title">별자리 관측하기</div>
+            <div class="task-time">
+              <i class="fas fa-clock time-icon"></i>
+              20:00 - 21:00
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- 할 일 추가 모달 -->
+<!-- 등록 모달 -->
+<div id="todo-modal" class="modal" style="display: none;">
+  <div class="modal-content">
+    <h3>할 일 추가</h3>
+    <input id="todo-title" type="text" placeholder="제목" />
+    <textarea id="todo-content" placeholder="내용"></textarea>
+
+    <!-- 추가할 날짜 필드 -->
+    <label>날짜</label>
+    <input id="todo-date" type="date" />
+
+    <label>시간</label>
+    <input id="todo-time" type="time" />
+
+    <div>
+      <button id="save-todo">저장</button>
+      <button id="cancel-todo">닫기</button>
+    </div>
+  </div>
+</div>
+
+<!-- 투두 상세 보기 모달 -->
+<!-- 투두 상세 & 수정 모달 -->
+<div id="todo-detail-modal" class="modal" style="display: none;">
+  <div class="modal-content" style="width: 500px;">
+    <h3>할 일 상세 / 수정</h3>
+    <label>제목</label>
+    <input type="text" id="detail-title" />
+
+    <label>내용</label>
+    <textarea id="detail-content"></textarea>
+
+    <label>날짜</label>
+    <input type="date" id="detail-date" />
+
+    <label>시간</label>
+    <input type="time" id="detail-time" />
+
+    <label>완료 여부</label>
+    <select id="detail-status">
+      <option value="false">미완료</option>
+      <option value="true">완료</option>
+    </select>
+
+    <div style="margin-top: 20px;">
+<!--      <div class="modal-button-group">-->
+        <div class="modal-footer">
+          <div class="left-buttons">
+            <button id="save-detail">수정하기</button>
+            <button id="delete-detail" class="danger">삭제하기</button>
+          </div>
+          <div class="right-button">
+            <button id="close-detail">닫기</button>
+          </div>
+<!--        </div>-->
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+
+<button class="add-task-btn">
+  <i class="fas fa-plus"></i>
+</button>
+
+<div id="navbar-container"></div>
+<script src="/js/navbar.js"></script>
+<script src="/js/mycalendar.js"></script>
+</body>
+</html>
