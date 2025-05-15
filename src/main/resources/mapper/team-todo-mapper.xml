@@ -6,8 +6,8 @@
 <mapper namespace="com.eureka.mp2.team4.planit.todo.team.mapper.TeamTodoMapper">
     <!--CREATE-->
     <insert id="createTeamTodo" parameterType="com.eureka.mp2.team4.planit.todo.team.dto.TeamTodoDto">
-        INSERT INTO team_todo (id, team_id, title, content, is_completed, created_at, updated_at)
-        VALUES (#{id}, #{teamId}, #{title}, #{content}, #{isCompleted}, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+        INSERT INTO team_todo (id, team_id, title, content, is_completed, created_at, updated_at, target_date)
+        VALUES (#{id}, #{teamId}, #{title}, #{content}, #{isCompleted}, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, #{targetDate});
     </insert>
 
     <!--READ-->
@@ -30,13 +30,26 @@
                       )
     </select>
 
+    <select id="countTeamTodoList" parameterType="java.lang.String" resultType="java.lang.Integer">
+        SELECT COUNT(*)
+        FROM team_todo
+        WHERE team_id = #{teamId}
+    </select>
+
+    <select id="findTeamTodoByTargetDate" parameterType="java.lang.String" resultType="com.eureka.mp2.team4.planit.todo.team.dto.TeamTodoDto">
+        SELECT *
+        FROM team_todo
+        WHERE team_id = #{teamId}
+        AND target_date = #{targetDate}
+    </select>
     <!--UPDATE-->
     <update id="updateTeamTodo" parameterType="com.eureka.mp2.team4.planit.todo.team.dto.TeamTodoDto">
         UPDATE team_todo
         SET title = #{title},
             content = #{content},
             is_completed = #{isCompleted},
-            updated_at = CURRENT_TIMESTAMP
+            updated_at = CURRENT_TIMESTAMP,
+            target_date = #{targetDate}
         WHERE id=#{id}
     </update>
 
