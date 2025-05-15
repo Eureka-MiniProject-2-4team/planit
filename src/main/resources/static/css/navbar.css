@@ -1,0 +1,112 @@
+/* Navbar 공통 스타일 */
+.navbar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background: rgba(15, 32, 39, 0.9);
+    backdrop-filter: blur(10px);
+    padding: 15px;
+    display: flex;
+    justify-content: center;
+    border-top: 1px solid rgba(106, 176, 238, 0.2);
+    z-index: 100;
+    box-shadow: 0 -5px 20px rgba(0, 0, 0, 0.3);
+}
+
+.nav-container {
+    display: flex;
+    justify-content: space-around;
+    width: 100%;
+    max-width: 600px;
+}
+
+.nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    color: rgba(255, 255, 255, 0.7);
+    text-decoration: none;
+    transition: all 0.3s;
+    position: relative;
+    padding: 8px 15px;
+    border-radius: 20px;
+}
+
+.nav-item:hover {
+    color: #fff;
+    background: rgba(106, 176, 238, 0.1);
+    transform: translateY(-5px);
+}
+
+.nav-item.active {
+    color: #fff;
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+}
+
+.nav-item.active::after {
+    content: '';
+    position: absolute;
+    bottom: -3px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background-color: #6ab0ee;
+    box-shadow: 0 0 10px #6ab0ee;
+}
+
+.nav-icon {
+    font-size: 24px;
+    margin-bottom: 5px;
+}
+
+.nav-text {
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.nav-logo {
+    position: absolute;
+    left: 50%;
+    top: -25px;
+    transform: translateX(-50%);
+    width: 50px;
+    height: 50px;
+    background: linear-gradient(135deg, #0f2027, #2c5364);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.4), 0 0 10px rgba(106, 176, 238, 0.4);
+    border: 2px solid rgba(106, 176, 238, 0.2);
+    z-index: 101;
+    font-size: 22px;
+    font-weight: bold;
+    color: #fff;
+    font-family: 'Orbitron', sans-serif;
+    text-shadow: 0 0 10px rgba(106, 176, 238, 0.5);
+}
+
+/* 반응형 */
+@media (max-width: 768px) {
+    .nav-text {
+        display: none;
+    }
+
+    .nav-icon {
+        font-size: 22px;
+        margin-bottom: 0;
+    }
+
+    .navbar {
+        padding: 10px;
+    }
+
+    .nav-logo {
+        width: 45px;
+        height: 45px;
+        font-size: 18px;
+    }
+}
