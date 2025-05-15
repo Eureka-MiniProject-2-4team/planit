@@ -7,6 +7,7 @@
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap"/>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&display=swap"/>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <link rel="stylesheet" href="/css/navbar.css" />
   <style>
     * {
       box-sizing: border-box;
@@ -348,73 +349,73 @@
     }
 
     /* Navbar */
-    .navbar {
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      width: 100%;
-      background: rgba(15, 32, 39, 0.9);
-      backdrop-filter: blur(10px);
-      padding: 15px;
-      display: flex;
-      justify-content: center;
-      border-top: 1px solid rgba(106, 176, 238, 0.2);
-      z-index: 100;
-      box-shadow: 0 -5px 20px rgba(0, 0, 0, 0.3);
-    }
+    /*.navbar {*/
+    /*  position: fixed;*/
+    /*  bottom: 0;*/
+    /*  left: 0;*/
+    /*  width: 100%;*/
+    /*  background: rgba(15, 32, 39, 0.9);*/
+    /*  backdrop-filter: blur(10px);*/
+    /*  padding: 15px;*/
+    /*  display: flex;*/
+    /*  justify-content: center;*/
+    /*  border-top: 1px solid rgba(106, 176, 238, 0.2);*/
+    /*  z-index: 100;*/
+    /*  box-shadow: 0 -5px 20px rgba(0, 0, 0, 0.3);*/
+    /*}*/
 
-    .nav-container {
-      display: flex;
-      justify-content: space-around;
-      width: 100%;
-      max-width: 600px; /* Limit width for better layout */
-    }
+    /*.nav-container {*/
+    /*  display: flex;*/
+    /*  justify-content: space-around;*/
+    /*  width: 100%;*/
+    /*  max-width: 600px; !* Limit width for better layout *!*/
+    /*}*/
 
-    .nav-item {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      color: rgba(255, 255, 255, 0.7);
-      text-decoration: none;
-      transition: all 0.3s;
-      position: relative;
-      padding: 8px 15px;
-      border-radius: 20px;
-    }
+    /*.nav-item {*/
+    /*  display: flex;*/
+    /*  flex-direction: column;*/
+    /*  align-items: center;*/
+    /*  color: rgba(255, 255, 255, 0.7);*/
+    /*  text-decoration: none;*/
+    /*  transition: all 0.3s;*/
+    /*  position: relative;*/
+    /*  padding: 8px 15px;*/
+    /*  border-radius: 20px;*/
+    /*}*/
 
-    .nav-item:hover {
-      color: #fff;
-      background: rgba(106, 176, 238, 0.1);
-      transform: translateY(-5px);
-    }
+    /*.nav-item:hover {*/
+    /*  color: #fff;*/
+    /*  background: rgba(106, 176, 238, 0.1);*/
+    /*  transform: translateY(-5px);*/
+    /*}*/
 
-    .nav-item.active {
-      color: #fff;
-      text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
-    }
+    /*.nav-item.active {*/
+    /*  color: #fff;*/
+    /*  text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);*/
+    /*}*/
 
-    .nav-item.active::after {
-      content: '';
-      position: absolute;
-      bottom: -3px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 6px;
-      height: 6px;
-      border-radius: 50%;
-      background-color: #6ab0ee;
-      box-shadow: 0 0 10px #6ab0ee;
-    }
+    /*.nav-item.active::after {*/
+    /*  content: '';*/
+    /*  position: absolute;*/
+    /*  bottom: -3px;*/
+    /*  left: 50%;*/
+    /*  transform: translateX(-50%);*/
+    /*  width: 6px;*/
+    /*  height: 6px;*/
+    /*  border-radius: 50%;*/
+    /*  background-color: #6ab0ee;*/
+    /*  box-shadow: 0 0 10px #6ab0ee;*/
+    /*}*/
 
-    .nav-icon {
-      font-size: 24px;
-      margin-bottom: 5px;
-    }
+    /*.nav-icon {*/
+    /*  font-size: 24px;*/
+    /*  margin-bottom: 5px;*/
+    /*}*/
 
-    .nav-text {
-      font-size: 12px;
-      font-weight: 600;
-    }
+    /*.nav-text {*/
+    /*  font-size: 12px;*/
+    /*  font-weight: 600;*/
+    /*}*/
 
     .add-task-btn {
       position: fixed;
@@ -666,28 +667,29 @@
   <i class="fas fa-plus"></i>
 </button>
 
-<nav class="navbar">
-  <div class="nav-container">
-    <div class="nav-logo">P!T</div>
-    <a href="#" class="nav-item active">
-      <i class="fas fa-user nav-icon"></i>
-      <span class="nav-text">나</span>
-    </a>
-    <a href="#" class="nav-item">
-      <i class="fas fa-users nav-icon"></i>
-      <span class="nav-text">친구</span>
-    </a>
-    <a href="#" class="nav-item">
-      <i class="fas fa-user-tie nav-icon"></i>
-      <span class="nav-text">팀</span>
-    </a>
-    <a href="#" class="nav-item">
-      <i class="fas fa-user-astronaut nav-icon"></i>
-      <span class="nav-text">마이페이지</span>
-    </a>
-  </div>
-</nav>
-
+<!--<nav class="navbar">-->
+<!--  <div class="nav-container">-->
+<!--    <div class="nav-logo">P!T</div>-->
+<!--    <a href="#" class="nav-item active">-->
+<!--      <i class="fas fa-user nav-icon"></i>-->
+<!--      <span class="nav-text">나</span>-->
+<!--    </a>-->
+<!--    <a href="#" class="nav-item">-->
+<!--      <i class="fas fa-users nav-icon"></i>-->
+<!--      <span class="nav-text">친구</span>-->
+<!--    </a>-->
+<!--    <a href="#" class="nav-item">-->
+<!--      <i class="fas fa-user-tie nav-icon"></i>-->
+<!--      <span class="nav-text">팀</span>-->
+<!--    </a>-->
+<!--    <a href="#" class="nav-item">-->
+<!--      <i class="fas fa-user-astronaut nav-icon"></i>-->
+<!--      <span class="nav-text">마이페이지</span>-->
+<!--    </a>-->
+<!--  </div>-->
+<!--</nav>-->
+<div id="navbar-container"></div>
+<script src="/js/navbar.js"></script>
 <script>
   // Create stars background
   function createStars() {
@@ -813,47 +815,47 @@
   }
 
   // Set up navbar
-  function setupNavbar() {
-    const navItems = document.querySelectorAll('.nav-item');
-
-    navItems.forEach(item => {
-      item.addEventListener('click', function(e) {
-        e.preventDefault();
-
-        // Remove active class from all items
-        navItems.forEach(i => i.classList.remove('active'));
-
-        // Add active class to clicked item
-        this.classList.add('active');
-
-        // Add visual feedback
-        const feedback = document.createElement('div');
-        feedback.style.position = 'absolute';
-        feedback.style.width = '100%';
-        feedback.style.height = '100%';
-        feedback.style.backgroundColor = 'rgba(106, 176, 238, 0.2)';
-        feedback.style.borderRadius = '20px';
-        feedback.style.zIndex = '-1';
-        feedback.style.transform = 'scale(0)';
-        feedback.style.transition = 'all 0.3s';
-
-        this.appendChild(feedback);
-
-        setTimeout(() => {
-          feedback.style.transform = 'scale(1)';
-        }, 10);
-
-        setTimeout(() => {
-          feedback.remove();
-        }, 500);
-      });
-    });
-  }
+  // function setupNavbar() {
+  //   const navItems = document.querySelectorAll('.nav-item');
+  //
+  //   navItems.forEach(item => {
+  //     item.addEventListener('click', function(e) {
+  //       e.preventDefault();
+  //
+  //       // Remove active class from all items
+  //       navItems.forEach(i => i.classList.remove('active'));
+  //
+  //       // Add active class to clicked item
+  //       this.classList.add('active');
+  //
+  //       // Add visual feedback
+  //       const feedback = document.createElement('div');
+  //       feedback.style.position = 'absolute';
+  //       feedback.style.width = '100%';
+  //       feedback.style.height = '100%';
+  //       feedback.style.backgroundColor = 'rgba(106, 176, 238, 0.2)';
+  //       feedback.style.borderRadius = '20px';
+  //       feedback.style.zIndex = '-1';
+  //       feedback.style.transform = 'scale(0)';
+  //       feedback.style.transition = 'all 0.3s';
+  //
+  //       this.appendChild(feedback);
+  //
+  //       setTimeout(() => {
+  //         feedback.style.transform = 'scale(1)';
+  //       }, 10);
+  //
+  //       setTimeout(() => {
+  //         feedback.remove();
+  //       }, 500);
+  //     });
+  //   });
+  // }
 
   window.onload = function () {
     createStars();
     generateCalendar();
-    setupNavbar();
+    // setupNavbar();
 
     // Set up navigation buttons
     document.getElementById('prev-month').addEventListener('click', function() {

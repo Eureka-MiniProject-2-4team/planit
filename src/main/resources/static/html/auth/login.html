@@ -169,7 +169,7 @@
             if (response.ok && result.data && result.data.accessToken) {
                 localStorage.setItem('accessToken', 'Bearer ' + result.data.accessToken);
                 alert('로그인 성공!');
-                window.location.href = '../user/mypage.html';
+                window.location.href = '/html/todo/calendar.html';
             } else {
                 errorMessage.textContent = result.message || '로그인 실패';
             }

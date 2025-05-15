@@ -15,6 +15,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -36,6 +38,7 @@ public class TeamTodoServiceImpl implements TeamTodoService {
                     .teamId(teamTodoRequestDto.getTeamId())
                     .title(teamTodoRequestDto.getTitle())
                     .content(teamTodoRequestDto.getContent())
+                    .targetDate(teamTodoRequestDto.getTargetDate())
                     .isCompleted(false)
                     .build();
 
@@ -101,6 +104,7 @@ public class TeamTodoServiceImpl implements TeamTodoService {
                     .isCompleted(teamTodoDto.isCompleted())
                     .createdAt(teamTodoDto.getCreatedAt())
                     .updatedAt(teamTodoDto.getUpdatedAt())
+                    .targetDate(teamTodoDto.getTargetDate())
                     .build();
 
             return ApiResponse.builder()
@@ -119,6 +123,44 @@ public class TeamTodoServiceImpl implements TeamTodoService {
     }
 
     @Override
+    public ApiResponse getTeamTodoByTargetDate(String teamId, LocalDateTime targetDate) {
+        try{
+            if(teamTodoMapper.findTeamTodoByTargetDate(teamId, targetDate) == null){
+                throw new NotFoundException(NOT_FOUND_TEAMTODO_DATA);
+            }
+
+            List<TeamTodoDto> teamTodoDto = teamTodoMapper.findTeamTodoByTargetDate(teamId, targetDate);
+            List<TeamTodoResponseDto> response = new ArrayList<>();
+
+            for(TeamTodoDto list : teamTodoDto){
+                TeamTodoResponseDto teamTodoResponseDto = TeamTodoResponseDto.builder()
+                        .title(list.getTitle())
+                        .content(list.getContent())
+                        .isCompleted(list.isCompleted())
+                        .createdAt(list.getCreatedAt())
+                        .updatedAt(list.getUpdatedAt())
+                        .targetDate(list.getTargetDate())
+                        .build();
+
+                response.add(teamTodoResponseDto);
+            }
+
+            return ApiResponse.builder()
+                    .result(Result.SUCCESS)
+                    .message(GET_TEAMTODO_LIST_SUCCESS)
+                    .data(response)
+                    .build();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ApiResponse.builder()
+                    .result(Result.FAIL)
+                    .message(GET_TEAMTODO_LIST_FAIL)
+                    .build();
+        }
+    }
+
+    @Override
     public ApiResponse updateTeamTodo(TeamTodoRequestDto teamTodoRequestDto) {
         try{
             if(teamTodoMapper.getTeamTodoById(teamTodoRequestDto.getId()) == null){
@@ -131,6 +173,7 @@ public class TeamTodoServiceImpl implements TeamTodoService {
                     .title(teamTodoRequestDto.getTitle())
                     .content(teamTodoRequestDto.getContent())
                     .isCompleted(teamTodoRequestDto.isCompleted())
+                    .targetDate(teamTodoRequestDto.getTargetDate())
                     .build();
 
             teamTodoMapper.updateTeamTodo(teamTodoDto);

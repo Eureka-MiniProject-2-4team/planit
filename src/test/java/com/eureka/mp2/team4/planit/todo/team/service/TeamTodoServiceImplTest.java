@@ -5,10 +5,7 @@ import static com.eureka.mp2.team4.planit.todo.team.constants.TeamTodoMessages.*
 
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 import com.eureka.mp2.team4.planit.common.ApiResponse;
 import com.eureka.mp2.team4.planit.common.Result;
@@ -21,6 +18,7 @@ import com.eureka.mp2.team4.planit.todo.team.dto.response.TeamTodoResponseDto;
 import com.eureka.mp2.team4.planit.todo.team.mapper.TeamTodoMapper;
 import com.eureka.mp2.team4.planit.todo.team.mapper.TeamTodoUserMapper;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -294,6 +292,143 @@ public class TeamTodoServiceImplTest {
         assertEquals("테스트 내용", resDto.getContent());
         assertEquals(false, resDto.isCompleted());
         verify(teamTodoMapper, times(2)).getTeamTodoById(eq(teamTodoId));
+    }
+
+    @Test
+    @DisplayName("특정 날짜의 팀 투두 리스트 조회 성공 테스트")
+    void testGetTeamTodoByTargetDateSuccess() {
+        // Given
+        String testTeamId = "test-team-id";
+        LocalDateTime targetDate = LocalDateTime.of(2025, 5, 15, 0, 0);
+
+        // TeamTodoDto 리스트 생성
+        List<TeamTodoDto> teamTodoDtoList = Arrays.asList(
+                TeamTodoDto.builder()
+                        .id(UUID.randomUUID().toString())
+                        .teamId(testTeamId)
+                        .title("테스트 할 일 1")
+                        .content("테스트 내용 1")
+                        .isCompleted(false)
+                        .createdAt(Timestamp.valueOf(LocalDateTime.now()))
+                        .updatedAt(Timestamp.valueOf(LocalDateTime.now()))
+                        .targetDate(targetDate)
+                        .build(),
+                TeamTodoDto.builder()
+                        .id(UUID.randomUUID().toString())
+                        .teamId(testTeamId)
+                        .title("테스트 할 일 2")
+                        .content("테스트 내용 2")
+                        .isCompleted(true)
+                        .createdAt(Timestamp.valueOf(LocalDateTime.now()))
+                        .updatedAt(Timestamp.valueOf(LocalDateTime.now()))
+                        .targetDate(targetDate)
+                        .build()
+        );
+
+        // 1. null 체크를 위한 모킹 - 투두가 존재함을 시뮬레이션
+        when(teamTodoMapper.findTeamTodoByTargetDate(eq(testTeamId), eq(targetDate)))
+                .thenReturn(teamTodoDtoList);
+
+        // When
+        ApiResponse response = teamTodoService.getTeamTodoByTargetDate(testTeamId, targetDate);
+
+        // Then
+        assertEquals(Result.SUCCESS, response.getResult());
+        assertEquals(GET_TEAMTODO_LIST_SUCCESS, response.getMessage());
+        assertNotNull(response.getData());
+
+        // 응답 데이터 검증
+        List<TeamTodoResponseDto> responseList = (List<TeamTodoResponseDto>) response.getData();
+
+        assertEquals(2, responseList.size());
+
+        assertEquals("테스트 할 일 1", responseList.get(0).getTitle());
+        assertEquals("테스트 내용 1", responseList.get(0).getContent());
+        assertFalse(responseList.get(0).isCompleted());
+        assertEquals(targetDate, responseList.get(0).getTargetDate());
+
+        assertEquals("테스트 할 일 2", responseList.get(1).getTitle());
+        assertEquals("테스트 내용 2", responseList.get(1).getContent());
+        assertTrue(responseList.get(1).isCompleted());
+        assertEquals(targetDate, responseList.get(1).getTargetDate());
+
+        // 메서드 호출 검증
+        // findTeamTodoByTargetDate는 두 번 호출됨(null 체크 용도 + 실제 값 조회 용도)
+        verify(teamTodoMapper, times(2)).findTeamTodoByTargetDate(eq(testTeamId), eq(targetDate));
+    }
+
+    @Test
+    @DisplayName("특정 날짜의 팀 투두 리스트 조회 실패 테스트 - 투두 없음")
+    void testGetTeamTodoByTargetDateFailNoTodo() {
+        // Given
+        String testTeamId = "test-team-id";
+        LocalDateTime targetDate = LocalDateTime.of(2025, 5, 15, 0, 0);
+
+        // null 반환하도록 모킹 - 투두가 없음을 시뮬레이션
+        when(teamTodoMapper.findTeamTodoByTargetDate(eq(testTeamId), eq(targetDate)))
+                .thenReturn(null);
+
+        // When
+        ApiResponse response = teamTodoService.getTeamTodoByTargetDate(testTeamId, targetDate);
+
+        // Then
+        assertEquals(Result.FAIL, response.getResult());
+        assertEquals(GET_TEAMTODO_LIST_FAIL, response.getMessage());
+        assertNull(response.getData());
+
+        // 메서드 호출 검증
+        verify(teamTodoMapper, times(1)).findTeamTodoByTargetDate(eq(testTeamId), eq(targetDate));
+    }
+
+    @Test
+    @DisplayName("특정 날짜의 팀 투두 리스트 조회 실패 테스트 - 데이터베이스 오류")
+    void testGetTeamTodoByTargetDateFailDatabaseError() {
+        // Given
+        String testTeamId = "test-team-id";
+        LocalDateTime targetDate = LocalDateTime.of(2025, 5, 15, 0, 0);
+
+        // 첫 번째 호출(null 체크)에서는 non-null 반환
+        when(teamTodoMapper.findTeamTodoByTargetDate(eq(testTeamId), eq(targetDate)))
+                .thenReturn(Arrays.asList(new TeamTodoDto()))  // 첫 번째 호출(null 체크)
+                .thenThrow(new RuntimeException("데이터베이스 오류")); // 두 번째 호출(실제 데이터 조회)
+
+        // When
+        ApiResponse response = teamTodoService.getTeamTodoByTargetDate(testTeamId, targetDate);
+
+        // Then
+        assertEquals(Result.FAIL, response.getResult());
+        assertEquals(GET_TEAMTODO_LIST_FAIL, response.getMessage());
+        assertNull(response.getData());
+
+        // 메서드 호출 검증
+        verify(teamTodoMapper, times(2)).findTeamTodoByTargetDate(eq(testTeamId), eq(targetDate));
+    }
+
+    @Test
+    @DisplayName("특정 날짜의 팀 투두 리스트 조회 성공 테스트 - 빈 리스트")
+    void testGetTeamTodoByTargetDateSuccessEmptyList() {
+        // Given
+        String testTeamId = "test-team-id";
+        LocalDateTime targetDate = LocalDateTime.of(2025, 5, 15, 0, 0);
+
+        // 빈 리스트 반환하도록 모킹 (null이 아님)
+        when(teamTodoMapper.findTeamTodoByTargetDate(eq(testTeamId), eq(targetDate)))
+                .thenReturn(Collections.emptyList());
+
+        // When
+        ApiResponse response = teamTodoService.getTeamTodoByTargetDate(testTeamId, targetDate);
+
+        // Then
+        assertEquals(Result.SUCCESS, response.getResult());
+        assertEquals(GET_TEAMTODO_LIST_SUCCESS, response.getMessage());
+        assertNotNull(response.getData());
+
+        // 응답 데이터 검증 - 빈 리스트
+        List<TeamTodoResponseDto> responseList = (List<TeamTodoResponseDto>) response.getData();
+        assertTrue(responseList.isEmpty());
+
+        // 메서드 호출 검증
+        verify(teamTodoMapper, times(2)).findTeamTodoByTargetDate(eq(testTeamId), eq(targetDate));
     }
 
     // 9. updateTeamTodo 테스트 - 실패 케이스 (데이터 없음)

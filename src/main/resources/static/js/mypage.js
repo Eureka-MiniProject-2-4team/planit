@@ -246,57 +246,6 @@ function createStars() {
     }
 }
 
-// 네비게이션 바 설정
-function setupNavbar() {
-    const navItems = document.querySelectorAll('.nav-item');
-
-    navItems.forEach(item => {
-        item.addEventListener('click', function(e) {
-            e.preventDefault();
-
-            // 모든 아이템에서 active 클래스 제거
-            navItems.forEach(i => i.classList.remove('active'));
-
-            // 클릭된 아이템에 active 클래스 추가
-            this.classList.add('active');
-        });
-    });
-}
-
-// // 폼 유효성 검증
-// function setupFormValidation() {
-//     const saveBtn = document.querySelector('.btn-save');
-//     const cancelBtn = document.querySelector('.btn-cancel');
-//
-//     // 저장 버튼
-//     saveBtn.addEventListener('click', function(e) {
-//         e.preventDefault();
-//
-//         // 간단한 유효성 검증
-//         const nickname = document.getElementById('nickname').value;
-//         if (!nickname) {
-//             alert('닉네임을 입력해주세요.');
-//             return;
-//         }
-//
-//         // 성공 메시지
-//         alert('프로필 정보가 저장되었습니다.');
-//
-//         // API 요청 - 실제 구현 시 주석 해제
-//         // updateUserProfile(nickname);
-//     });
-//
-//     // 취소 버튼
-//     cancelBtn.addEventListener('click', function(e) {
-//         e.preventDefault();
-//
-//         if (confirm('변경 사항이 저장되지 않습니다. 취소하시겠습니까?')) {
-//             // 폼 리셋 또는 리디렉션
-//             window.location.reload();
-//         }
-//     });
-// }
-
 // 모달 관리
 function setupModals() {
     // 비밀번호 변경 모달
@@ -477,6 +426,8 @@ function setupModals() {
 async function loadUserData() {
     try {
         const token = localStorage.getItem('accessToken');
+        if (!token) throw new Error('토큰 없음');
+
         const response = await fetch('/api/users/me', {
             method: 'GET',
             headers: {
@@ -486,36 +437,33 @@ async function loadUserData() {
 
         const result = await response.json();
 
-        if (response.ok && result.result === 'SUCCESS') {
-            const userData = result.data;
-
-            // 사용자 정보 표시
-            document.getElementById('username').value = userData.userName;
-            document.getElementById('nickname').value = userData.nickname;
-            document.getElementById('email').value = userData.email;
-
-            // 프로필 카드 정보 업데이트
-            document.querySelector('.profile-name').textContent = userData.nickname || userData.userName;
-            document.querySelector('.profile-email').textContent = userData.email;
-
-            // 프로필 아바타 이니셜 설정
-            const initials = (userData.nickname || userData.userName).substring(0, 2).toUpperCase();
-            document.querySelector('.profile-avatar').textContent = initials;
-
-            return userData;
-        } else {
-            console.error('사용자 데이터 로드 실패:', result.message);
-
-            // 인증 오류인 경우 로그인 페이지로 이동
-            if (response.status === 401) {
-                alert('로그인이 필요합니다.');
-                window.location.href = '/html/auth/login.html';
-            }
+        if (!response.ok || result.result !== 'SUCCESS') {
+            throw new Error(result.message || '사용자 정보 로드 실패');
         }
+
+        const userData = result.data;
+
+        // 사용자 정보 표시
+        document.getElementById('username').value = userData.userName;
+        document.getElementById('nickname').value = userData.nickname;
+        document.getElementById('email').value = userData.email;
+
+        document.querySelector('.profile-name').textContent = userData.nickname || userData.userName;
+        document.querySelector('.profile-email').textContent = userData.email;
+
+        const initials = (userData.nickname || userData.userName).substring(0, 2).toUpperCase();
+        document.querySelector('.profile-avatar').textContent = initials;
+
+        return userData;
+
     } catch (error) {
-        console.error('사용자 데이터 로드 중 오류:', error);
+        console.error('사용자 데이터 로드 실패:', error.message);
+        alert('로그인이 필요합니다. 로그인 페이지로 이동합니다.');
+        localStorage.removeItem('accessToken');
+        window.location.href = '/html/auth/login.html';
     }
 }
+
 
 async function updateUserProfile(nickname) {
     try {
@@ -646,8 +594,6 @@ async function deleteAccount() {
 // 페이지 로드 시 실행
 window.onload = function() {
     createStars();
-    setupNavbar();
-    // setupFormValidation();
     setupModals();
     setupNicknameEdit();
     setupPasswordModals();

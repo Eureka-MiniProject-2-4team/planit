@@ -53,6 +53,7 @@ public class TeamTodoUserServiceImpl implements TeamTodoUserService{
                         .isCompleted(user.isCompleted())
                         .createdAt(user.getCreatedAt())
                         .updatedAt(user.getUpdatedAt())
+                        .targetDate(user.getTargetDate())
                         .build();
 
                 responseDtoList.add(responseDto);
@@ -95,6 +96,7 @@ public class TeamTodoUserServiceImpl implements TeamTodoUserService{
                     .content(teamTodoDto.getContent())
                     .isCompleted(teamTodoUserDto.isCompleted())
                     .updatedAt(teamTodoUserDto.getUpdatedAt())
+                    .targetDate(teamTodoDto.getTargetDate())
                     .build();
 
             return ApiResponse.builder()
