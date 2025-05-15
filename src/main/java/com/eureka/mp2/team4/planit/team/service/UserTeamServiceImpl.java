@@ -12,6 +12,7 @@ import com.eureka.mp2.team4.planit.team.mapper.TeamMapper;
 import com.eureka.mp2.team4.planit.team.mapper.UserTeamMapper;
 import com.eureka.mp2.team4.planit.user.mapper.UserMapper;
 import lombok.RequiredArgsConstructor;
+import org.apache.coyote.BadRequestException;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -204,10 +205,7 @@ public class UserTeamServiceImpl implements UserTeamService {
             }
 
             if(userTeamMapper.isTeamLeader(teamId, userId) == 1) {
-                return ApiResponse.builder()
-                        .result(Result.FAIL)
-                        .message(LEADER_CANNOT_DENY_TEAM)
-                        .build();
+                throw new BadRequestException(LEADER_CANNOT_DENY_TEAM);
             } else {
                 userTeamMapper.deleteTeamMember(teamId, userId);
 
@@ -216,7 +214,13 @@ public class UserTeamServiceImpl implements UserTeamService {
                         .message(QUIT_TEAM_MEMBER_SUCCESS)
                         .build();
             }
-        } catch (Exception e) {
+        }catch(BadRequestException be) {
+            return ApiResponse.builder()
+                    .result(Result.FAIL)
+                    .message(LEADER_CANNOT_DENY_TEAM)
+                    .build();
+        }
+        catch (Exception e) {
             e.printStackTrace();
             return ApiResponse.builder()
                     .result(Result.FAIL)
