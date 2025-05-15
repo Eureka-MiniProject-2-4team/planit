@@ -6,7 +6,6 @@
     <title>PLAN!T - 친구 목록</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
     <link rel="stylesheet" href="/css/friend/friend.css" />
-    <link rel="stylesheet" href="/css/navbar.css" />
 </head>
 <body>
 <div class="stars" id="stars"></div>
@@ -34,6 +33,9 @@
         <div class="panel-header">
             <i class="fas fa-users panel-icon"></i>
             <div class="panel-title">친구 목록</div>
+            <button class="header-btn" id="sent-requests-btn">
+                <i class="fas fa-paper-plane"></i>
+            </button>
         </div>
 
         <div class="search-box">
@@ -61,12 +63,11 @@
         </button>
         <div class="modal-header">
             <div class="modal-title">친구 추가</div>
-            <div class="modal-subtitle">새로운 친구의 사용자 이름을 입력하세요</div>
+            <div class="modal-subtitle">새로운 친구를 추가하세요!</div>
         </div>
         <form class="friend-form" id="search-friend-form">
             <div class="form-group">
-                <label class="form-label">사용자 이름</label>
-                <input type="text" class="form-input" id="username-input" placeholder="username" />
+                <input type="text" class="form-input" id="username-input" placeholder="이메일 또는 닉네임" />
             </div>
             <div class="form-actions">
                 <button type="button" class="control-btn" id="cancel-btn">취소</button>
@@ -112,8 +113,27 @@
     </div>
 </div>
 
-<div id="navbar-container"></div>
-<script src="/js/navbar.js"></script>
+<nav class="navbar">
+    <div class="nav-container">
+        <div class="nav-logo">P!T</div>
+        <a href="#" class="nav-item">
+            <i class="fas fa-user nav-icon"></i>
+            <span class="nav-text">나</span>
+        </a>
+        <a href="#" class="nav-item active">
+            <i class="fas fa-users nav-icon"></i>
+            <span class="nav-text">친구</span>
+        </a>
+        <a href="#" class="nav-item">
+            <i class="fas fa-user-tie nav-icon"></i>
+            <span class="nav-text">팀</span>
+        </a>
+        <a href="#" class="nav-item">
+            <i class="fas fa-user-astronaut nav-icon"></i>
+            <span class="nav-text">마이페이지</span>
+        </a>
+    </div>
+</nav>
 
 <script src="/js/friend/friend.js"></script>
 </body>

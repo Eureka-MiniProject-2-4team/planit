@@ -34,6 +34,7 @@ window.addEventListener('DOMContentLoaded', () => {
     setupFriendModal();
     setupTodoModal();
     setupSentRequestsModal();
+    setupSentRequestsButton();
     setupFriendSearch();
     getFriends();
     getFriendRequests();
@@ -239,7 +240,7 @@ function setupFriendSearch() {
     });
 }
 
-// 13. 보낸 친구 요청 목록 조회 & 렌더링
+// 13. 보낸 친구 요청 목록 조회 & 렌더링 (상태별 아이콘/텍스트 분기)
 async function getSentRequests() {
     try {
         const res = await fetch('/api/friend/sent', {
@@ -250,17 +251,40 @@ async function getSentRequests() {
         const list = document.getElementById('sent-requests-list');
         list.innerHTML = '';
 
-        if (result.result === 'SUCCESS' && result.data?.friends && result.data.friends.length) {
+        if (result.result === 'SUCCESS' &&
+            Array.isArray(result.data?.friends) &&
+            result.data.friends.length
+        ) {
             result.data.friends.forEach(request => {
+                // 상태별로 아이콘과 텍스트 결정
+                let statusIcon, statusText;
+                if (request.status === 'PENDING') {
+                    statusIcon = 'fa-paper-plane';
+                    statusText = '요청 중';
+                } else if (request.status === 'REJECTED') {
+                    statusIcon = 'fa-times-circle';
+                    statusText = '거절됨';
+                } else {
+                    // 혹시 ACCEPTED가 내려오는 경우 대비 (대상에서 제외 처리할 수도 있음)
+                    return;
+                }
+
                 const item = document.createElement('div');
                 item.className = 'friend-item';
                 item.innerHTML = `
-                    <div class="friend-avatar">${request.receiverNickName?.charAt(0) || 'U'}</div>
+                    <div class="friend-avatar">
+                        ${request.receiverNickName?.charAt(0) || 'U'}
+                    </div>
                     <div class="friend-info">
-                        <div class="friend-name">${request.receiverNickName}</div>
-                        <div class="friend-email">${request.receiverEmail || ''}</div>
+                        <div class="friend-name">
+                            ${request.receiverNickName}
+                        </div>
+                        <div class="friend-email">
+                            ${request.receiverEmail || ''}
+                        </div>
                         <div class="friend-status">
-                            <i class="fas fa-paper-plane status-icon"></i> 요청 중
+                            <i class="fas ${statusIcon} status-icon"></i>
+                            ${statusText}
                         </div>
                     </div>
                 `;
@@ -269,16 +293,27 @@ async function getSentRequests() {
         } else {
             list.innerHTML = '<div class="no-results">보낸 요청이 없습니다.</div>';
         }
-        // 모달 표시
+
+        // 모달 띄우기
         document.getElementById('sent-requests-modal').style.display = 'flex';
     } catch (error) {
         console.error('보낸 친구 요청 목록 조회 중 오류:', error);
-        document.getElementById('sent-requests-list').innerHTML = '<div class="no-results">보낸 요청을 불러오는 중 오류가 발생했습니다.</div>';
+        document.getElementById('sent-requests-list').innerHTML =
+            '<div class="no-results">보낸 요청을 불러오는 중 오류가 발생했습니다.</div>';
         document.getElementById('sent-requests-modal').style.display = 'flex';
     }
 }
 
 
+// 14. 보낸 요청 버튼 셋업
+function setupSentRequestsButton() {
+    const btn = document.getElementById('sent-requests-btn');
+    if (btn) {
+        btn.addEventListener('click', () => {
+            getSentRequests();
+        });
+    }
+}
 
 // 15. 받은 친구 요청 목록 조회 & 렌더링
 async function getFriendRequests() {

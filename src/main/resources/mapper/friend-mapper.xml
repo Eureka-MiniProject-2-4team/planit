@@ -31,15 +31,15 @@
           AND u1.is_active = true AND u2.is_active=true
     </select>
 
-    <!-- 보낸 친구 요청 목록 -->
+    <!-- 보낸 친구 요청 목록 (3일 이내 REJECTED만 포함, ACCEPTED 제외) -->
     <select id="findAskedByRequesterId" resultType="com.eureka.mp2.team4.planit.friend.dto.FriendDto">
         SELECT f.id,
                f.requester_id,
-               u1.nickname AS requesterNickName,
-               u1.email AS requesterEmail,
+               u1.nickname       AS requesterNickName,
+               u1.email          AS requesterEmail,
                f.receiver_id,
-               u2.nickname AS receiverNickName,
-               u2.email AS receiverEmail,
+               u2.nickname       AS receiverNickName,
+               u2.email          AS receiverEmail,
                f.status,
                f.created_at,
                f.accepted_at
@@ -47,8 +47,14 @@
                  JOIN users u1 ON f.requester_id = u1.id
                  JOIN users u2 ON f.receiver_id = u2.id
         WHERE f.requester_id = #{userId}
-          AND u1.is_active = true AND u2.is_active=true
-
+          AND u1.is_active = true
+          AND u2.is_active = true
+          AND (
+            f.status = 'PENDING'
+                OR (f.status = 'REJECTED'
+                AND f.created_at >= DATE_SUB(NOW(), INTERVAL 3 DAY)
+                )
+            )
     </select>
 
     <!-- 받은 친구 요청 목록 (대기 중) -->
