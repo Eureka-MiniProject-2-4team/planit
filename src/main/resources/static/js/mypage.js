@@ -46,33 +46,23 @@ function setupPasswordModals() {
         }
 
         // 비밀번호 확인 API 호출 - 실제 구현 시 주석 해제
-        // verifyPassword(password)
-        //     .then(response => {
-        //         if (response.result === 'SUCCESS') {
-        //             verifyPasswordModal.style.display = 'none';
-        //
-        //             // 비밀번호 변경 모달 표시
-        //             newPassword.value = '';
-        //             confirmPassword.value = '';
-        //             passwordModal.style.display = 'flex';
-        //         } else {
-        //             alert(response.message || '비밀번호가 일치하지 않습니다.');
-        //         }
-        //     })
-        //     .catch(error => {
-        //         console.error('비밀번호 확인 오류:', error);
-        //         alert('서버 오류: 비밀번호 확인에 실패했습니다.');
-        //     });
+        verifyPassword(password)
+            .then(response => {
+                if (response.result === 'SUCCESS') {
+                    verifyPasswordModal.style.display = 'none';
 
-        // 첫 번째 모달을 먼저 완전히 닫음
-        verifyPasswordModal.style.display = 'none';
-
-        // 비밀번호 변경 모달 표시 (시간차를 두고 표시)
-        setTimeout(() => {
-            newPassword.value = '';
-            confirmPassword.value = '';
-            passwordModal.style.display = 'flex';
-        }, 300); // 더 긴 지연 시간 적용
+                    // 비밀번호 변경 모달 표시
+                    newPassword.value = '';
+                    confirmPassword.value = '';
+                    passwordModal.style.display = 'flex';
+                } else {
+                    alert(response.message || '비밀번호가 일치하지 않습니다.');
+                }
+            })
+            .catch(error => {
+                console.error('비밀번호 확인 오류:', error);
+                alert('서버 오류: 비밀번호 확인에 실패했습니다.');
+            });
     });
 
     // 비밀번호 변경 모달 닫기
@@ -102,24 +92,21 @@ function setupPasswordModals() {
         }
 
         // 비밀번호 변경 API 호출 - 실제 구현 시 주석 해제
-        // const currentPassword = currentPasswordVerify.value;
-        // changePassword(currentPassword, newPasswordValue)
-        //     .then(response => {
-        //         if (response.result === 'SUCCESS') {
-        //             alert('비밀번호가 변경되었습니다.');
-        //             passwordModal.style.display = 'none';
-        //         } else {
-        //             alert(response.message || '비밀번호 변경 실패');
-        //         }
-        //     })
-        //     .catch(error => {
-        //         console.error('비밀번호 변경 오류:', error);
-        //         alert('서버 오류: 비밀번호 변경에 실패했습니다.');
-        //     });
-
-        // 임시 성공 처리
-        alert('비밀번호가 변경되었습니다.');
-        passwordModal.style.display = 'none';
+        const currentPassword = currentPasswordVerify.value;
+        changePassword(currentPassword, newPasswordValue)
+            .then(response => {
+                if (response.result === 'SUCCESS') {
+                    alert('비밀번호가 변경되었습니다. 다시 로그인해주세요.');
+                    localStorage.removeItem('accessToken'); // 토큰 제거
+                    window.location.href = '/html/auth/login.html'; // 로그인 페이지로 이동
+                } else {
+                    alert(response.message || '비밀번호 변경 실패');
+                }
+            })
+            .catch(error => {
+                console.error('비밀번호 변경 오류:', error);
+                alert('서버 오류: 비밀번호 변경에 실패했습니다.');
+            });
     });
 
     // ESC키로 모달 닫기
@@ -184,40 +171,25 @@ function setupNicknameEdit() {
         }
 
         // 중복 확인 API 호출 - 실제 구현 시 사용
-        // checkNicknameDuplicate(nickname)
-        //     .then(response => {
-        //         if (response.result === 'SUCCESS') {
-        //             nicknameStatus.textContent = '사용 가능한 닉네임입니다.';
-        //             nicknameStatus.className = 'input-status success';
-        //             isNicknameVerified = true;
-        //             editNicknameBtn.disabled = false;
-        //         } else {
-        //             nicknameStatus.textContent = response.message || '이미 사용 중인 닉네임입니다.';
-        //             nicknameStatus.className = 'input-status error';
-        //             isNicknameVerified = false;
-        //             editNicknameBtn.disabled = true;
-        //         }
-        //     })
-        //     .catch(error => {
-        //         console.error('닉네임 중복 확인 오류:', error);
-        //         nicknameStatus.textContent = '서버 오류: 중복 확인에 실패했습니다.';
-        //         nicknameStatus.className = 'input-status error';
-        //     });
-
-        // 임시 검증 (랜덤하게 성공/실패 처리 - 테스트용)
-        setTimeout(() => {
-            if (Math.random() > 0.3) { // 70% 확률로 성공
-                nicknameStatus.textContent = '사용 가능한 닉네임입니다.';
-                nicknameStatus.className = 'input-status success';
-                isNicknameVerified = true;
-                editNicknameBtn.disabled = false;
-            } else {
-                nicknameStatus.textContent = '이미 사용 중인 닉네임입니다.';
+        checkNicknameDuplicate(nickname)
+            .then(response => {
+                if (response.result === 'SUCCESS') {
+                    nicknameStatus.textContent = '사용 가능한 닉네임입니다.';
+                    nicknameStatus.className = 'input-status success';
+                    isNicknameVerified = true;
+                    editNicknameBtn.disabled = false;
+                } else {
+                    nicknameStatus.textContent = response.message || '이미 사용 중인 닉네임입니다.';
+                    nicknameStatus.className = 'input-status error';
+                    isNicknameVerified = false;
+                    editNicknameBtn.disabled = true;
+                }
+            })
+            .catch(error => {
+                console.error('닉네임 중복 확인 오류:', error);
+                nicknameStatus.textContent = '서버 오류: 중복 확인에 실패했습니다.';
                 nicknameStatus.className = 'input-status error';
-                isNicknameVerified = false;
-                editNicknameBtn.disabled = true;
-            }
-        }, 700); // 검증 시간 지연 효과
+            });
     });
 
     // 수정 버튼 클릭 처리
@@ -230,17 +202,13 @@ function setupNicknameEdit() {
         }
 
         // 실제 구현 시 API 호출 - 변경 요청
-        // updateUserProfile(nickname)
-        //     .then(success => {
-        //         if (success) {
-        //             alert('닉네임이 변경되었습니다.');
-        //             document.querySelector('.profile-name').textContent = nickname;
-        //         }
-        //     });
-
-        // 임시 성공 처리
-        alert('닉네임이 변경되었습니다.');
-        document.querySelector('.profile-name').textContent = nickname;
+        updateUserProfile(nickname)
+            .then(success => {
+                if (success) {
+                    alert('닉네임이 변경되었습니다.');
+                    document.querySelector('.profile-name').textContent = nickname;
+                }
+            });
     });
 }
 
@@ -295,39 +263,39 @@ function setupNavbar() {
     });
 }
 
-// 폼 유효성 검증
-function setupFormValidation() {
-    const saveBtn = document.querySelector('.btn-save');
-    const cancelBtn = document.querySelector('.btn-cancel');
-
-    // 저장 버튼
-    saveBtn.addEventListener('click', function(e) {
-        e.preventDefault();
-
-        // 간단한 유효성 검증
-        const nickname = document.getElementById('nickname').value;
-        if (!nickname) {
-            alert('닉네임을 입력해주세요.');
-            return;
-        }
-
-        // 성공 메시지
-        alert('프로필 정보가 저장되었습니다.');
-
-        // API 요청 - 실제 구현 시 주석 해제
-        // updateUserProfile(nickname);
-    });
-
-    // 취소 버튼
-    cancelBtn.addEventListener('click', function(e) {
-        e.preventDefault();
-
-        if (confirm('변경 사항이 저장되지 않습니다. 취소하시겠습니까?')) {
-            // 폼 리셋 또는 리디렉션
-            window.location.reload();
-        }
-    });
-}
+// // 폼 유효성 검증
+// function setupFormValidation() {
+//     const saveBtn = document.querySelector('.btn-save');
+//     const cancelBtn = document.querySelector('.btn-cancel');
+//
+//     // 저장 버튼
+//     saveBtn.addEventListener('click', function(e) {
+//         e.preventDefault();
+//
+//         // 간단한 유효성 검증
+//         const nickname = document.getElementById('nickname').value;
+//         if (!nickname) {
+//             alert('닉네임을 입력해주세요.');
+//             return;
+//         }
+//
+//         // 성공 메시지
+//         alert('프로필 정보가 저장되었습니다.');
+//
+//         // API 요청 - 실제 구현 시 주석 해제
+//         // updateUserProfile(nickname);
+//     });
+//
+//     // 취소 버튼
+//     cancelBtn.addEventListener('click', function(e) {
+//         e.preventDefault();
+//
+//         if (confirm('변경 사항이 저장되지 않습니다. 취소하시겠습니까?')) {
+//             // 폼 리셋 또는 리디렉션
+//             window.location.reload();
+//         }
+//     });
+// }
 
 // 모달 관리
 function setupModals() {
@@ -372,23 +340,20 @@ function setupModals() {
         }
 
         // 비밀번호 변경 API 호출 - 실제 구현 시 주석 해제
-        // changePassword(currentPassword, newPassword)
-        //     .then(response => {
-        //         if (response.result === 'SUCCESS') {
-        //             alert('비밀번호가 변경되었습니다.');
-        //             passwordModal.style.display = 'none';
-        //         } else {
-        //             alert(response.message || '비밀번호 변경 실패');
-        //         }
-        //     })
-        //     .catch(error => {
-        //         console.error('비밀번호 변경 오류:', error);
-        //         alert('서버 오류: 비밀번호 변경에 실패했습니다.');
-        //     });
+        changePassword(currentPassword, newPassword)
+            .then(response => {
+                if (response.result === 'SUCCESS') {
+                    alert('비밀번호가 변경되었습니다.');
+                    passwordModal.style.display = 'none';
+                } else {
+                    alert(response.message || '비밀번호 변경 실패');
+                }
+            })
+            .catch(error => {
+                console.error('비밀번호 변경 오류:', error);
+                alert('서버 오류: 비밀번호 변경에 실패했습니다.');
+            });
 
-        // 임시 성공 처리
-        alert('비밀번호가 변경되었습니다.');
-        passwordModal.style.display = 'none';
     });
 
     // 계정 비활성화 및 회원 탈퇴
@@ -412,7 +377,7 @@ function setupModals() {
         currentAction = 'deactivate';
         document.getElementById('confirm-action-title').textContent = '계정 비활성화';
         document.getElementById('confirm-action-message').textContent =
-            '계정을 비활성화하면 일정 기간 동안 서비스를 이용할 수 없습니다. 계속하시겠습니까?';
+            '로그인을 하시면 계정 비활성화가 자동으로 해제됩니다. 계속하시겠습니까?';
         confirmActionModal.style.display = 'flex';
     });
 
@@ -463,37 +428,26 @@ function setupModals() {
         }
 
         // 비밀번호 확인 API 호출 - 실제 구현 시 주석 해제
-        // verifyPassword(password)
-        //     .then(response => {
-        //         if (response.result === 'SUCCESS') {
-        //             verifyModal.style.display = 'none';
-        //
-        //             if (currentAction === 'deactivate') {
-        //                 deactivateAccount();
-        //             } else if (currentAction === 'delete') {
-        //                 deleteAccount();
-        //             }
-        //         } else {
-        //             alert(response.message || '비밀번호가 일치하지 않습니다.');
-        //         }
-        //     })
-        //     .catch(error => {
-        //         console.error('비밀번호 확인 오류:', error);
-        //         alert('서버 오류: 비밀번호 확인에 실패했습니다.');
-        //     });
+        verifyPassword(password)
+            .then(response => {
+                if (response.result === 'SUCCESS') {
+                    verifyModal.style.display = 'none';
 
-        // 임시 성공 처리
-        verifyModal.style.display = 'none';
+                    if (currentAction === 'deactivate') {
+                        deactivateAccount();
+                    } else if (currentAction === 'delete') {
+                        deleteAccount();
+                    }
+                } else {
+                    alert(response.message || '비밀번호가 일치하지 않습니다.');
+                }
+            })
+            .catch(error => {
+                console.error('비밀번호 확인 오류:', error);
+                alert('서버 오류: 비밀번호 확인에 실패했습니다.');
+            });
 
-        if (currentAction === 'deactivate') {
-            alert('계정이 비활성화되었습니다.');
-            // 로그아웃 또는 로그인 페이지로 이동
-            // window.location.href = '/login.html';
-        } else if (currentAction === 'delete') {
-            alert('회원 탈퇴가 완료되었습니다.');
-            // 로그아웃 또는 로그인 페이지로 이동
-            // window.location.href = '/login.html';
-        }
+
     });
 
     // ESC키로 모달 닫기
@@ -555,7 +509,7 @@ async function loadUserData() {
             // 인증 오류인 경우 로그인 페이지로 이동
             if (response.status === 401) {
                 alert('로그인이 필요합니다.');
-                window.location.href = '/login.html';
+                window.location.href = '/html/auth/login.html';
             }
         }
     } catch (error) {
@@ -654,7 +608,7 @@ async function deactivateAccount() {
         if (response.ok && result.result === 'SUCCESS') {
             alert('계정이 비활성화되었습니다.');
             localStorage.removeItem('accessToken');
-            window.location.href = '/login.html';
+            window.location.href = '/html/auth/login.html';
         } else {
             alert(result.message || '계정 비활성화 실패');
         }
@@ -679,7 +633,7 @@ async function deleteAccount() {
         if (response.ok && result.result === 'SUCCESS') {
             alert('회원 탈퇴가 완료되었습니다.');
             localStorage.removeItem('accessToken');
-            window.location.href = '/login.html';
+            window.location.href = '/html/auth/login.html';
         } else {
             alert(result.message || '회원 탈퇴 실패');
         }
@@ -693,7 +647,7 @@ async function deleteAccount() {
 window.onload = function() {
     createStars();
     setupNavbar();
-    setupFormValidation();
+    // setupFormValidation();
     setupModals();
     setupNicknameEdit();
     setupPasswordModals();
@@ -705,5 +659,5 @@ window.onload = function() {
     });
 
     // 실제 구현 시 사용자 데이터 로드
-    // loadUserData();
+    loadUserData();
 };
