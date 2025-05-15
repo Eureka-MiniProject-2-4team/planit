@@ -40,7 +40,7 @@
     <select id="findById" resultType="com.eureka.mp2.team4.planit.todo.personal.dto.PersonalTodoDto">
         SELECT pt.*
         FROM personal_todo pt
-        JOIN user u ON pt.user_id = u.id
+        JOIN users u ON pt.user_id = u.id
         WHERE pt.id = #{id}
         AND u.is_active = true
     </select>
@@ -49,7 +49,7 @@
     <select id="findAllByUserId" resultType="com.eureka.mp2.team4.planit.todo.personal.dto.PersonalTodoDto">
         SELECT pt.*
         FROM personal_todo pt
-                 JOIN user u ON pt.user_id = u.id
+                 JOIN users u ON pt.user_id = u.id
         WHERE pt.user_id = #{userId}
           AND u.is_active = true
         ORDER BY pt.target_date ASC
