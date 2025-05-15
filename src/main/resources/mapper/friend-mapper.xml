@@ -28,6 +28,7 @@
                  JOIN users u2 ON f.receiver_id = u2.id
         WHERE (f.requester_id = #{userId} OR f.receiver_id = #{userId})
           AND f.status = 'ACCEPTED'
+          AND u1.is_active = true AND u2.is_active=true
     </select>
 
     <!-- 보낸 친구 요청 목록 -->
@@ -46,6 +47,8 @@
                  JOIN users u1 ON f.requester_id = u1.id
                  JOIN users u2 ON f.receiver_id = u2.id
         WHERE f.requester_id = #{userId}
+          AND u1.is_active = true AND u2.is_active=true
+
     </select>
 
     <!-- 받은 친구 요청 목록 (대기 중) -->
@@ -65,6 +68,8 @@
                  JOIN users u2 ON f.receiver_id = u2.id
         WHERE f.receiver_id = #{userId}
           AND f.status = 'PENDING'
+          AND u1.is_active = true AND u2.is_active=true
+
     </select>
 
     <!-- 친구 요청 상태 변경 -->
@@ -95,6 +100,8 @@
                  JOIN users u1 ON f.requester_id = u1.id
                  JOIN users u2 ON f.receiver_id = u2.id
         WHERE f.id = #{friendId}
+          AND u1.is_active = true AND u2.is_active=true
+
     </select>
 
     <!-- 요청자/수신자의 위치가 바뀌어도 동일한 관계 -->
@@ -114,6 +121,8 @@
                  JOIN users u2 ON f.receiver_id = u2.id
         WHERE (f.requester_id = #{userId} AND f.receiver_id = #{targetUserId})
            OR (f.requester_id = #{targetUserId} AND f.receiver_id = #{userId})
+            AND u1.is_active = true AND u2.is_active=true
+
     </select>
 
     <!-- 친구 삭제 -->
