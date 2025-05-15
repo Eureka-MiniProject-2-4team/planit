@@ -4,8 +4,6 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>PLAN!T - 친구 목록</title>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap"/>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&display=swap"/>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
     <link rel="stylesheet" href="/css/friend/friend.css" />
 </head>
@@ -20,6 +18,17 @@
         </div>
     </header>
 
+    <!-- 친구 요청 수락 섹션 -->
+    <div class="friends-panel friend-requests" id="friend-requests-panel" style="display: none;">
+        <div class="panel-header">
+            <i class="fas fa-user-check panel-icon"></i>
+            <div class="panel-title">친구 요청</div>
+        </div>
+        <div class="friends-list" id="friend-requests-list">
+            <!-- JS로 렌더링되는 친구 요청 아이템 영역 -->
+        </div>
+    </div>
+
     <div class="friends-panel">
         <div class="panel-header">
             <i class="fas fa-users panel-icon"></i>
@@ -28,7 +37,7 @@
 
         <div class="search-box">
             <i class="fas fa-search search-icon"></i>
-            <input type="text" class="search-input" placeholder="친구 검색..." />
+            <input type="text" class="search-input" id="friend-search-input" placeholder="친구 검색..." />
         </div>
 
         <div class="friends-list" id="friends-list">
@@ -38,6 +47,9 @@
         <div class="bottom-controls">
             <button class="control-btn" id="refresh-btn">
                 <i class="fas fa-sync-alt"></i> 새로고침
+            </button>
+            <button class="control-btn" id="sent-requests-btn">
+                <i class="fas fa-paper-plane"></i> 보낸 요청
             </button>
             <button class="control-btn add-btn" id="add-friend-btn">
                 <i class="fas fa-user-plus"></i> 친구 추가
@@ -69,6 +81,38 @@
 
         <div id="search-results" class="search-results">
             <!-- 검색 결과가 여기에 표시됩니다 -->
+        </div>
+    </div>
+</div>
+
+<!-- 투두 리스트 모달 -->
+<div class="friend-modal" id="todo-modal" style="display: none;">
+    <div class="modal-content">
+        <button class="close-modal" id="close-todo-modal">
+            <i class="fas fa-times"></i>
+        </button>
+        <div class="modal-header">
+            <div class="modal-title">친구의 할 일 목록</div>
+            <div class="modal-subtitle" id="todo-friend-name">친구 이름</div>
+        </div>
+        <div id="todo-list" class="todo-list">
+            <!-- 투두 리스트가 여기에 표시됩니다 -->
+        </div>
+    </div>
+</div>
+
+<!-- 보낸 요청 모달 -->
+<div class="friend-modal" id="sent-requests-modal" style="display: none;">
+    <div class="modal-content">
+        <button class="close-modal" id="close-sent-modal">
+            <i class="fas fa-times"></i>
+        </button>
+        <div class="modal-header">
+            <div class="modal-title">보낸 친구 요청</div>
+            <div class="modal-subtitle">내가 보낸 친구 요청 목록</div>
+        </div>
+        <div id="sent-requests-list" class="friends-list">
+            <!-- 보낸 친구 요청 목록이 여기에 표시됩니다 -->
         </div>
     </div>
 </div>
