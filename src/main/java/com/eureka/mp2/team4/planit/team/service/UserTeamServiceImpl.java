@@ -2,6 +2,7 @@ package com.eureka.mp2.team4.planit.team.service;
 
 import com.eureka.mp2.team4.planit.common.ApiResponse;
 import com.eureka.mp2.team4.planit.common.Result;
+import com.eureka.mp2.team4.planit.common.exception.ForbiddenException;
 import com.eureka.mp2.team4.planit.common.exception.NotFoundException;
 import com.eureka.mp2.team4.planit.team.dto.TeamDto;
 import com.eureka.mp2.team4.planit.team.dto.UserTeamDto;
@@ -9,15 +10,20 @@ import com.eureka.mp2.team4.planit.team.dto.request.UserTeamRequestDto;
 import com.eureka.mp2.team4.planit.team.dto.response.MyTeamResponseDto;
 import com.eureka.mp2.team4.planit.team.mapper.TeamMapper;
 import com.eureka.mp2.team4.planit.team.mapper.UserTeamMapper;
+import com.eureka.mp2.team4.planit.user.mapper.UserMapper;
 import lombok.RequiredArgsConstructor;
+import org.apache.coyote.BadRequestException;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
 import static com.eureka.mp2.team4.planit.team.constants.TeamMessages.*;
+import static com.eureka.mp2.team4.planit.team.constants.Team_Role.MEMBER;
+import static com.eureka.mp2.team4.planit.team.constants.Team_Status.WAIT;
 
 @Service
 @RequiredArgsConstructor
@@ -29,12 +35,14 @@ public class UserTeamServiceImpl implements UserTeamService {
     @Override
     public ApiResponse inviteTeamMember(UserTeamRequestDto userTeamRequestDto) {
         try {
+            String userId = userTeamMapper.findUserIdByNickNameOREmail(userTeamRequestDto.getSearch());
+
             UserTeamDto userTeamDto = UserTeamDto.builder()
                     .id(UUID.randomUUID().toString())
-                    .userId(userTeamRequestDto.getUserId())
+                    .userId(userId)
                     .teamId(userTeamRequestDto.getTeamId())
-                    .status("대기")
-                    .role("팀원")
+                    .status(WAIT)
+                    .role(MEMBER)
                     .build();
 
             userTeamMapper.registerTeamMember(userTeamDto);
@@ -189,20 +197,30 @@ public class UserTeamServiceImpl implements UserTeamService {
     }
 
     @Override
+    @Transactional
     public ApiResponse denyTeamMember(String teamId, String userId) {
         try {
             if (teamMapper.findTeamById(teamId) == null) {
                 throw new NotFoundException(NOT_FOUND_ID);
             }
 
-            userTeamMapper.deleteTeamMember(teamId, userId);
+            if(userTeamMapper.isTeamLeader(teamId, userId) == 1) {
+                throw new BadRequestException(LEADER_CANNOT_DENY_TEAM);
+            } else {
+                userTeamMapper.deleteTeamMember(teamId, userId);
 
+                return ApiResponse.builder()
+                        .result(Result.SUCCESS)
+                        .message(QUIT_TEAM_MEMBER_SUCCESS)
+                        .build();
+            }
+        }catch(BadRequestException be) {
             return ApiResponse.builder()
-                    .result(Result.SUCCESS)
-                    .message(QUIT_TEAM_MEMBER_SUCCESS)
+                    .result(Result.FAIL)
+                    .message(LEADER_CANNOT_DENY_TEAM)
                     .build();
-
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             e.printStackTrace();
             return ApiResponse.builder()
                     .result(Result.FAIL)
