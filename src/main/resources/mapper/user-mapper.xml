@@ -82,7 +82,7 @@
         SELECT *
         FROM users
         WHERE nickName = #{nickName}
-        AND isActive = true
+        AND is_active = true
     </select>
 
     <select id="findUserByNameAndEmail" resultType="com.eureka.mp2.team4.planit.user.dto.UserDto">
