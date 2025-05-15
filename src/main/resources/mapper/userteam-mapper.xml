@@ -20,7 +20,6 @@
         AND u.is_active = true
     </select>
 
-
     <select id="getMyTeamList" parameterType="java.lang.String" resultType="com.eureka.mp2.team4.planit.team.dto.UserTeamDto">
         SELECT *
         FROM user_team
@@ -56,6 +55,13 @@
                       WHERE team_id = #{teamId}
                         AND user_id = #{userId}
                         AND role = 'LEADER')
+    </select>
+
+    <select id="findUserIdByNickNameOREmail" parameterType="java.lang.String" resultType="java.lang.String">
+        SELECT id
+        FROM users
+        WHERE email = #{search}
+        OR nickname = #{search}
     </select>
 
     <!--UPDATE-->

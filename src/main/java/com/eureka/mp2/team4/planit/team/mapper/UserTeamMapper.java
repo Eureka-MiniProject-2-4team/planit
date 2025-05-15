@@ -28,6 +28,8 @@ public interface UserTeamMapper {
 
     Integer isTeamLeader(@Param("teamId") String teamId, @Param("userId") String userId);
 
+    String findUserIdByNickNameOREmail(String search);
+
     // UPDATE
     void acceptTeamJoin(@Param("teamId") String teamId, @Param("userId") String userId);
 

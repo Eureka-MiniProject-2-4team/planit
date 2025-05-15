@@ -48,4 +48,6 @@ public class TeamMessages {
     public static final String NOT_FOUND_MY_INVITED = "나를 초대한 팀이 존재하지 않음";
     // DUPLICATED KEY
     public static final String DUPLICATED_INVITED = "이미 초대된 대상입니다.";
+
+    public static final String LEADER_CANNOT_DENY_TEAM = "팀장은 팀을 탈퇴할 수 없습니다.";
 }
