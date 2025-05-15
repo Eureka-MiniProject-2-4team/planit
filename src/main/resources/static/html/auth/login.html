@@ -168,7 +168,6 @@
 
             if (response.ok && result.data && result.data.accessToken) {
                 localStorage.setItem('accessToken', 'Bearer ' + result.data.accessToken);
-                alert('로그인 성공!');
                 window.location.href = '../todo/myCalendar.html';
             } else {
                 errorMessage.textContent = result.message || '로그인 실패';

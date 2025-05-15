@@ -424,16 +424,28 @@ function setupModals() {
 
 // API 함수들 - 실제 구현 시 사용
 async function loadUserData() {
-    try {
-        const token = localStorage.getItem('accessToken');
-        if (!token) throw new Error('토큰 없음');
+    const token = localStorage.getItem('accessToken');
+    if (!token) {
+        alert('로그인이 필요합니다. 로그인 페이지로 이동합니다.');
+        window.location.href = '/html/auth/login.html';
+        return;
+    }
 
+    try {
         const response = await fetch('/api/users/me', {
             method: 'GET',
             headers: {
                 'Authorization': token
             }
         });
+
+        if (response.status === 401) {
+            const errorData = await response.json();
+            alert(errorData.message || '인증이 만료되었습니다. 다시 로그인해주세요.');
+            localStorage.removeItem('accessToken');
+            window.location.href = '/html/auth/login.html';
+            return;
+        }
 
         const result = await response.json();
 
@@ -458,11 +470,10 @@ async function loadUserData() {
 
     } catch (error) {
         console.error('사용자 데이터 로드 실패:', error.message);
-        alert('로그인이 필요합니다. 로그인 페이지로 이동합니다.');
-        localStorage.removeItem('accessToken');
-        window.location.href = '/html/auth/login.html';
+        alert('데이터를 불러오는 중 오류가 발생했습니다.');
     }
 }
+
 
 
 async function updateUserProfile(nickname) {
@@ -597,7 +608,6 @@ window.onload = function() {
     setupModals();
     setupNicknameEdit();
     setupPasswordModals();
-
     // 페이지 로드 시 모든 모달 초기화
     const modals = document.querySelectorAll('.modal');
     modals.forEach(modal => {
@@ -606,4 +616,5 @@ window.onload = function() {
 
     // 실제 구현 시 사용자 데이터 로드
     loadUserData();
+    document.body.style.display = 'block';
 };
