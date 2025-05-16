@@ -57,6 +57,61 @@ async function getCurrentUser() {
     }
 }
 
+// 팀 정보 수정 함수 - 개선된 버전
+function updateTeamInfo() {
+    try {
+        console.log('updateTeamInfo 함수 시작');
+        const teamId = getTeamId();
+        const teamName = document.getElementById('team-name').value.trim();
+        const description = document.getElementById('team-info').value.trim();
+
+        console.log('팀 정보:', { teamId, teamName, description });
+
+        // 유효성 검사
+        if (!teamName) {
+            alert('팀 이름을 입력해주세요.');
+            return;
+        }
+
+        // API 호출하여 팀 정보 수정
+        fetch(`/api/team/${teamId}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': localStorage.getItem('accessToken')
+            },
+            body: JSON.stringify({
+                id: teamId,
+                teamName: teamName,
+                description: description
+            })
+        })
+            .then(response => {
+                console.log('API 응답 상태:', response.status);
+                return response.json();
+            })
+            .then(data => {
+                console.log('API 응답 데이터:', data);
+
+                // 서버 응답의 result 필드를 확인하여 성공/실패 처리
+                if (data.result === 'SUCCESS') {
+                    alert('팀 정보가 성공적으로 저장되었습니다.');
+                } else {
+                    // 서버에서 반환한 실패 메시지 표시
+                    alert(`팀 정보 저장 실패: ${data.message || '알 수 없는 오류가 발생했습니다.'}`);
+                    console.error('저장 실패:', data.message);
+                }
+            })
+            .catch(error => {
+                console.error('API 호출 중 오류 발생:', error);
+                alert(`오류가 발생했습니다: ${error.message}`);
+            });
+    } catch (error) {
+        console.error('updateTeamInfo 함수 내부 오류:', error);
+        alert(`팀 정보 수정 중 오류가 발생했습니다: ${error.message}`);
+    }
+}
+
 // 팀원 목록을 불러오는 함수
 async function loadTeamMembers(teamId) {
     try {
@@ -87,6 +142,7 @@ async function loadTeamMembers(teamId) {
 
         const data = await response.json();
         currentTeamMembers = data.data || [];
+        console.log('여기까진 성공');
         renderTeamMembers(currentTeamMembers);
         return data;
 
@@ -237,48 +293,90 @@ function createStars() {
 }
 
 // 버튼 이벤트 설정
+// 버튼 이벤트 설정 함수 재정의
 function setupButtons() {
-    const backButton = document.getElementById('back-button');
-    const teamCalendarButton = document.getElementById('team-calendar-button');
-    const deleteTeamButton = document.getElementById('delete-team-button');
+    try {
+        console.log('setupButtons 함수 시작');
 
-    backButton.addEventListener('click', function() {
-        if (confirm('팀 목록으로 돌아가시겠습니까?')) {
-            window.location.href = 'team.html';
+        const backButton = document.getElementById('back-button');
+        console.log('backButton:', backButton);
+
+        const teamCalendarButton = document.getElementById('team-calendar-button');
+        console.log('teamCalendarButton:', teamCalendarButton);
+
+        const deleteTeamButton = document.getElementById('delete-team-button');
+        console.log('deleteTeamButton:', deleteTeamButton);
+
+        const saveButton = document.getElementById('save-button');
+        console.log('saveButton:', saveButton);
+
+        if (backButton) {
+            backButton.addEventListener('click', function() {
+                if (confirm('팀 목록으로 돌아가시겠습니까?')) {
+                    window.location.href = 'team.html';
+                }
+            });
+            console.log('backButton 이벤트 설정 완료');
+        } else {
+            console.warn('back-button 요소를 찾을 수 없습니다');
         }
-    });
 
-    teamCalendarButton.addEventListener('click', function() {
-        const teamId = getTeamId();
-        window.location.href = `/html/todo/teamCalendar.html?teamId=${teamId}`;
-    });
-
-    deleteTeamButton.addEventListener('click', function() {
-        const teamId = getTeamId();
-        if (confirm('정말로 팀을 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.')) {
-            if (confirm('모든 팀 데이터가 영구적으로 삭제됩니다. 계속하시겠습니까?')) {
-                // API 호출하여 팀 삭제
-                fetch(`/api/team/${teamId}`, {
-                    method: 'DELETE',
-                    headers: authHeaders()
-                })
-                    .then(response => {
-                        if (!response.ok) {
-                            throw new Error('팀 삭제에 실패했습니다.');
-                        }
-                        return response.json();
-                    })
-                    .then(data => {
-                        alert('팀이 성공적으로 삭제되었습니다.');
-                        window.location.href = 'team.html';
-                    })
-                    .catch(error => {
-                        console.error('오류 발생:', error);
-                        alert(`오류가 발생했습니다: ${error.message}`);
-                    });
-            }
+        if (teamCalendarButton) {
+            teamCalendarButton.addEventListener('click', function() {
+                const teamId = getTeamId();
+                window.location.href = `/html/todo/teamCalendar.html?teamId=${teamId}`;
+            });
+            console.log('teamCalendarButton 이벤트 설정 완료');
+        } else {
+            console.warn('team-calendar-button 요소를 찾을 수 없습니다');
         }
-    });
+
+        if (saveButton) {
+            saveButton.addEventListener('click', updateTeamInfo);
+            console.log('saveButton 이벤트 설정 완료');
+        } else {
+            console.warn('save-button 요소를 찾을 수 없습니다');
+        }
+
+        if (deleteTeamButton) {
+            deleteTeamButton.addEventListener('click', function() {
+                const teamId = getTeamId();
+                if (confirm('정말로 팀을 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.')) {
+                    if (confirm('모든 팀 데이터가 영구적으로 삭제됩니다. 계속하시겠습니까?')) {
+                        // API 호출하여 팀 삭제
+                        fetch(`/api/team/${teamId}`, {
+                            method: 'DELETE',
+                            headers: {
+                                'Authorization': localStorage.getItem('accessToken'),
+                                'Content-Type': 'application/json'
+                            }
+                        })
+                            .then(response => {
+                                if (!response.ok) {
+                                    throw new Error('팀 삭제에 실패했습니다.');
+                                }
+                                return response.json();
+                            })
+                            .then(data => {
+                                alert('팀이 성공적으로 삭제되었습니다.');
+                                window.location.href = 'team.html';
+                            })
+                            .catch(error => {
+                                console.error('오류 발생:', error);
+                                alert(`오류가 발생했습니다: ${error.message}`);
+                            });
+                    }
+                }
+            });
+            console.log('deleteTeamButton 이벤트 설정 완료');
+        } else {
+            console.warn('delete-team-button 요소를 찾을 수 없습니다');
+        }
+
+        console.log('setupButtons 함수 완료');
+    } catch (error) {
+        console.error('setupButtons 함수 오류:', error);
+    }
 }
 
 // 사용자 검색 기능
@@ -443,44 +541,70 @@ async function loadTeamInfo(teamId) {
 
 // 검색 기능 이벤트 설정
 function setupSearchFunctionality() {
-    const searchButton = document.getElementById('search-button');
-    const usernameInput = document.getElementById('username-input');
-    const searchResultsContainer = document.getElementById('search-results');
+    try {
+        const searchButton = document.getElementById('search-button');
+        const usernameInput = document.getElementById('username-input');
+        const searchResultsContainer = document.getElementById('search-results');
 
-    // 검색 버튼 클릭 이벤트
-    searchButton.addEventListener('click', searchUser);
-
-    // 엔터 키 이벤트
-    usernameInput.addEventListener('keypress', function(e) {
-        if (e.key === 'Enter') {
-            searchUser();
+        // DOM 요소 확인
+        if (!searchButton) {
+            console.error('search-button 요소를 찾을 수 없습니다.');
+            return;
         }
-    });
-
-    // 검색 입력 필드 포커스 이벤트
-    usernameInput.addEventListener('focus', function() {
-        // 검색 결과 컨테이너가 비어있지 않으면 표시
-        if (searchResultsContainer.innerHTML.trim() !== '') {
-            searchResultsContainer.classList.add('active');
+        if (!usernameInput) {
+            console.error('username-input 요소를 찾을 수 없습니다.');
+            return;
         }
-    });
-
-    // 검색 입력 필드 변경 이벤트 (초기화 시)
-    usernameInput.addEventListener('input', function() {
-        if (this.value.trim() === '') {
-            // 입력 필드가 비었을 때 검색 결과 숨기기
-            searchResultsContainer.classList.remove('active');
-            searchResultsContainer.innerHTML = '';
+        if (!searchResultsContainer) {
+            console.error('search-results 요소를 찾을 수 없습니다.');
+            return;
         }
-    });
 
-    // 문서 클릭 이벤트 (검색 결과 외부 클릭 시 결과 숨기기)
-    document.addEventListener('click', function(e) {
-        // 클릭된 요소가 검색 폼이나 검색 결과 컨테이너의 자식이 아니면 결과 숨기기
-        if (!e.target.closest('.search-form')) {
-            searchResultsContainer.classList.remove('active');
+        // searchUser 함수가 있는지 확인
+        if (typeof searchUser !== 'function') {
+            console.error('searchUser 함수가 정의되지 않았습니다.');
+            return;
         }
-    });
+
+        // 검색 버튼 클릭 이벤트
+        searchButton.addEventListener('click', searchUser);
+
+        // 엔터 키 이벤트
+        usernameInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                searchUser();
+            }
+        });
+
+        // 검색 입력 필드 포커스 이벤트
+        usernameInput.addEventListener('focus', function() {
+            // 검색 결과 컨테이너가 비어있지 않으면 표시
+            if (searchResultsContainer.innerHTML.trim() !== '') {
+                searchResultsContainer.classList.add('active');
+            }
+        });
+
+        // 검색 입력 필드 변경 이벤트 (초기화 시)
+        usernameInput.addEventListener('input', function() {
+            if (this.value.trim() === '') {
+                // 입력 필드가 비었을 때 검색 결과 숨기기
+                searchResultsContainer.classList.remove('active');
+                searchResultsContainer.innerHTML = '';
+            }
+        });
+
+        // 문서 클릭 이벤트 (검색 결과 외부 클릭 시 결과 숨기기)
+        document.addEventListener('click', function(e) {
+            // 클릭된 요소가 검색 폼이나 검색 결과 컨테이너의 자식이 아니면 결과 숨기기
+            if (!e.target.closest('.search-form')) {
+                searchResultsContainer.classList.remove('active');
+            }
+        });
+
+        console.log('검색 기능 설정 완료!');
+    } catch (error) {
+        console.error('setupSearchFunctionality 함수에서 오류 발생:', error);
+    }
 }
 
 // 페이지 초기화
@@ -522,14 +646,30 @@ document.addEventListener('DOMContentLoaded', async function() {
         // ✅ 팀장 권한 확인 성공 시, 페이지 표시 및 초기화
         document.body.style.display = 'block';
 
+        console.log('getCurrentUser 시작');
         await getCurrentUser();
+        console.log('getCurrentUser 완료');
+
+        console.log('createStars 시작');
         createStars();
+        console.log('createStars 완료');
+
+        console.log('setupButtons 시작');
         setupButtons();
+        console.log('setupButtons 완료');
+
+        console.log('setupSearchFunctionality 시작');
         setupSearchFunctionality();
+        console.log('setupSearchFunctionality 완료');
 
         // 팀 정보와 멤버 로드
+        console.log('loadTeamInfo 시작');
         await loadTeamInfo(teamId);
+        console.log('loadTeamInfo 완료');
+
+        console.log('loadTeamMembers 시작');
         await loadTeamMembers(teamId);
+        console.log('loadTeamMembers 완료');
 
     } catch (err) {
         console.error('권한 확인 중 오류:', err);
