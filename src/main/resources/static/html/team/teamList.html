@@ -789,7 +789,7 @@
     setupMemberActionButtons();
   }
 
-  // 팀 초대 목록 표시 함수
+  // 각 초대 렌더링 함수 수정
   function displayTeamInvites(invites) {
     // 컨테이너 비우기
     teamListContainer.innerHTML = '';
@@ -808,23 +808,23 @@
 
       teamItem.className = 'team-item';
       teamItem.innerHTML = `
-      <div class="invite-item" data-invite-id="${userTeam.id}">
-        <div class="team-avatar">${getInitials(team.teamName)}</div>
-        <div class="team-info">
-          <div class="team-name">${team.teamName}</div>
-          <div class="invite-from">
-            <i class="fas fa-user"></i> ${team.teamName}님이 초대함
-          </div>
-        </div>
-        <div class="invite-actions">
-          <button class="invite-action-btn accept-invite" title="수락" data-invite-id="${userTeam.id}">
-            <i class="fas fa-check"></i>
-          </button>
-          <button class="invite-action-btn decline-invite" title="거절" data-invite-id="${userTeam.id}">
-            <i class="fas fa-times"></i>
-          </button>
+    <div class="invite-item" data-invite-id="${userTeam.id}" data-team-id="${team.id}">
+      <div class="team-avatar">${getInitials(team.teamName)}</div>
+      <div class="team-info">
+        <div class="team-name">${team.teamName}</div>
+        <div class="invite-from">
+          <i class="fas fa-user"></i> ${team.teamName}님이 초대함
         </div>
       </div>
+      <div class="invite-actions">
+        <button class="invite-action-btn accept-invite" title="수락" data-invite-id="${userTeam.id}" data-team-id="${team.id}">
+          <i class="fas fa-check"></i>
+        </button>
+        <button class="invite-action-btn decline-invite" title="거절" data-invite-id="${userTeam.id}" data-team-id="${team.id}">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+    </div>
     `;
 
       teamListContainer.appendChild(teamItem);
@@ -905,7 +905,7 @@
       button.addEventListener('click', function() {
         const teamId = this.closest('.invite-item').dataset.teamId;
 
-        fetch(`/api/teams/${teamId}/member`, {
+        fetch(`/api/team/${teamId}/member`, {
           method: 'PUT', // PutMapping 사용
           headers: {
             'Content-Type': 'application/json',
@@ -928,14 +928,20 @@
       });
     });
 
-// 거절 버튼
+    // 거절 버튼
     document.querySelectorAll('.decline-invite').forEach(button => {
       button.addEventListener('click', function() {
-        const teamId = this.closest('.invite-item').dataset.teamId;
+        const teamId = this.getAttribute('data-team-id'); // 버튼에서 직접 data-team-id 속성 가져오기
+
+        if (!teamId) {
+          console.error('팀 ID를 찾을 수 없습니다.');
+          alert('팀 정보를 찾을 수 없습니다.');
+          return;
+        }
 
         // 팀 가입 거절 API 호출
-        fetch(`/api/teams/${teamId}/member`, {
-          method: 'DELETE', // DeleteMapping 사용
+        fetch(`/api/team/${teamId}/member`, {
+          method: 'DELETE',
           headers: {
             'Content-Type': 'application/json',
             'Authorization': localStorage.getItem('accessToken')
@@ -945,8 +951,7 @@
                 .then(data => {
                   if (data.result === 'SUCCESS') {
                     alert(data.message);
-                    // 초대 목록 새로고침 또는 페이지 이동
-                    location.reload();
+                    loadTeamInvites(); // 초대 목록 새로고침
                   } else {
                     alert(data.message || '초대 거절에 실패했습니다.');
                   }
@@ -957,7 +962,6 @@
                 });
       });
     });
-
   }
 
   // Create stars background

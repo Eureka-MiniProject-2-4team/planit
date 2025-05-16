@@ -67,7 +67,7 @@
     <!--UPDATE-->
     <update id="acceptTeamJoin">
         UPDATE user_team
-        SET status = 'JOIN'
+        SET status = 'JOINED'
         WHERE team_id = #{teamId}
           AND user_id = #{userId}
     </update>
