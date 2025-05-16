@@ -125,7 +125,7 @@ public class TeamTodoUserServiceImpl implements TeamTodoUserService{
             TeamTodoUserDto teamTodoUserDto = TeamTodoUserDto.builder()
                     .teamTodoId(myTeamTodoRequestDto.getTeamTodoId())
                     .userId(myTeamTodoRequestDto.getUserId())
-                    .isCompleted(!(myTeamTodoRequestDto.isCompleted()))
+                    .isCompleted(myTeamTodoRequestDto.isCompleted())
                     .build();
 
             myMapper.updateMyTeamTodo(teamTodoUserDto);

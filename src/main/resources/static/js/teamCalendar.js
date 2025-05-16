@@ -494,7 +494,7 @@ function renderTodos(todos) {
         const checkbox = document.createElement('input');
         checkbox.type = 'checkbox';
         checkbox.className = 'task-checkbox';
-        checkbox.checked = todo.isCompleted;
+        checkbox.checked = todo.completed;
         checkbox.addEventListener('change', function (e) {
             e.stopPropagation(); // 클릭 이벤트 버블링 방지 (상세보기 안 뜨게)
             e.preventDefault();  // 기본 동작 방지 (리다이렉트 방지)
@@ -504,13 +504,14 @@ function renderTodos(todos) {
             taskItem.style.opacity = newStatus ? '0.6' : '1';
 
             const token = localStorage.getItem('accessToken');
-            fetch(`/api/team/${teamId}/todo/my/${todo.id}`, {
+            fetch(`/api/team/${teamId}/todo/my/${todo.teamTodoId}`, {
                 method: 'PUT',
                 headers: {
                     'Authorization': token,
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({
+                    teamTodoId : todo.teamTodoId,
                     title: todo.title,
                     content: todo.content,
                     targetDate: todo.targetDate,
@@ -522,7 +523,7 @@ function renderTodos(todos) {
                     console.log('상태 업데이트 성공:', data);
                     // 상태만 변경하고 목록을 다시 불러오지 않음
                     // 체크박스 상태를 유지하기 위해 allTodos에서 해당 todo 업데이트
-                    const todoIndex = allTodos.findIndex(t => t.id === todo.id);
+                    const todoIndex = allTodos.findIndex(t => t.teamTodoId === todo.teamTodoId);
                     if (todoIndex >= 0) {
                         allTodos[todoIndex].isCompleted = newStatus;
                     }
@@ -565,8 +566,8 @@ function renderTodos(todos) {
             // 커스텀 시간 설정 함수 호출
             setDetailTime(formatTimeInput(todo.targetDate));
 
-            document.getElementById('detail-status').value = todo.isCompleted;
-            document.getElementById('save-detail').setAttribute('data-id', todo.id);
+            document.getElementById('detail-status').value = todo.completed;
+            document.getElementById('save-detail').setAttribute('data-id', todo.teamTodoId);
             document.getElementById('todo-detail-modal').style.display = 'flex';
         });
 
@@ -766,6 +767,7 @@ window.onload = function() {
         const targetDate = new Date(year, month - 1, day, hour, minute);
         const kstISOString = toKSTISOString(targetDate);
         const token = localStorage.getItem('accessToken');
+
         fetch(`/api/team/${teamId}/todo/${todoId}`, {
             method: 'PUT',
             headers: {
@@ -773,7 +775,7 @@ window.onload = function() {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-                todoId,
+                teamTodoId : todoId,
                 title,
                 content,
                 targetDate: kstISOString,

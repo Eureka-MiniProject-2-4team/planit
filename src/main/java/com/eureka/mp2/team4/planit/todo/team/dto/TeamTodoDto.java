@@ -1,5 +1,6 @@
 package com.eureka.mp2.team4.planit.todo.team.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -17,6 +18,7 @@ public class TeamTodoDto {
     private String teamId;
     private String title;
     private String content;
+    @JsonProperty("isCompleted")
     private boolean isCompleted;
     private Timestamp createdAt;
     private Timestamp updatedAt;
