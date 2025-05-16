@@ -51,8 +51,7 @@ public class SecurityConfig {
                 .logout(logout -> logout.disable())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/users/**").hasRole("USER")
-                        .requestMatchers("/api/team/**").hasRole("USER")
+                        .requestMatchers("/api/**","/auth/verify-password").hasRole("USER")
                         .anyRequest().permitAll())   // 임시로 모두 허용
                 .exceptionHandling(excetion -> excetion
                         .accessDeniedHandler(new PlanitAccessDeniedHandler())
