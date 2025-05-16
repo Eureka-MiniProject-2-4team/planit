@@ -508,7 +508,7 @@
   </style>
   <link rel="stylesheet" href="/css/navbar.css" />
 </head>
-<body>
+<body style="display: none;">
 <div class="stars" id="stars"></div>
 
 <div class="container">
@@ -672,23 +672,42 @@
     // 로딩 표시
     teamListContainer.innerHTML = '<div class="loading">로딩 중...</div>';
 
+    const token = localStorage.getItem('accessToken');
+    if (!token) {
+      alert('로그인이 필요합니다. 로그인 페이지로 이동합니다.');
+      window.location.href = '/html/auth/login.html';
+      return;
+    }
+
     // API 호출
     fetch('/api/team/myteamlist', {
       method: 'GET',
       headers: {
-        'Authorization': localStorage.getItem('accessToken')
+        'Authorization': token
       }
     })
-            .then(response => {
+            .then(async response => {
+              if (response.status === 401) {
+                const errorData = await response.json();
+                alert(errorData.message || '인증이 만료되었습니다. 다시 로그인해주세요.');
+                localStorage.removeItem('accessToken');
+                window.location.href = '/html/auth/login.html';
+                return;
+              }
+
               if (!response.ok) {
                 throw new Error('팀 목록을 불러오는데 실패했습니다.');
               }
+
               return response.json();
             })
             .then(data => {
+              if (!data) return; // 위에서 리턴된 경우 중단
+
               if (data.result === 'SUCCESS') {
                 renderTeams(data.data); // API 응답 데이터 처리
-              } else {
+                }
+              else {
                 teamListContainer.innerHTML = '<div class="error">팀 목록을 불러오는데 실패했습니다.</div>';
               }
             })
@@ -697,6 +716,7 @@
               teamListContainer.innerHTML = '<div class="error">서버 오류가 발생했습니다.</div>';
             });
   }
+
 
   // 팀 초대 목록 로드 함수
   function loadTeamInvites() {
@@ -1133,6 +1153,7 @@
       setupMenuSlider();
       setupFriendModal();
       initTeamPanel();
+      document.body.style.display = 'block';
     }
 </script>
 </body>

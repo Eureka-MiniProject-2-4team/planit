@@ -21,7 +21,7 @@ fetch('/html/navbar.html')
         if (logoutBtn) {
             logoutBtn.addEventListener('click', (e) => {
                 e.preventDefault();
-                localStorage.removeItem('token');
+                localStorage.removeItem('accessToken');
                 window.location.href = '/html/auth/login.html';
             });
         }

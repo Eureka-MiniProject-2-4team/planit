@@ -449,7 +449,11 @@ function updateSelectedDate(day, referenceDate = new Date()) {
 
 function fetchMyTodos() {
     const token = localStorage.getItem('accessToken');
-    if (!token) return console.error('토큰 없음');
+    if (!token) {
+        alert('로그인이 필요합니다. 로그인 페이지로 이동합니다.');
+        window.location.href = '/html/auth/login.html';
+        return;
+    }
 
     fetch('/api/todo/me', {
         method: 'GET',
@@ -458,22 +462,41 @@ function fetchMyTodos() {
             'Content-Type': 'application/json'
         }
     })
-        .then(res => res.json())
+        .then(async res => {
+            if (res.status === 401) {
+                const errorData = await res.json();
+                alert(errorData.message || '인증이 만료되었습니다. 다시 로그인해주세요.');
+                localStorage.removeItem('accessToken');
+                window.location.href = '/html/auth/login.html';
+                return;
+            }
+
+            return res.json(); // 정상 응답 처리
+        })
         .then(response => {
+            if (!response) return; // 위에서 401로 빠진 경우 처리 중단
+
             console.log('내 투두:', response);
             if (Array.isArray(response.data?.personalTodosDto)) {
                 allTodos = response.data.personalTodosDto;
+
                 const today = new Date();
                 today.setHours(0, 0, 0, 0);
-                generateCalendar();          // ✅ 여기서 캘린더 다시 그림 (할 일 기준으로 점 찍힘)
-                renderTodos(allTodos);       // 할 일 렌더링
-                highlightTodayDate();        // 오늘 날짜 강조
+
+                generateCalendar();
+                renderTodos(allTodos);
+                highlightTodayDate();
+
             } else {
                 console.error('투두 데이터가 배열이 아님:', response.data);
             }
         })
-        .catch(err => console.error('투두 조회 실패', err));
+        .catch(err => {
+            console.error('투두 조회 실패', err);
+            alert('데이터를 불러오는 중 오류가 발생했습니다.');
+        });
 }
+
 
 function renderTodos(todos) {
     if (!selectedDateKey) return;
@@ -683,12 +706,6 @@ function initializeDatePicker() {
 }
 
 window.onload = function() {
-    const token = localStorage.getItem('accessToken');
-    if (!token) {
-        alert('로그인이 필요합니다. 로그인 페이지로 이동합니다.');
-        window.location.href = '/html/auth/login.html';
-        return;
-    }
     if (selectedDateKey == null) {
         const today = new Date();
         today.setHours(0, 0, 0, 0);
@@ -697,13 +714,12 @@ window.onload = function() {
 
     // 날짜 선택기(jQuery DatePicker)만 초기화
     initializeDatePicker();
-
     // 커스텀 시간 선택기 초기화
     initializeCustomTimePickers();
-
     createStars();
     fetchMyTodos();
     highlightTodayDate();
+    document.body.style.display = 'block';
 
     document.getElementById('close-detail').addEventListener('click', function() {
         document.getElementById('todo-detail-modal').style.display = 'none';

@@ -149,7 +149,16 @@
         }
     }
 
-    window.onload = createStars;
+    window.onload = function () {
+        createStars();
+
+        const token = localStorage.getItem('accessToken');
+        if (token) {
+            // 이미 로그인된 경우
+            window.location.href = '/html/todo/myCalendar.html';
+        }
+    };
+
 
     async function login() {
         const email = document.getElementById('email').value;
@@ -168,7 +177,6 @@
 
             if (response.ok && result.data && result.data.accessToken) {
                 localStorage.setItem('accessToken', 'Bearer ' + result.data.accessToken);
-                alert('로그인 성공!');
                 window.location.href = '../todo/myCalendar.html';
             } else {
                 errorMessage.textContent = result.message || '로그인 실패';
