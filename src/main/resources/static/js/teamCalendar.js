@@ -1,5 +1,6 @@
 let allTodos = [];
 let selectedDateKey = null;
+const teamId = new URLSearchParams(window.location.search).get('teamId');
 
 // 커스텀 시간 선택기 기능
 function initializeCustomTimePickers() {
@@ -451,7 +452,7 @@ function fetchMyTodos() {
     const token = localStorage.getItem('accessToken');
     if (!token) return console.error('토큰 없음');
 
-    fetch('/api/todo/me', {
+    fetch(`/api/team/${teamId}/todo/my/list`, {
         method: 'GET',
         headers: {
             'Authorization': token,
@@ -460,9 +461,9 @@ function fetchMyTodos() {
     })
         .then(res => res.json())
         .then(response => {
-            console.log('내 투두:', response);
-            if (Array.isArray(response.data?.personalTodosDto)) {
-                allTodos = response.data.personalTodosDto;
+            console.log('내 팀 투두:', response);
+            if (Array.isArray(response.data?.myTeamTodoStatus)) {
+                allTodos = response.data.myTeamTodoStatus;
                 const today = new Date();
                 today.setHours(0, 0, 0, 0);
                 generateCalendar();          // ✅ 여기서 캘린더 다시 그림 (할 일 기준으로 점 찍힘)
@@ -503,8 +504,8 @@ function renderTodos(todos) {
             taskItem.style.opacity = newStatus ? '0.6' : '1';
 
             const token = localStorage.getItem('accessToken');
-            fetch(`/api/todo/me/${todo.id}`, {
-                method: 'PATCH',
+            fetch(`/api/team/${teamId}/todo/my/${todo.id}`, {
+                method: 'PUT',
                 headers: {
                     'Authorization': token,
                     'Content-Type': 'application/json'
@@ -614,13 +615,14 @@ function createTodo() {
         const targetDate = new Date(year, month - 1, day, hour, minute);
 
         const newTodo = {
+            teamId,
             title,
             content,
             targetDate: toKSTISOString(targetDate),
             isCompleted: false
         };
 
-        fetch('/api/todo/me', {
+        fetch(`/api/team/${teamId}/todo`, {
             method: 'POST',
             headers: {
                 'Authorization': token,
@@ -747,7 +749,7 @@ window.onload = function() {
     });
 
     document.getElementById('save-detail').addEventListener('click', function() {
-        const id = this.getAttribute('data-id');
+        const todoId = this.getAttribute('data-id');
         const title = document.getElementById('detail-title').value;
         const content = document.getElementById('detail-content').value;
         const dateInput = document.getElementById('detail-date').value;
@@ -764,13 +766,14 @@ window.onload = function() {
         const targetDate = new Date(year, month - 1, day, hour, minute);
         const kstISOString = toKSTISOString(targetDate);
         const token = localStorage.getItem('accessToken');
-        fetch(`/api/todo/me/${id}`, {
-            method: 'PATCH',
+        fetch(`/api/team/${teamId}/todo/${todoId}`, {
+            method: 'PUT',
             headers: {
                 'Authorization': token,
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({
+                todoId,
                 title,
                 content,
                 targetDate: kstISOString,
@@ -790,12 +793,12 @@ window.onload = function() {
     });
 
     document.getElementById('delete-detail').addEventListener('click', function() {
-        const id = document.getElementById('save-detail').getAttribute('data-id');
+        const todoId = document.getElementById('save-detail').getAttribute('data-id');
         const token = localStorage.getItem('accessToken');
 
         if (!confirm('정말 이 할 일을 삭제하시겠습니까?')) return;
 
-        fetch(`/api/todo/me/${id}`, {
+        fetch(`/api/team/${teamId}/todo/${todoId}`, {
             method: 'DELETE',
             headers: {
                 'Authorization': token,
@@ -817,6 +820,23 @@ window.onload = function() {
             });
     });
 };
+
+// 팀 관리 버튼 이벤트
+document.getElementById('team-manage-btn').addEventListener('click', function() {
+    // 현재 URL에서 teamId 파라미터 추출
+    const urlParams = new URLSearchParams(window.location.search);
+    const teamId = urlParams.get('teamId');
+
+    // teamId가 존재하면 팀 관리 페이지로 이동하면서 파라미터 유지
+    if (teamId) {
+        window.location.href = `/html/team/teamManage.html?teamId=${teamId}`;
+    } else {
+        // teamId가 없는 경우 처리 (오류 메시지 또는 기본 페이지로 이동)
+        alert('팀 ID를 찾을 수 없습니다.');
+        // 또는 기본 팀 페이지로 이동
+        // window.location.href = '/html/team/list.html';
+    }
+});
 
 function updateMonthDisplay() {
     const today = new Date(selectedDateKey);
