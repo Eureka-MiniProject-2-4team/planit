@@ -6,7 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.sql.Timestamp;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Builder
 @Data
@@ -20,6 +20,6 @@ public class TeamTodoUserDto {
     private boolean isCompleted;
     private Timestamp createdAt;
     private Timestamp updatedAt;
-    private LocalDate targetDate;
+    private LocalDateTime targetDate;
 
 }

@@ -4,7 +4,7 @@ import lombok.Builder;
 import lombok.Getter;
 
 import java.sql.Timestamp;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Getter
 @Builder
@@ -15,5 +15,5 @@ public class MyTeamTodoResponseDto {
     private boolean isCompleted;
     private Timestamp createdAt;
     private Timestamp updatedAt;
-    private LocalDate targetDate;
+    private LocalDateTime targetDate;
 }
