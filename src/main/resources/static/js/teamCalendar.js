@@ -450,7 +450,11 @@ function updateSelectedDate(day, referenceDate = new Date()) {
 
 function fetchMyTodos() {
     const token = localStorage.getItem('accessToken');
-    if (!token) return console.error('토큰 없음');
+    if (!token) {
+        alert('로그인이 필요합니다. 로그인 페이지로 이동합니다.');
+        window.location.href = '/html/auth/login.html';
+        return;
+    }
 
     fetch(`/api/team/${teamId}/todo/my/list`, {
         method: 'GET',
@@ -459,22 +463,59 @@ function fetchMyTodos() {
             'Content-Type': 'application/json'
         }
     })
-        .then(res => res.json())
+        .then(async res => {
+            if (res.status === 401) {
+                const errorData = await res.json();
+                alert(errorData.message || '인증이 만료되었습니다. 다시 로그인해주세요.');
+                localStorage.removeItem('accessToken');
+                window.location.href = '/html/auth/login.html';
+                return;
+            }
+
+            if (res.status === 403) {
+                const errorData = await res.json();
+                alert(errorData.message || '이 팀에 접근 권한이 없습니다.');
+                if (document.referrer) {
+                    window.location.href = 'teamList.html';
+                } else {
+                    // 이전 페이지 정보가 없으면 기본 페이지로 이동
+                    window.location.href = '/html/auth/login.html';
+                }
+                return;
+            }
+
+            if (!res.ok) {
+                throw new Error('할 일 목록 조회 실패');
+            }
+
+            return res.json();
+        })
         .then(response => {
+            if (!response) return; // 이전 단계에서 중단된 경우
+
             console.log('내 팀 투두:', response);
             if (Array.isArray(response.data?.myTeamTodoStatus)) {
                 allTodos = response.data.myTeamTodoStatus;
+
                 const today = new Date();
                 today.setHours(0, 0, 0, 0);
-                generateCalendar();          // ✅ 여기서 캘린더 다시 그림 (할 일 기준으로 점 찍힘)
-                renderTodos(allTodos);       // 할 일 렌더링
-                highlightTodayDate();        // 오늘 날짜 강조
+
+                generateCalendar();
+                renderTodos(allTodos);
+                highlightTodayDate();
+
+                // ✅ 렌더링까지 성공했으면 body 보여주기 (선택적으로)
+                document.body.style.display = 'block';
             } else {
                 console.error('투두 데이터가 배열이 아님:', response.data);
             }
         })
-        .catch(err => console.error('투두 조회 실패', err));
+        .catch(err => {
+            console.error('투두 조회 실패:', err);
+            alert('할 일 데이터를 불러오는 중 오류가 발생했습니다.');
+        });
 }
+
 
 function renderTodos(todos) {
     if (!selectedDateKey) return;
@@ -706,6 +747,7 @@ window.onload = function() {
     createStars();
     fetchMyTodos();
     highlightTodayDate();
+    document.body.style.display = 'block';
 
     document.getElementById('close-detail').addEventListener('click', function() {
         document.getElementById('todo-detail-modal').style.display = 'none';

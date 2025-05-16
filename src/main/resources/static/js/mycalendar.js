@@ -466,6 +466,7 @@ function fetchMyTodos() {
             if (res.status === 401) {
                 const errorData = await res.json();
                 alert(errorData.message || '인증이 만료되었습니다. 다시 로그인해주세요.');
+                localStorage.removeItem('accessToken');
                 window.location.href = '/html/auth/login.html';
                 return;
             }
@@ -486,8 +487,6 @@ function fetchMyTodos() {
                 renderTodos(allTodos);
                 highlightTodayDate();
 
-                // ✅ 정상 응답일 때만 본문 보이기
-                document.body.style.display = 'block';
             } else {
                 console.error('투두 데이터가 배열이 아님:', response.data);
             }
@@ -720,6 +719,7 @@ window.onload = function() {
     createStars();
     fetchMyTodos();
     highlightTodayDate();
+    document.body.style.display = 'block';
 
     document.getElementById('close-detail').addEventListener('click', function() {
         document.getElementById('todo-detail-modal').style.display = 'none';

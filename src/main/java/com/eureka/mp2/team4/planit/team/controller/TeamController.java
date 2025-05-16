@@ -2,6 +2,7 @@ package com.eureka.mp2.team4.planit.team.controller;
 
 import com.eureka.mp2.team4.planit.auth.security.PlanitUserDetails;
 import com.eureka.mp2.team4.planit.common.ApiResponse;
+import com.eureka.mp2.team4.planit.common.Result;
 import com.eureka.mp2.team4.planit.common.annotations.TeamCheck;
 import com.eureka.mp2.team4.planit.team.dto.request.TeamRequestDto;
 import com.eureka.mp2.team4.planit.team.dto.request.UserTeamRequestDto;
@@ -118,4 +119,13 @@ public class TeamController {
         String userId = planitUserDetails.getUsername();
         return ResponseEntity.ok(userTeamService.denyTeamMember(teamId, userId));
     }
+
+    @Operation(summary = "해당 팀의 팀장인지 확인", description = "프론트에서 권한 체크용으로 사용")
+    @TeamCheck(onlyLeader = true)
+    @GetMapping("/{teamId}/check-leader")
+    public ResponseEntity<ApiResponse> checkTeamLeader(@PathVariable("teamId") String teamId) {
+        // 아무 작업도 하지 않고 200 OK 반환
+        return ResponseEntity.ok(ApiResponse.builder().result(Result.SUCCESS).build());
+    }
+
 }

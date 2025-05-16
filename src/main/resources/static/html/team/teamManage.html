@@ -424,7 +424,7 @@
     }
   </style>
 </head>
-<body>
+<body style="display: none;">
 <div class="stars" id="stars"></div>
 
 <div class="container">
@@ -987,12 +987,44 @@
             return;
         }
 
-        createStars();
-        setupButtons();
-        setupInvite();
-      initTeamDetailsPage();
-        loadTeamInfo(teamId);
-        loadTeamMembers(teamId);
+      // ✅ 팀장 권한 확인
+      fetch(`/api/team/${teamId}/check-leader`, {
+        method: 'GET',
+        headers: {
+          'Authorization': localStorage.getItem('accessToken')
+        }
+      })
+              .then(async res => {
+                if (res.status === 200) {
+                  document.body.style.display = 'block'; // ✅ 통과 시 페이지 보여줌
+                  createStars();
+                  setupButtons();
+                  setupInvite();
+                  initTeamDetailsPage();
+                  loadTeamInfo(teamId);
+                  loadTeamMembers(teamId);
+                } else if (res.status === 403) {
+                  const error = await res.json();
+                  alert(error.message || '팀장만 접근할 수 있는 페이지입니다.');
+
+                  // 👉 referrer가 있다면 그쪽으로 이동, 없다면 기본 페이지로 이동
+                  if (document.referrer) {
+                    window.location.href = document.referrer;
+                  } else {
+                    window.location.href = 'teamList.html';
+                  }
+                } else {
+                  throw new Error('예상치 못한 응답');
+                }
+              })
+              .catch(err => {
+                console.error('접근 권한 확인 실패:', err);
+                alert('접근 권한을 확인하는 중 오류가 발생했습니다.');
+                window.location.href = 'teamList.html';
+              });
+
+
+
     });
 
 </script>

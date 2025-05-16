@@ -58,7 +58,7 @@ public class TeamTodoController {
 
     // 캘린더 페이지 로드 시 실행
     @Operation(summary = "나의 팀 투두 전체 조회", description = "내가 속한 팀의 모든 투두 나의 상태로 가져오기, 추후에 캘린더에서 모든 팀의 모든 투두 가져오기와 연계")
-//    @TeamCheck
+    @TeamCheck
     @GetMapping("{teamId}/todo/my/list")
     public ResponseEntity<ApiResponse> getMyTeamListTodoList(@PathVariable("teamId") String teamId, @AuthenticationPrincipal PlanitUserDetails planitUserDetails) {
         String userId = planitUserDetails.getUsername();

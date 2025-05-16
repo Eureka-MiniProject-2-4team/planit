@@ -149,7 +149,16 @@
         }
     }
 
-    window.onload = createStars;
+    window.onload = function () {
+        createStars();
+
+        const token = localStorage.getItem('accessToken');
+        if (token) {
+            // 이미 로그인된 경우
+            window.location.href = '/html/todo/myCalendar.html';
+        }
+    };
+
 
     async function login() {
         const email = document.getElementById('email').value;
