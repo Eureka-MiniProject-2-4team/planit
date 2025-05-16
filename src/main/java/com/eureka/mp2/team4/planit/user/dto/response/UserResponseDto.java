@@ -13,12 +13,6 @@ public class UserResponseDto {
     private String email;
     private String userName;
     private String nickname;
-//    private UserRole role;
-//    private LocalDateTime createdAt;
-//    private LocalDateTime updatedAt;
-//    private Boolean isActive;
-//    private String phoneNumber;
-
     private int friendCount;
     private int teamCount;
     private int todoCount;
