@@ -278,6 +278,7 @@ body {
     max-height: 500px;
 }
 
+/* 팀장/팀원에 따른 할 일 아이템 스타일 다르게 표시 */
 .task-item {
     display: flex;
     align-items: center;
@@ -295,9 +296,24 @@ body {
 .task-item:nth-child(4n+3) { border-left-color: #80ed99; }
 .task-item:nth-child(4n+4) { border-left-color: #f0c674; }
 
-.task-item:hover {
+/* 팀장인 경우에만 적용될 스타일 */
+.task-item.leader-access {
+    cursor: pointer;
+}
+
+.task-item.leader-access:hover {
     transform: translateX(5px);
     background: rgba(106, 176, 238, 0.12);
+}
+
+/* 팀원인 경우 적용될 스타일 */
+.task-item.member-only {
+    cursor: default;
+}
+
+.task-item.member-only:hover {
+    transform: none;
+    background: rgba(106, 176, 238, 0.08);
 }
 
 .task-checkbox {
