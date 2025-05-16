@@ -466,6 +466,12 @@ async function loadUserData() {
         const initials = (userData.nickname || userData.userName).substring(0, 2).toUpperCase();
         document.querySelector('.profile-avatar').textContent = initials;
 
+        // 통계 수치 표시 (친구 수, 팀 수, 일정 수)
+        document.querySelector('.stat-item:nth-child(1) .stat-value').textContent = userData.friendCount;
+        document.querySelector('.stat-item:nth-child(2) .stat-value').textContent = userData.teamCount;
+        document.querySelector('.stat-item:nth-child(3) .stat-value').textContent = userData.todoCount;
+
+
         return userData;
 
     } catch (error) {

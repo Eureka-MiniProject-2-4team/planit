@@ -33,16 +33,11 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserResponseDto getMyPageData(String userId) {
         try {
-            UserDto userDto = userMapper.findUserById(userId);
+            UserResponseDto userDto = userMapper.findMyPageData(userId);
             if (userDto == null) {
                 throw new NotFoundException(NOT_FOUND_USER);
             }
-            return UserResponseDto.builder()
-                    .email(userDto.getEmail())
-                    .phoneNumber(userDto.getPhoneNumber())
-                    .nickname(userDto.getNickName())
-                    .userName(userDto.getUserName())
-                    .build();
+            return userDto;
         } catch (NotFoundException e) {
             throw e;
         } catch (Exception e) {

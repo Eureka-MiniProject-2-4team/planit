@@ -34,6 +34,41 @@
         WHERE email = #{email}
     </select>
 
+    <select id="findMyPageData" parameterType="string" resultType="com.eureka.mp2.team4.planit.user.dto.response.UserResponseDto">
+        SELECT
+            u.id,
+            u.email,
+            u.userName,
+            u.nickname,
+
+            -- 친구 수 (양방향 포함)
+            (
+                SELECT COUNT(*)
+                FROM friend f
+                WHERE (f.requester_id = u.id OR f.receiver_id = u.id)
+                  AND f.status = 'ACCEPTED'
+            ) AS friendCount,
+
+            -- 팀 수
+            (
+                SELECT COUNT(*)
+                FROM user_team ut
+                WHERE ut.user_id = u.id
+                  AND ut.status = 'JOINED'
+            ) AS teamCount,
+
+            -- 개인 투두 수
+            (
+                SELECT COUNT(*)
+                FROM personal_todo pt
+                WHERE pt.user_id = u.id
+            ) AS todoCount
+
+        FROM users u
+        WHERE u.id = #{id}
+    </select>
+
+
     <select id="findActiveUserByEmail" parameterType="string" resultType="com.eureka.mp2.team4.planit.user.dto.UserDto">
         SELECT *
         FROM users
