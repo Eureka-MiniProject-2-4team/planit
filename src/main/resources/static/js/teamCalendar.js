@@ -1,6 +1,7 @@
 let allTodos = [];
 let selectedDateKey = null;
 const teamId = new URLSearchParams(window.location.search).get('teamId');
+let isTeamLeader = false;
 
 // 커스텀 시간 선택기 기능
 function initializeCustomTimePickers() {
@@ -517,6 +518,7 @@ function fetchMyTodos() {
 }
 
 
+// renderTodos 함수 수정
 function renderTodos(todos) {
     if (!selectedDateKey) return;
     const taskList = document.querySelector('.task-list');
@@ -530,7 +532,9 @@ function renderTodos(todos) {
 
     filtered.forEach(todo => {
         const taskItem = document.createElement('div');
-        taskItem.className = 'task-item';
+
+        // 팀장/팀원에 따라 클래스 추가
+        taskItem.className = isTeamLeader ? 'task-item leader-access' : 'task-item member-only';
 
         const checkbox = document.createElement('input');
         checkbox.type = 'checkbox';
@@ -593,28 +597,32 @@ function renderTodos(todos) {
         taskItem.appendChild(checkbox);
         taskItem.appendChild(content);
 
-        content.addEventListener('click', function (e) {
-            document.getElementById('detail-title').value = todo.title;
-            document.getElementById('detail-content').value = todo.content || '';
+        // 팀장인 경우에만 클릭 이벤트 추가
+        if (isTeamLeader) {
+            content.addEventListener('click', function (e) {
+                document.getElementById('detail-title').value = todo.title;
+                document.getElementById('detail-content').value = todo.content || '';
 
-            // 날짜 및 시간 설정
-            const todoDate = new Date(todo.targetDate);
+                // 날짜 및 시간 설정
+                const todoDate = new Date(todo.targetDate);
 
-            // 데이트피커 설정
-            $("#detail-date-display").datepicker("setDate", todoDate);
-            $("#detail-date").val(formatDateInput(todoDate));
+                // 데이트피커 설정
+                $("#detail-date-display").datepicker("setDate", todoDate);
+                $("#detail-date").val(formatDateInput(todoDate));
 
-            // 커스텀 시간 설정 함수 호출
-            setDetailTime(formatTimeInput(todo.targetDate));
+                // 커스텀 시간 설정 함수 호출
+                setDetailTime(formatTimeInput(todo.targetDate));
 
-            document.getElementById('detail-status').value = todo.completed;
-            document.getElementById('save-detail').setAttribute('data-id', todo.teamTodoId);
-            document.getElementById('todo-detail-modal').style.display = 'flex';
-        });
+                document.getElementById('detail-status').value = todo.completed;
+                document.getElementById('save-detail').setAttribute('data-id', todo.teamTodoId);
+                document.getElementById('todo-detail-modal').style.display = 'flex';
+            });
+        }
 
         taskList.appendChild(taskItem);
     });
 }
+
 
 
 function formatDateTime(dateTimeString) {
@@ -726,44 +734,58 @@ function initializeDatePicker() {
     });
 }
 
-// 팀 리더인지 확인하는 함수
+// 팀 리더인지 확인하는 함수 수정
 function checkIfTeamLeader() {
-    // URL에서 teamId 추출
-    if (!teamId) {
-        console.error('teamId가 URL에 없습니다.');
-        return;
-    }
-
-    const token = localStorage.getItem('accessToken');
-    if (!token) {
-        console.error('토큰이 없습니다.');
-        return;
-    }
-
-    // 팀 리더 확인 API 호출
-    fetch(`/api/team/${teamId}/check-leader`, {
-        method: 'GET',
-        headers: {
-            'Authorization': token,
-            'Content-Type': 'application/json'
+    return new Promise((resolve, reject) => {
+        if (!teamId) {
+            console.error('teamId가 URL에 없습니다.');
+            reject('팀 ID가 없습니다');
+            return;
         }
-    })
-        .then(response => {
-            if (response.status === 200) {
-                // 팀 리더인 경우 - 버튼 표시 유지
-                console.log('팀 리더입니다.');
-                showLeaderButtons();
-            } else {
-                // 팀 리더가 아닌 경우 - 버튼 숨김
-                console.log('팀 리더가 아닙니다.');
-                hideLeaderButtons();
+
+        const token = localStorage.getItem('accessToken');
+        if (!token) {
+            console.error('토큰이 없습니다.');
+            reject('인증 토큰이 없습니다');
+            return;
+        }
+
+        // 팀 리더 확인 API 호출
+        fetch(`/api/team/${teamId}/check-leader`, {
+            method: 'GET',
+            headers: {
+                'Authorization': token,
+                'Content-Type': 'application/json'
             }
         })
-        .catch(error => {
-            console.error('팀 리더 확인 오류:', error);
-            // 오류 발생 시 안전하게 버튼 숨김
-            hideLeaderButtons();
-        });
+            .then(response => {
+                if (response.status === 200) {
+                    console.log('팀 리더입니다.');
+                    isTeamLeader = true;
+                    showLeaderButtons();
+
+                    // 메시지 숨기기
+                    const memberMessage = document.getElementById('member-message');
+                    if (memberMessage) memberMessage.style.display = 'none';
+                    resolve(true);
+                } else {
+                    console.log('팀 리더가 아닙니다.');
+                    isTeamLeader = false;
+                    hideLeaderButtons();
+
+                    // 팀원 메시지 표시
+                    const memberMessage = document.getElementById('member-message');
+                    if (memberMessage) memberMessage.style.display = 'block';
+                    resolve(false);
+                }
+            })
+            .catch(error => {
+                console.error('팀 리더 확인 오류:', error);
+                isTeamLeader = false;
+                hideLeaderButtons();
+                reject(error);
+            });
+    });
 }
 
 // 팀 리더용 버튼 표시 함수
@@ -786,7 +808,7 @@ function hideLeaderButtons() {
     if (teamManageBtn) teamManageBtn.style.display = 'none';
 }
 
-window.onload = function() {
+window.onload = async function() {
     const token = localStorage.getItem('accessToken');
     if (!token) {
         alert('로그인이 필요합니다. 로그인 페이지로 이동합니다.');
@@ -799,16 +821,23 @@ window.onload = function() {
         selectedDateKey = today.toISOString().slice(0, 10);
     }
 
+
     // 날짜 선택기(jQuery DatePicker)만 초기화
     initializeDatePicker();
 
     // 커스텀 시간 선택기 초기화
     initializeCustomTimePickers();
-
     createStars();
+    try {
+        await checkIfTeamLeader();
+    } catch (err) {
+        console.error('권한 확인 오류:', err);
+        // 권한 확인 실패 시에도 계속 진행
+    }
+
     fetchMyTodos();
     highlightTodayDate();
-    checkIfTeamLeader();
+
     document.body.style.display = 'block';
 
     document.getElementById('close-detail').addEventListener('click', function() {
