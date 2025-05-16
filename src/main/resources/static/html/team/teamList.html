@@ -181,6 +181,22 @@
       outline: none;
     }
 
+    /* 초대 아이템 레이아웃 */
+    .invite-item {
+      display: flex;
+      align-items: center;
+      width: 100%;
+    }
+
+    /* 초대 콘텐츠 영역 (텍스트와 버튼을 포함) */
+    .invite-content {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex: 1;
+      margin-left: 15px;
+    }
+
     /* 친구 리스트 */
     .team-list {
       max-height: 400px;
@@ -293,6 +309,56 @@
 
     .team-action-btn.view-btn:hover {
       background: rgba(106, 176, 238, 0.5);
+    }
+
+    /* 초대 액션 버튼 컨테이너 */
+    .invite-actions {
+      display: flex;
+      gap: 10px;
+      margin-left: 15px;
+    }
+
+    /* 둥근 모서리 사각형 버튼 기본 스타일 */
+    .square-action-btn {
+      width: 36px; /* 약간 작게 조정 */
+      height: 36px;
+      border-radius: 8px; /* 둥근 모서리 */
+      border: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    /* 수락 버튼 (초록색) */
+    .square-action-btn.accept-btn {
+      background-color: rgba(76, 175, 80, 0.15);  /* 연한 초록색 배경 */
+      border: 2px solid #4CAF50;  /* 초록색 테두리 */
+    }
+
+    .square-action-btn.accept-btn:hover {
+      background-color: rgba(76, 175, 80, 0.3);  /* 호버 시 약간 진한 초록색 */
+    }
+
+    .square-action-btn.accept-btn i {
+      color: #4CAF50;  /* 초록색 아이콘 */
+      font-size: 20px;
+    }
+
+    /* 거절 버튼 (빨간색) */
+    .square-action-btn.decline-btn {
+      background-color: rgba(255, 87, 87, 0.15);
+      border: 2px solid #ff5757;
+    }
+
+    .square-action-btn.decline-btn:hover {
+      background-color: rgba(255, 87, 87, 0.3);
+    }
+
+    .square-action-btn.decline-btn i {
+      color: #ff5757;
+      font-size: 20px;
     }
 
     .kick-btn {
@@ -506,6 +572,7 @@
       }
     }
   </style>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
   <link rel="stylesheet" href="/css/navbar.css" />
 </head>
 <body style="display: none;">
@@ -808,23 +875,25 @@
 
       teamItem.className = 'team-item';
       teamItem.innerHTML = `
-    <div class="invite-item" data-invite-id="${userTeam.id}" data-team-id="${team.id}">
-      <div class="team-avatar">${getInitials(team.teamName)}</div>
-      <div class="team-info">
-        <div class="team-name">${team.teamName}</div>
-        <div class="invite-from">
-          <i class="fas fa-user"></i> ${team.teamName}님이 초대함
-        </div>
-      </div>
-      <div class="invite-actions">
-        <button class="invite-action-btn accept-invite" title="수락" data-invite-id="${userTeam.id}" data-team-id="${team.id}">
-          <i class="fas fa-check"></i>
-        </button>
-        <button class="invite-action-btn decline-invite" title="거절" data-invite-id="${userTeam.id}" data-team-id="${team.id}">
-          <i class="fas fa-times"></i>
-        </button>
+<div class="invite-item" data-invite-id="${userTeam.id}" data-team-id="${team.id}">
+  <div class="team-avatar">${getInitials(team.teamName)}</div>
+  <div class="invite-content">
+    <div class="team-info">
+      <div class="team-name">${team.teamName}</div>
+      <div class="invite-from">
+        <i class="fas fa-user"></i> ${team.teamName}님이 초대함
       </div>
     </div>
+    <div class="invite-actions">
+      <button class="square-action-btn accept-btn" title="수락" data-invite-id="${userTeam.id}" data-team-id="${team.id}">
+        <i class="fas fa-check"></i>
+      </button>
+      <button class="square-action-btn decline-btn" title="거절" data-invite-id="${userTeam.id}" data-team-id="${team.id}">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+  </div>
+</div>
     `;
 
       teamListContainer.appendChild(teamItem);

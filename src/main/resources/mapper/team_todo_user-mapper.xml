@@ -16,6 +16,7 @@
             team_todo td ON td.id = du.team_todo_id
         WHERE td.team_id = #{teamId}
         AND du.user_id = #{userId}
+        AND td.is_completed = true
     </select>
 
     <select id="getMyTeamTodoDetail" parameterType="java.lang.String" resultType="com.eureka.mp2.team4.planit.todo.team.dto.TeamTodoUserDto">
