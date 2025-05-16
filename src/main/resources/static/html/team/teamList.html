@@ -773,7 +773,7 @@
 
               if (data.result === 'SUCCESS') {
                 renderTeams(data.data); // API 응답 데이터 처리
-                }
+              }
               else {
                 teamListContainer.innerHTML = '<div class="error">팀 목록을 불러오는데 실패했습니다.</div>';
               }
@@ -1087,29 +1087,35 @@
   function setupMenuSlider() {
     const menuSlider = document.getElementById('menu-slider');
     const menuOptions = document.querySelectorAll('.menu-option');
+    const activeOption = document.querySelector('.menu-option.active');
 
-    function updateSlider(index) {
-      const activeOption = document.querySelector(`.menu-option[data-index="${index}"]`);
-      const width = 100 / menuOptions.length;
+    if (menuSlider && activeOption) {
+      // 활성 탭의 너비와 위치 계산
+      const optionWidth = activeOption.offsetWidth;
+      const optionLeft = activeOption.offsetLeft;
 
-      menuSlider.style.width = `${width}%`;
-      // menuSlider.style.left = `${width * index}%`;
-
-      menuOptions.forEach(option => {
-        option.classList.remove('active');
-      });
-
-      activeOption.classList.add('active');
+      // 슬라이더 스타일 설정 - 정확한 위치로 초기화
+      menuSlider.style.width = `${optionWidth}px`;
+      menuSlider.style.transform = `translateX(${optionLeft}px)`;
     }
 
-    // Initialize slider
-    updateSlider(0);
-
-    // Set up option click events
+    // 각 메뉴 옵션에 이벤트 리스너 추가
     menuOptions.forEach(option => {
       option.addEventListener('click', function() {
-        const index = this.getAttribute('data-index');
-        updateSlider(index);
+        const index = parseInt(this.getAttribute('data-index'));
+
+        // 활성 탭 업데이트
+        menuOptions.forEach(opt => opt.classList.remove('active'));
+        this.classList.add('active');
+
+        // 슬라이더 위치 업데이트
+        if (menuSlider) {
+          const optionWidth = this.offsetWidth;
+          const optionLeft = this.offsetLeft;
+
+          menuSlider.style.width = `${optionWidth}px`;
+          menuSlider.style.transform = `translateX(${optionLeft}px)`;
+        }
       });
     });
   }
@@ -1208,51 +1214,37 @@
     // 새로고침 버튼 설정
     setupRefreshButton();
 
-    // 초기 탭에 맞는 슬라이더 위치 설정
-    const activeOption = document.querySelector('.menu-option.active');
-    if (activeOption) {
-      const menuSlider = document.getElementById('menu-slider');
-      if (menuSlider) {
-        const optionWidth = activeOption.offsetWidth;
-        const optionLeft = activeOption.offsetLeft;
-        menuSlider.style.width = optionWidth + 'px';
-        menuSlider.style.transform = `translateX(${optionLeft}px)`;
+    // 초기 데이터 로드
+    loadMyTeams();
+  }
 
-        // 슬라이더가 컨테이너를 벗어나지 않도록 제한
-        const containerWidth = document.querySelector('.friends-menu').offsetWidth;
-        if (optionLeft + optionWidth > containerWidth) {
-          menuSlider.style.width = `${containerWidth - optionLeft}px`;
-
+  // 새로고침 버튼 이벤트 추가 함수
+  function setupRefreshButton() {
+    const refreshBtn = document.querySelector('.control-btn');
+    if (refreshBtn) {
+      refreshBtn.addEventListener('click', function () {
+        // 현재 탭에 따라 데이터 새로고침
+        if (currentTab === 0) {
+          loadMyTeams();
+        } else {
+          loadTeamInvites();
         }
-      }
-
-      // 초기 데이터 로드 - 항상 로드되도록 강제 호출
-      loadMyTeams();
+      });
     }
   }
 
-    // 새로고침 버튼 이벤트 추가 함수
-    function setupRefreshButton() {
-      const refreshBtn = document.querySelector('.control-btn');
-      if (refreshBtn) {
-        refreshBtn.addEventListener('click', function () {
-          // 현재 탭에 따라 데이터 새로고침
-          if (currentTab === 0) {
-            loadMyTeams();
-          } else {
-            loadTeamInvites();
-          }
-        });
-      }
-    }
+  window.onload = function () {
+    // 먼저 body를 표시하여 올바른 DOM 요소 크기와 위치를 계산할 수 있도록 함
+    document.body.style.display = 'block';
 
-    window.onload = function () {
-      createStars();
-      setupMenuSlider();
-      setupFriendModal();
-      initTeamPanel();
-      document.body.style.display = 'block';
-    }
+    // 요소 생성 및 초기화
+    createStars();
+    setupFriendModal();
+
+    // 메뉴 슬라이더를 body가 표시된 후에 설정
+    setupMenuSlider();
+    initTeamPanel();
+  }
 </script>
 </body>
 </html>

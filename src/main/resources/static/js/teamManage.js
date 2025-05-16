@@ -266,7 +266,7 @@ function setupButtons() {
     cancelButton.addEventListener('click', function() {
         if (confirm('변경 사항이 저장되지 않습니다. 취소하시겠습니까?')) {
             alert('팀 관리를 취소합니다.');
-            window.location.href = 'teamList.html'; // 실제 구현 시 활성화
+            window.location.href = 'team.html'; // 실제 구현 시 활성화
         }
     });
 
