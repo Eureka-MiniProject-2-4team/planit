@@ -726,6 +726,66 @@ function initializeDatePicker() {
     });
 }
 
+// 팀 리더인지 확인하는 함수
+function checkIfTeamLeader() {
+    // URL에서 teamId 추출
+    if (!teamId) {
+        console.error('teamId가 URL에 없습니다.');
+        return;
+    }
+
+    const token = localStorage.getItem('accessToken');
+    if (!token) {
+        console.error('토큰이 없습니다.');
+        return;
+    }
+
+    // 팀 리더 확인 API 호출
+    fetch(`/api/team/${teamId}/check-leader`, {
+        method: 'GET',
+        headers: {
+            'Authorization': token,
+            'Content-Type': 'application/json'
+        }
+    })
+        .then(response => {
+            if (response.status === 200) {
+                // 팀 리더인 경우 - 버튼 표시 유지
+                console.log('팀 리더입니다.');
+                showLeaderButtons();
+            } else {
+                // 팀 리더가 아닌 경우 - 버튼 숨김
+                console.log('팀 리더가 아닙니다.');
+                hideLeaderButtons();
+            }
+        })
+        .catch(error => {
+            console.error('팀 리더 확인 오류:', error);
+            // 오류 발생 시 안전하게 버튼 숨김
+            hideLeaderButtons();
+        });
+}
+
+// 팀 리더용 버튼 표시 함수
+function showLeaderButtons() {
+    // 할 일 추가 버튼과 팀 관리 버튼 표시
+    const addTaskBtn = document.querySelector('.add-task-btn');
+    const teamManageBtn = document.getElementById('team-manage-btn');
+
+    if (addTaskBtn) addTaskBtn.style.display = 'flex';
+    if (teamManageBtn) teamManageBtn.style.display = 'inline-block';
+}
+
+// 팀 리더용 버튼 숨김 함수
+function hideLeaderButtons() {
+    // 할 일 추가 버튼과 팀 관리 버튼 숨김
+    const addTaskBtn = document.querySelector('.add-task-btn');
+    const teamManageBtn = document.getElementById('team-manage-btn');
+
+    if (addTaskBtn) addTaskBtn.style.display = 'none';
+    if (teamManageBtn) teamManageBtn.style.display = 'none';
+}
+
 window.onload = function() {
     const token = localStorage.getItem('accessToken');
     if (!token) {
@@ -748,6 +808,7 @@ window.onload = function() {
     createStars();
     fetchMyTodos();
     highlightTodayDate();
+    checkIfTeamLeader();
     document.body.style.display = 'block';
 
     document.getElementById('close-detail').addEventListener('click', function() {
