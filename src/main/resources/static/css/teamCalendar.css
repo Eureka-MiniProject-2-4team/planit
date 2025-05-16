@@ -75,6 +75,7 @@ body {
     font-size: 22px;
     font-weight: 700;
     margin-left: 10px;
+    margin-right: auto; /* 추가: 오른쪽 여백 자동으로 설정하여 팀 관리 버튼 공간 확보 */
     font-family: 'Orbitron', sans-serif;
     letter-spacing: 1px;
 }
@@ -732,25 +733,30 @@ body {
     font-weight: bold;
 }
 
+/* 버튼 너비 조정 및 줄바꿈 방지 - 재수정된 부분 */
 .todo-btn-group {
     display: flex;
     justify-content: center;
-    gap: 15px;
+    gap: 8px; /* 간격 줄임 */
     margin-top: 30px;
+    flex-wrap: nowrap; /* 줄바꿈 방지 */
 }
 
 .todo-btn {
-    padding: 12px 24px;
+    padding: 10px 16px; /* 패딩 줄임 */
     border: none;
     border-radius: 30px;
     font-family: 'Nunito', sans-serif;
     font-weight: 700;
-    font-size: 16px;
+    font-size: 15px; /* 글자 크기 약간 줄임 */
     cursor: pointer;
     transition: all 0.3s;
     display: flex;
     align-items: center;
     justify-content: center;
+    min-width: 110px; /* 최소 너비 줄임 */
+    white-space: nowrap; /* 텍스트 줄바꿈 방지 */
+    flex: 1; /* 공간 균등 분배 */
 }
 
 .todo-btn i {
@@ -779,13 +785,14 @@ body {
     color: #fff;
 }
 
-.delete-btn {
+/* 삭제 버튼 스타일 - 이름 변경됨 */
+.todo-delete-btn {
     background: linear-gradient(135deg, #ff5c5c, #d9534f);
     color: white;
     border: none;
 }
 
-.delete-btn:hover {
+.todo-delete-btn:hover {
     background: linear-gradient(135deg, #ff7a7a, #e74c3c);
     box-shadow: 0 8px 20px rgba(255, 92, 92, 0.5);
 }
@@ -813,7 +820,6 @@ body {
 
 /* 팀 관리 버튼 스타일 */
 .team-manage-btn {
-    margin-left: auto;
     background: rgba(106, 176, 238, 0.15);
     border: none;
     color: #ffffff;
@@ -826,6 +832,12 @@ body {
     font-family: 'Nunito', sans-serif;
     letter-spacing: 0.5px;
     box-shadow: 0 0 10px rgba(106, 176, 238, 0.1);
+    display: flex;
+    align-items: center;
+}
+
+.team-manage-btn i {
+    margin-right: 5px;
 }
 
 .team-manage-btn:hover {
@@ -833,26 +845,35 @@ body {
     box-shadow: 0 0 15px rgba(106, 176, 238, 0.2);
 }
 
-/* 패널 헤더 조정 */
-.panel-header {
-    display: flex;
-    align-items: center;
-    margin-bottom: 25px;
-    padding-bottom: 15px;
-    border-bottom: 2px solid rgba(106, 176, 238, 0.2);
+/* 완료 여부 셀렉트 박스 스타일 - 새로 추가됨 */
+.todo-select {
+    width: 100%;
+    background: rgba(27, 38, 59, 0.8);
+    border: 1px solid rgba(106, 176, 238, 0.3);
+    border-radius: 12px;
+    padding: 12px 15px;
+    color: #fff;
+    font-family: 'Nunito', sans-serif;
+    font-size: 16px;
+    transition: all 0.3s;
+    appearance: none; /* 기본 드롭다운 화살표 제거 */
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='6' fill='%236ab0ee'><path d='M0 0l6 6 6-6z'/></svg>");
+    background-repeat: no-repeat;
+    background-position: right 15px center;
+    background-size: 12px;
 }
 
-.panel-title {
-    font-size: 22px;
-    font-weight: 700;
-    margin-left: 10px;
-    margin-right: 10px;
-    font-family: 'Orbitron', sans-serif;
-    letter-spacing: 1px;
-    color: #ffffff;
+.todo-select:focus {
+    outline: none;
+    border-color: rgba(106, 176, 238, 0.6);
+    box-shadow: 0 0 15px rgba(106, 176, 238, 0.2);
 }
 
-.panel-icon {
-    font-size: 20px;
-    color: #6ab0ee;
+/* 미완료/완료 옵션 스타일 */
+.todo-select option {
+    background: rgba(27, 38, 59, 0.9);
+    color: #fff;
+    padding: 10px;
 }

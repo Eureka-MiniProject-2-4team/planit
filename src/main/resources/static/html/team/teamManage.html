@@ -7,6 +7,7 @@
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap"/>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&display=swap"/>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <link rel="stylesheet" href="/css/navbar.css" />
   <link rel="stylesheet" href="/css/teamManage.css" />
 </head>
 <body style="display: none;">
@@ -28,12 +29,12 @@
   <div class="management-panel">
     <div class="form-group">
       <label for="team-name" class="form-label">팀 이름</label>
-      <input type="text" id="team-name" class="form-input" value="우주 탐험대" placeholder="팀 이름을 입력하세요">
+      <input type="text" id="team-name" class="form-input" placeholder="팀 이름을 입력하세요">
     </div>
 
     <div class="form-group">
       <label for="team-info" class="form-label">팀 정보</label>
-      <textarea id="team-info" class="form-input" placeholder="팀에 대한 설명을 입력하세요">우주 탐사 프로젝트를 함께 계획하고 실행하는 팀입니다. 별자리 관측과 천체 탐구에 관심 있는 분들의 모임입니다.</textarea>
+      <textarea id="team-info" class="form-input" placeholder="팀에 대한 설명을 입력하세요"></textarea>
     </div>
 
     <div class="section-divider">
@@ -73,13 +74,16 @@
       </div>
 
       <div class="right-buttons">
-        <button class="btn btn-cancel" id="cancel-button">취소</button>
-        <button class="btn btn-save" id="save-button">저장</button>
+        <button class="btn btn-calendar" id="team-calendar-button">
+          <i class="fas fa-calendar-alt"></i> 팀 캘린더로 가기
+        </button>
       </div>
     </div>
   </div>
 </div>
+<div id="navbar-container"></div>
 
+<script src="/js/mycalendar.js"></script>
 <script src="/js/teamManage.js"></script>
 </body>
 </html>

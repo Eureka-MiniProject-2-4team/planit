@@ -476,7 +476,7 @@ function fetchMyTodos() {
                 const errorData = await res.json();
                 alert(errorData.message || '이 팀에 접근 권한이 없습니다.');
                 if (document.referrer) {
-                    window.location.href = 'teamList.html';
+                    window.location.href = 'team.html';
                 } else {
                     // 이전 페이지 정보가 없으면 기본 페이지로 이동
                     window.location.href = '/html/auth/login.html';
@@ -927,19 +927,24 @@ window.onload = function() {
 };
 
 // 팀 관리 버튼 이벤트
-document.getElementById('team-manage-btn').addEventListener('click', function() {
-    // 현재 URL에서 teamId 파라미터 추출
-    const urlParams = new URLSearchParams(window.location.search);
-    const teamId = urlParams.get('teamId');
+document.addEventListener('DOMContentLoaded', function() {
+    const teamManageBtn = document.getElementById('team-manage-btn');
+    if (teamManageBtn) {
+        teamManageBtn.addEventListener('click', function() {
+            // 현재 URL에서 teamId 파라미터 추출
+            const urlParams = new URLSearchParams(window.location.search);
+            const teamId = urlParams.get('teamId');
 
-    // teamId가 존재하면 팀 관리 페이지로 이동하면서 파라미터 유지
-    if (teamId) {
-        window.location.href = `/html/team/teamManage.html?teamId=${teamId}`;
-    } else {
-        // teamId가 없는 경우 처리 (오류 메시지 또는 기본 페이지로 이동)
-        alert('팀 ID를 찾을 수 없습니다.');
-        // 또는 기본 팀 페이지로 이동
-        // window.location.href = '/html/team/list.html';
+            // teamId가 존재하면 팀 관리 페이지로 이동하면서 파라미터 유지
+            if (teamId) {
+                window.location.href = `/html/team/teamManage.html?teamId=${teamId}`;
+            } else {
+                // teamId가 없는 경우 처리 (오류 메시지 또는 기본 페이지로 이동)
+                alert('팀 ID를 찾을 수 없습니다.');
+                // 또는 기본 팀 페이지로 이동
+                // window.location.href = '/html/team/list.html';
+            }
+        });
     }
 });
 

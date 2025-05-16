@@ -9,7 +9,8 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
   <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
   <link rel="stylesheet" href="/css/navbar.css" />
-  <link rel="stylesheet" href="/css/teamCalendar.css"/>
+  <link rel="stylesheet" href="/css/teamCalendar.css" />
+</head>
 <body style="display: none;">
 <div class="stars" id="stars"></div>
 
@@ -59,8 +60,10 @@
     <div class="panel task-panel">
       <div class="panel-header">
         <i class="fas fa-tasks panel-icon"></i>
-        <div class="panel-title">팀의 todo 리스트</div>
-        <button class="team-manage-btn" id="team-manage-btn">팀 관리</button>
+        <div class="panel-title">우리 팀의 todo 리스트</div>
+        <button class="team-manage-btn" id="team-manage-btn">
+          <i class="fas fa-users"></i> 팀 관리
+        </button>
       </div>
 
       <div class="user-info">
@@ -200,7 +203,7 @@
 
     <div class="todo-form-group">
       <label for="detail-status">완료 여부</label>
-      <select id="detail-status" class="todo-input">
+      <select id="detail-status" class="todo-select">
         <option value="false">미완료</option>
         <option value="true">완료</option>
       </select>
@@ -210,7 +213,7 @@
       <button id="save-detail" class="todo-btn todo-save-btn">
         <i class="fas fa-save"></i> 수정하기
       </button>
-      <button id="delete-detail" class="todo-btn todo-cancel-btn delete-btn">
+      <button id="delete-detail" class="todo-btn todo-delete-btn">
         <i class="fas fa-trash-alt"></i> 삭제하기
       </button>
       <button id="close-detail" class="todo-btn todo-cancel-btn">
@@ -223,7 +226,7 @@
 <div id="navbar-container"></div>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
-<script src="/js/navbar.js"></script>
 <script src="/js/teamCalendar.js"></script>
+<script src="/js/navbar.js"></script>
 </body>
 </html>

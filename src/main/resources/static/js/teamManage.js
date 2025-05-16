@@ -87,7 +87,7 @@ async function loadTeamMembers(teamId) {
 
         const data = await response.json();
         currentTeamMembers = data.data || [];
-        renderTeamMembers(data.data, data.currentUserRole);
+        renderTeamMembers(currentTeamMembers);
         return data;
 
     } catch (error) {
@@ -97,7 +97,7 @@ async function loadTeamMembers(teamId) {
 }
 
 // 팀원 목록 렌더링 함수
-function renderTeamMembers(members, currentUserRole) {
+function renderTeamMembers(members) {
     const memberListContainer = document.querySelector('.member-list');
 
     // 컨테이너 비우기
@@ -121,6 +121,8 @@ function renderTeamMembers(members, currentUserRole) {
         // HTML 생성
         const memberItem = document.createElement('div');
         memberItem.className = 'member-item';
+
+        // 방출 버튼이 항상 보이도록 HTML 수정
         memberItem.innerHTML = `
             <div class="member-avatar">${initials}</div>
             <div class="member-info">
@@ -129,11 +131,8 @@ function renderTeamMembers(members, currentUserRole) {
                     ${isLeader ? '<span class="leader-badge">팀장</span>' : ''}
                 </div>
             </div>
-            <div class="member-actions">
-                <button class="member-action-btn view-btn" title="프로필 보기" data-user-id="${member.userId}">
-                    <i class="fas fa-id-badge"></i>
-                </button>
-                ${(currentUserRole === 'LEADER' && !isLeader) ? `
+            <div class="member-actions always-visible">
+                ${(!isLeader) ? `
                     <button class="member-action-btn kick-btn" title="팀에서 내보내기" data-user-id="${member.userId}">
                         <i class="fas fa-user-minus"></i>
                     </button>
@@ -150,16 +149,6 @@ function renderTeamMembers(members, currentUserRole) {
 
 // 멤버 액션 버튼 이벤트 설정
 function setupMemberActionButtons() {
-    // 프로필 보기 버튼
-    document.querySelectorAll('.view-btn').forEach(button => {
-        button.addEventListener('click', function() {
-            const userId = this.getAttribute('data-user-id');
-            // 프로필 보기 로직 구현
-            alert(`사용자 ID: ${userId}의 프로필을 봅니다.`);
-            // 실제 구현에서는 프로필 페이지로 이동하거나 모달 표시 등
-        });
-    });
-
     // 강퇴 버튼
     document.querySelectorAll('.kick-btn').forEach(button => {
         button.addEventListener('click', function() {
@@ -193,8 +182,6 @@ function setupMemberActionButtons() {
                         return response.json();
                     })
                     .then(data => {
-                        console.log('API 응답:', data);
-
                         // 성공 시 UI에서 멤버 제거 (애니메이션 효과)
                         memberItem.style.transition = 'all 0.3s ease';
                         memberItem.style.opacity = '0';
@@ -252,60 +239,18 @@ function createStars() {
 // 버튼 이벤트 설정
 function setupButtons() {
     const backButton = document.getElementById('back-button');
-    const cancelButton = document.getElementById('cancel-button');
-    const saveButton = document.getElementById('save-button');
+    const teamCalendarButton = document.getElementById('team-calendar-button');
     const deleteTeamButton = document.getElementById('delete-team-button');
 
     backButton.addEventListener('click', function() {
-        if (confirm('변경 사항이 저장되지 않습니다. 팀 목록으로 돌아가시겠습니까?')) {
-            alert('팀 목록 페이지로 이동합니다.');
-            window.location.href = 'teamList.html'; // 실제 구현 시 활성화
+        if (confirm('팀 목록으로 돌아가시겠습니까?')) {
+            window.location.href = 'team.html';
         }
     });
 
-    cancelButton.addEventListener('click', function() {
-        if (confirm('변경 사항이 저장되지 않습니다. 취소하시겠습니까?')) {
-            alert('팀 관리를 취소합니다.');
-            window.location.href = 'teamList.html'; // 실제 구현 시 활성화
-        }
-    });
-
-    saveButton.addEventListener('click', function() {
+    teamCalendarButton.addEventListener('click', function() {
         const teamId = getTeamId();
-        const teamName = document.getElementById('team-name').value;
-        const description = document.getElementById('team-info').value;
-
-        // 유효성 검사
-        if (!teamName.trim()) {
-            alert('팀 이름을 입력해주세요.');
-            return;
-        }
-
-        // API 호출하여 팀 정보 수정
-        fetch(`/api/team/${teamId}`, {
-            method: 'PUT',
-            headers: authHeaders(),
-            body: JSON.stringify({
-                teamName: teamName,
-                description: description
-            })
-        })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('팀 정보 수정에 실패했습니다.');
-                }
-                return response.json();
-            })
-            .then(data => {
-                console.log('API 응답:', data);
-                alert('팀 정보가 성공적으로 저장되었습니다.');
-                // 저장 성공 후 리다이렉트 또는 추가 작업
-                // window.location.href = 'teamList.html'; // 실제 구현 시 활성화
-            })
-            .catch(error => {
-                console.error('오류 발생:', error);
-                alert(`오류가 발생했습니다: ${error.message}`);
-            });
+        window.location.href = `/html/todo/teamCalendar.html?teamId=${teamId}`;
     });
 
     deleteTeamButton.addEventListener('click', function() {
@@ -324,10 +269,8 @@ function setupButtons() {
                         return response.json();
                     })
                     .then(data => {
-                        console.log('API 응답:', data);
                         alert('팀이 성공적으로 삭제되었습니다.');
-                        // 팀 목록 페이지로 리다이렉트
-                        window.location.href = 'teamList.html'; // 실제 구현 시 활성화
+                        window.location.href = 'team.html';
                     })
                     .catch(error => {
                         console.error('오류 발생:', error);
@@ -367,7 +310,7 @@ async function searchUser() {
             const div = document.createElement('div');
             div.className = 'search-result-item';
 
-// 버튼 상태 결정
+            // 버튼 상태 결정
             let buttonHtml = '';
             if (isCurrentUser) {
                 buttonHtml = `<button class="request-btn" disabled>본인입니다</button>`;
@@ -417,7 +360,7 @@ function setupInviteButtons() {
 
             if (confirm(`${userName}님을 팀에 초대하시겠습니까?`)) {
                 try {
-                    // API 호출로 팀원 초대 - 원본 코드와 동일한 방식으로
+                    // API 호출로 팀원 초대
                     const response = await fetch(`/api/team/${teamId}/member`, {
                         method: 'POST',
                         headers: {
@@ -436,7 +379,6 @@ function setupInviteButtons() {
                     }
 
                     const data = await response.json();
-                    console.log('API 응답:', data);
                     alert(`${userName}님에게 초대 메시지가 전송되었습니다.`);
 
                     // 버튼 상태 업데이트
@@ -458,6 +400,13 @@ function setupInviteButtons() {
 // 팀 정보 로드 함수
 async function loadTeamInfo(teamId) {
     try {
+        // 로딩 상태 표시
+        const teamNameInput = document.getElementById('team-name');
+        const teamInfoInput = document.getElementById('team-info');
+
+        if (teamNameInput) teamNameInput.value = '로딩 중...';
+        if (teamInfoInput) teamInfoInput.value = '로딩 중...';
+
         const response = await fetch(`/api/team/${teamId}`, {
             method: 'GET',
             headers: authHeaders()
@@ -468,57 +417,25 @@ async function loadTeamInfo(teamId) {
         }
 
         const data = await response.json();
-        // 폼에 데이터 채우기
-        document.getElementById('team-name').value = data.teamName || '';
-        document.getElementById('team-info').value = data.description || '';
-    } catch (error) {
-        console.error('오류 발생:', error);
-        alert(`팀 정보를 불러오는 중 오류가 발생했습니다: ${error.message}`);
-    }
-}
 
-// 팀 상세 정보 로드 함수
-async function loadTeamDetails(teamId) {
-    // 로딩 상태 표시 (필요한 경우)
-    const teamNameInput = document.getElementById('team-name');
-    const teamInfoInput = document.getElementById('team-info');
-
-    if (teamNameInput) teamNameInput.value = '로딩 중...';
-    if (teamInfoInput) teamInfoInput.value = '로딩 중...';
-
-    try {
-        const response = await fetch(`/api/team/${teamId}`, {
-            method: 'GET',
-            headers: authHeaders()
-        });
-
-        if (!response.ok) {
-            throw new Error('팀 정보를 불러오는데 실패했습니다.');
-        }
-
-        const data = await response.json();
-        console.log('팀 상세 정보:', data);
-
-        if (data.result === 'SUCCESS') {
-            // 응답 데이터에서 필요한 정보 추출
+        // API 응답 구조 확인
+        if (data.result === 'SUCCESS' && data.data) {
             const team = data.data;
 
             // 폼에 데이터 채우기
             if (teamNameInput) teamNameInput.value = team.teamName || '';
             if (teamInfoInput) teamInfoInput.value = team.description || '';
         } else {
-            // 오류 처리
-            alert('팀 정보를 불러오는데 실패했습니다: ' + (data.message || '알 수 없는 오류'));
-
-            // 입력 필드 초기화
-            if (teamNameInput) teamNameInput.value = '';
-            if (teamInfoInput) teamInfoInput.value = '';
+            throw new Error(data.message || '팀 정보를 불러오는데 실패했습니다.');
         }
     } catch (error) {
         console.error('팀 정보 로드 중 오류:', error);
-        alert('팀 정보를 불러오는 중 오류가 발생했습니다.');
+        alert(`팀 정보를 불러오는 중 오류가 발생했습니다: ${error.message}`);
 
         // 입력 필드 초기화
+        const teamNameInput = document.getElementById('team-name');
+        const teamInfoInput = document.getElementById('team-info');
+
         if (teamNameInput) teamNameInput.value = '';
         if (teamInfoInput) teamInfoInput.value = '';
     }
@@ -566,28 +483,13 @@ function setupSearchFunctionality() {
     });
 }
 
-// 페이지 로드 시 팀 ID 파라미터를 URL에서 추출하여 상세 정보 로드
-function initTeamDetailsPage() {
-    // URL에서 쿼리 파라미터로 팀 ID 추출
-    const urlParams = new URLSearchParams(window.location.search);
-    const teamId = urlParams.get('teamId');
-
-    // 유효한 ID가 있는 경우 상세 정보 로드
-    if (teamId && teamId.trim() !== '') {
-        loadTeamDetails(teamId);
-    } else {
-        console.error('URL에서 팀 ID를 찾을 수 없습니다.');
-        alert('팀 정보를 불러올 수 없습니다. 올바른 경로로 접근해주세요.');
-    }
-}
-
 // 페이지 초기화
 document.addEventListener('DOMContentLoaded', async function() {
     const teamId = getTeamId();
 
     if (!teamId) {
         alert('팀 ID를 찾을 수 없습니다. 팀 목록 페이지로 이동합니다.');
-        window.location.href = 'teamList.html';
+        window.location.href = 'team.html';
         return;
     }
 
@@ -624,13 +526,14 @@ document.addEventListener('DOMContentLoaded', async function() {
         createStars();
         setupButtons();
         setupSearchFunctionality();
-        initTeamDetailsPage();
-        loadTeamInfo(teamId);
+
+        // 팀 정보와 멤버 로드
+        await loadTeamInfo(teamId);
         await loadTeamMembers(teamId);
 
     } catch (err) {
         console.error('권한 확인 중 오류:', err);
         alert('페이지 접근 권한을 확인하는 중 오류가 발생했습니다.');
-        window.location.href = 'teamList.html';
+        window.location.href = 'team.html';
     }
 });

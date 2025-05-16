@@ -547,6 +547,34 @@ body {
     resize: vertical;
 }
 
+/* 커스텀 셀렉트 박스 (완료 여부 드롭다운) 스타일링 */
+.custom-select {
+    background: rgba(27, 38, 59, 0.8) url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 4 5'%3E%3Cpath fill='%236ab0ee' d='M2 0L0 2h4zm0 5L0 3h4z'/%3E%3C/svg%3E") no-repeat right 1rem center;
+    background-size: 8px 10px;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    color: #fff;
+    font-size: 16px;
+    border: 1px solid rgba(106, 176, 238, 0.3);
+    border-radius: 12px;
+    padding: 12px 15px;
+    width: 100%;
+    cursor: pointer;
+}
+
+.custom-select:focus {
+    outline: none;
+    border-color: rgba(106, 176, 238, 0.6);
+    box-shadow: 0 0 15px rgba(106, 176, 238, 0.2);
+}
+
+.custom-select option {
+    background-color: #1b263b;
+    color: #fff;
+    padding: 10px;
+}
+
 /* Improved date-time picker */
 .datetime-picker {
     display: flex;
@@ -734,23 +762,27 @@ body {
 
 .todo-btn-group {
     display: flex;
-    justify-content: center;
-    gap: 15px;
+    justify-content: space-between; /* 변경: 버튼들을 양 끝으로 배치 */
+    flex-wrap: wrap; /* 추가: 필요시 줄바꿈 허용 */
+    gap: 10px; /* 간격 줄임 */
     margin-top: 30px;
 }
 
 .todo-btn {
-    padding: 12px 24px;
+    padding: 12px 18px; /* 패딩 조정 */
     border: none;
     border-radius: 30px;
     font-family: 'Nunito', sans-serif;
     font-weight: 700;
-    font-size: 16px;
+    font-size: 15px; /* 폰트 크기 약간 줄임 */
     cursor: pointer;
     transition: all 0.3s;
     display: flex;
     align-items: center;
     justify-content: center;
+    flex: 1; /* 버튼 너비 확장 */
+    min-width: 120px; /* 최소 너비 설정 */
+    white-space: nowrap; /* 텍스트 줄바꿈 방지 */
 }
 
 .todo-btn i {
@@ -779,15 +811,18 @@ body {
     color: #fff;
 }
 
-.delete-btn {
+/* 삭제 버튼 별도 스타일 */
+.todo-delete-btn {
     background: linear-gradient(135deg, #ff5c5c, #d9534f);
     color: white;
     border: none;
+    box-shadow: 0 5px 15px rgba(255, 92, 92, 0.3);
 }
 
-.delete-btn:hover {
+.todo-delete-btn:hover {
     background: linear-gradient(135deg, #ff7a7a, #e74c3c);
     box-shadow: 0 8px 20px rgba(255, 92, 92, 0.5);
+    transform: translateY(-3px);
 }
 
 @keyframes fadeIn {

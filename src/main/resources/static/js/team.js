@@ -189,7 +189,7 @@ function renderTeams(teams) {
     </div>
     <div class="team-actions">
       <button class="team-action-btn view-btn" title="선택" data-team-id="${team.id}">
-        <i class="fas fa-check"></i>
+        <i class="fas fa-sign-in-alt"></i>
       </button>
       <button class="team-action-btn kick-btn" title="탈퇴" data-team-id="${team.id}">
         <i class="fas fa-sign-out-alt"></i>

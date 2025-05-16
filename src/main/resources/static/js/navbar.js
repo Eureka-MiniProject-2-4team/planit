@@ -27,29 +27,16 @@ function setupTeamNavLink() {
     const urlParams = new URLSearchParams(window.location.search);
     const currentTeamId = urlParams.get('teamId');
 
-    // 팀 ID가 URL에 있으면 저장
+    // 팀 ID가 URL에 있으면 저장 (나중에 팀 선택 후 다시 사용할 수 있도록)
     if (currentTeamId) {
         localStorage.setItem('lastViewedTeamId', currentTeamId);
     }
 
-    // 최근 방문한 팀이 있는지 확인
-    const lastTeamId = localStorage.getItem('lastViewedTeamId');
-
-    // 팀 메뉴 클릭 이벤트 핸들러
+    // 팀 메뉴 클릭 이벤트 핸들러 - 항상 팀 목록 페이지로 이동
     teamNavItem.addEventListener('click', function(e) {
-        // 현재 이미 팀 캘린더 페이지에 있고 URL에 teamId가 있는 경우
-        if (isTeamCalendar && currentTeamId) {
-            e.preventDefault();
-            // 팀 목록 페이지로 이동
-            window.location.href = '/html/team/team.html';
-        }
-        // 최근 방문한 팀이 있고, 현재 팀 캘린더 페이지가 아닌 경우
-        else if (lastTeamId && !isTeamCalendar) {
-            e.preventDefault();
-            // 해당 팀의 캘린더로 이동
-            window.location.href = `/html/todo/teamCalendar.html?teamId=${lastTeamId}`;
-        }
-        // 그 외의 경우는 기본 동작 (팀 목록 페이지로 이동)
+        e.preventDefault();
+        // 무조건 팀 목록 페이지로 이동
+        window.location.href = '/html/team/team.html';
     });
 }
 

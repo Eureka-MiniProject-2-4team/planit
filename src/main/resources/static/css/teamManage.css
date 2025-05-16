@@ -43,7 +43,6 @@ body {
     width: 100%;
     z-index: 1;
     position: relative;
-
     margin: 0 auto;
 }
 
@@ -225,6 +224,13 @@ textarea.form-input {
     transition: opacity 0.3s ease;
 }
 
+/* 항상 보이는 member-actions 스타일 추가 */
+.member-actions.always-visible {
+    opacity: 1;
+    display: flex;
+    gap: 8px;
+}
+
 .member-item:hover .member-actions {
     opacity: 1;
 }
@@ -247,10 +253,6 @@ textarea.form-input {
 .member-action-btn:hover {
     background: rgba(106, 176, 238, 0.3);
     transform: scale(1.1);
-}
-
-.view-btn:hover {
-    background: rgba(106, 176, 238, 0.4);
 }
 
 .kick-btn {
@@ -480,6 +482,23 @@ textarea.form-input {
 
 .back-icon {
     margin-right: 5px;
+}
+
+.btn-calendar {
+    background: linear-gradient(135deg, #6ab0ee, #4a90da);
+    color: white;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.btn-calendar:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(106, 176, 238, 0.3);
+}
+
+.btn-calendar i {
+    font-size: 16px;
 }
 
 /* 반응형 */
