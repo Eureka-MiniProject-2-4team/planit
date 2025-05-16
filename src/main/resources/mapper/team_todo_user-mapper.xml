@@ -10,7 +10,7 @@
     </insert>
 
     <select id="getMyTeamTodoList" parameterType="java.lang.String" resultType="com.eureka.mp2.team4.planit.todo.team.dto.TeamTodoUserDto">
-        SELECT td.title, td.content, td.created_at, du.team_todo_id, du.is_completed, du.updated_at
+        SELECT td.title, td.content, td.created_at, td.target_date, du.team_todo_id, du.is_completed, du.updated_at
         FROM team_todo_user du
         JOIN
             team_todo td ON td.id = du.team_todo_id
