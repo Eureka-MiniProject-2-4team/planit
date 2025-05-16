@@ -903,7 +903,7 @@
     setupMemberActionButtons();
   }
 
-  // 멤버 액션 버튼 이벤트 설정
+  // 멤버 액션 버튼 이벤트 설정 함수 수정
   function setupMemberActionButtons() {
     // 프로필 보기 버튼
     document.querySelectorAll('.view-btn').forEach(button => {
@@ -913,102 +913,123 @@
       });
     });
 
-      // 강퇴 버튼
-      document.querySelectorAll('.kick-btn').forEach(button => {
-        button.addEventListener('click', function () {
-          const teamId = this.getAttribute('data-team-id');
-          const teamItem = this.closest('.team-item');
-          const teamName = teamItem.querySelector('.team-name').textContent.trim();
+    // 강퇴 버튼
+    document.querySelectorAll('.kick-btn').forEach(button => {
+      button.addEventListener('click', function () {
+        const teamId = this.getAttribute('data-team-id');
+        const teamItem = this.closest('.team-item');
+        const teamName = teamItem.querySelector('.team-name').textContent.trim();
 
-          if (!teamId) {
-            alert('팀 ID를 찾을 수 없습니다.');
-            return;
-          }
+        if (!teamId) {
+          alert('팀 ID를 찾을 수 없습니다.');
+          return;
+        }
 
-          if (confirm(`정말로 ${teamName} 팀에서 탈퇴 하시겠습니까?`)) {
-            // API 호출로 팀원 강퇴
-            fetch(`/api/team/${teamId}/member`, {
-              method: 'DELETE',
-              headers: {
-                'Authorization': localStorage.getItem('accessToken')
-              }
-            })
-                    .then(response => {
-                      // 응답 상태에 따라 다른 처리
-                      if (!response.ok) {
-                        // HTTP 에러 상태 (400, 401, 403, 404, 500 등)
-                        return response.json().then(errorData => {
-                          // 서버에서 보낸 에러 데이터 사용
-                          throw new Error(errorData.message || '요청 처리 중 오류가 발생했습니다.');
-                        });
-                      }
-                      return response.json();
-                    })
-                    .then(data => {
-                      if(data.message.includes('팀장')){
-                        alert('팀 리더는 탈퇴할 수 없습니다. 먼저 리더 권한을 다른 멤버에게 위임해주세요.');
-                      } else{
-                        console.log('API 응답:', data);
-                        // 성공적인 응답 처리
-                        alert(`${teamName}팀에서 탈퇴했습니다.`);
-                        // UI 업데이트 로직...
-                      }
-                    })
-                    .catch(error => {
-                      console.error('오류 발생:', error);
+        if (confirm(`정말로 ${teamName} 팀에서 탈퇴 하시겠습니까?`)) {
+          // API 호출로 팀원 강퇴
+          fetch(`/api/team/${teamId}/member`, {
+            method: 'DELETE',
+            headers: {
+              'Authorization': localStorage.getItem('accessToken')
+            }
+          })
+                  .then(response => {
+                    // 응답 상태에 따라 다른 처리
+                    if (!response.ok) {
+                      // HTTP 에러 상태 (400, 401, 403, 404, 500 등)
+                      return response.json().then(errorData => {
+                        // 서버에서 보낸 에러 데이터 사용
+                        throw new Error(errorData.message || '요청 처리 중 오류가 발생했습니다.');
+                      });
+                    }
+                    return response.json();
+                  })
+                  .then(data => {
+                    if (data.message.includes('팀장')) {
+                      alert('팀 리더는 탈퇴할 수 없습니다. 먼저 리더 권한을 다른 멤버에게 위임해주세요.');
+                    } else {
+                      console.log('API 응답:', data);
+                      // 성공적인 응답 처리
+                      alert(`${teamName}팀에서 탈퇴했습니다.`);
+                      // UI 업데이트 로직...
+                      loadMyTeams(); // 팀 목록 새로고침
+                    }
+                  })
+                  .catch(error => {
+                    console.error('오류 발생:', error);
 
-                      // 에러 메시지에 따라 다른 처리
-                      if (error.message.includes('리더는 팀을 탈퇴할 수 없습니다') ||
-                              error.message === LEADER_CANNOT_DENY_TEAM) {
-                        alert('팀 리더는 탈퇴할 수 없습니다. 먼저 리더 권한을 다른 멤버에게 위임해주세요.');
-                      } else {
-                        alert(`오류가 발생했습니다: ${error.message}`);
-                      }
-                    });
-          }
-        });
+                    // 에러 메시지에 따라 다른 처리
+                    if (error.message.includes('리더는 팀을 탈퇴할 수 없습니다') ||
+                            error.message === LEADER_CANNOT_DENY_TEAM) {
+                      alert('팀 리더는 탈퇴할 수 없습니다. 먼저 리더 권한을 다른 멤버에게 위임해주세요.');
+                    } else {
+                      alert(`오류가 발생했습니다: ${error.message}`);
+                    }
+                  });
+        }
       });
+    });
 
-    // 수락 버튼
-    document.querySelectorAll('.accept-invite').forEach(button => {
+    // 수락 버튼 - 클래스 이름 변경: accept-invite -> accept-btn
+    document.querySelectorAll('.accept-btn').forEach(button => {
       button.addEventListener('click', function() {
-        const teamId = this.closest('.invite-item').dataset.teamId;
+        // 버튼에서 직접 data-team-id 속성 가져오기
+        const teamId = this.getAttribute('data-team-id');
+
+        if (!teamId) {
+          console.error('팀 ID를 찾을 수 없습니다:', this);
+          alert('팀 정보를 찾을 수 없습니다.');
+          return;
+        }
+
+        console.log('초대 수락 시도 - 팀 ID:', teamId); // 디버깅용
 
         fetch(`/api/team/${teamId}/member`, {
-          method: 'PUT', // PutMapping 사용
+          method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
             'Authorization': localStorage.getItem('accessToken')
           }
         })
-                .then(response => response.json())
+                .then(response => {
+                  if (!response.ok) {
+                    return response.json().then(errorData => {
+                      throw new Error(errorData.message || '요청 처리 중 오류가 발생했습니다.');
+                    });
+                  }
+                  return response.json();
+                })
                 .then(data => {
-                  if (data.result === 'SUCCESS') {
-                    alert(data.message);
+                  console.log('초대 수락 성공:', data);
+                  alert(data.message || '초대를 수락했습니다.');
+
+                  // 초대 수락 후 처리
+                  if (currentTab === 1) {
                     loadTeamInvites(); // 초대 목록 새로고침
                   } else {
-                    alert(data.message || '초대 수락에 실패했습니다.');
+                    loadMyTeams(); // 팀 목록으로 새로고침
                   }
                 })
                 .catch(error => {
                   console.error('초대 수락 중 오류:', error);
-                  alert('서버 오류가 발생했습니다.');
+                  alert(`오류가 발생했습니다: ${error.message}`);
                 });
       });
     });
 
-    // 거절 버튼
-    document.querySelectorAll('.decline-invite').forEach(button => {
+    // 거절 버튼 - 클래스 이름 변경: decline-invite -> decline-btn
+    document.querySelectorAll('.decline-btn').forEach(button => {
       button.addEventListener('click', function() {
-        const teamId = this.getAttribute('data-team-id'); // 버튼에서 직접 data-team-id 속성 가져오기
+        const teamId = this.getAttribute('data-team-id');
 
         if (!teamId) {
-          console.error('팀 ID를 찾을 수 없습니다.');
+          console.error('팀 ID를 찾을 수 없습니다:', this);
           alert('팀 정보를 찾을 수 없습니다.');
           return;
         }
 
-        // 팀 가입 거절 API 호출
+        console.log('초대 거절 시도 - 팀 ID:', teamId); // 디버깅용
+
         fetch(`/api/team/${teamId}/member`, {
           method: 'DELETE',
           headers: {
@@ -1016,18 +1037,22 @@
             'Authorization': localStorage.getItem('accessToken')
           }
         })
-                .then(response => response.json())
-                .then(data => {
-                  if (data.result === 'SUCCESS') {
-                    alert(data.message);
-                    loadTeamInvites(); // 초대 목록 새로고침
-                  } else {
-                    alert(data.message || '초대 거절에 실패했습니다.');
+                .then(response => {
+                  if (!response.ok) {
+                    return response.json().then(errorData => {
+                      throw new Error(errorData.message || '요청 처리 중 오류가 발생했습니다.');
+                    });
                   }
+                  return response.json();
+                })
+                .then(data => {
+                  console.log('초대 거절 성공:', data);
+                  alert(data.message || '초대를 거절했습니다.');
+                  loadTeamInvites(); // 초대 목록 새로고침
                 })
                 .catch(error => {
                   console.error('초대 거절 중 오류:', error);
-                  alert('서버 오류가 발생했습니다.');
+                  alert(`오류가 발생했습니다: ${error.message}`);
                 });
       });
     });

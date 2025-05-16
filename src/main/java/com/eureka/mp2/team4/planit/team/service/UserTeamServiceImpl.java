@@ -10,6 +10,9 @@ import com.eureka.mp2.team4.planit.team.dto.request.UserTeamRequestDto;
 import com.eureka.mp2.team4.planit.team.dto.response.MyTeamResponseDto;
 import com.eureka.mp2.team4.planit.team.mapper.TeamMapper;
 import com.eureka.mp2.team4.planit.team.mapper.UserTeamMapper;
+import com.eureka.mp2.team4.planit.todo.team.dto.TeamTodoDto;
+import com.eureka.mp2.team4.planit.todo.team.mapper.TeamTodoMapper;
+import com.eureka.mp2.team4.planit.todo.team.mapper.TeamTodoUserMapper;
 import com.eureka.mp2.team4.planit.user.mapper.UserMapper;
 import lombok.RequiredArgsConstructor;
 import org.apache.coyote.BadRequestException;
@@ -31,6 +34,8 @@ public class UserTeamServiceImpl implements UserTeamService {
 
     private final UserTeamMapper userTeamMapper;
     private final TeamMapper teamMapper;
+    private final TeamTodoMapper teamTodoMapper;
+    private final TeamTodoUserMapper teamTodoUserMapper;
 
     @Override
     public ApiResponse inviteTeamMember(UserTeamRequestDto userTeamRequestDto) {
@@ -151,13 +156,23 @@ public class UserTeamServiceImpl implements UserTeamService {
     }
 
     @Override
+    @Transactional
     public ApiResponse acceptTeamJoin(String teamId, String userId) {
         try {
             if (teamMapper.findTeamById(teamId) == null) {
                 throw new NotFoundException(NOT_FOUND_ID);
             }
 
-            userTeamMapper.acceptTeamJoin(teamId, userId);
+            List<TeamTodoDto> teamTodoDtoList = teamTodoMapper.getTeamTodoList(teamId);
+
+            if(teamTodoDtoList.isEmpty()){
+                userTeamMapper.acceptTeamJoin(teamId, userId);
+            } else{
+                userTeamMapper.acceptTeamJoin(teamId, userId);
+                for(TeamTodoDto dto : teamTodoDtoList){
+                    teamTodoUserMapper.registerTeamTodoToMembers(dto.getId(), userId);
+                }
+            }
 
             return ApiResponse.builder()
                     .result(Result.SUCCESS)
