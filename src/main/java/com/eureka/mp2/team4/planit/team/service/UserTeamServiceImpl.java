@@ -60,7 +60,7 @@ public class UserTeamServiceImpl implements UserTeamService {
         } catch (DuplicateKeyException de) {
             de.printStackTrace();
             return ApiResponse.builder()
-                    .result(Result.FAIL)
+                    .result(Result.DUPLICATED)
                     .message(DUPLICATED_INVITED)
                     .build();
         } catch (Exception e){

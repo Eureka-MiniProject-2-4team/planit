@@ -505,7 +505,6 @@ function fetchMyTodos() {
                 renderTodos(allTodos);
                 highlightTodayDate();
 
-                // ✅ 렌더링까지 성공했으면 body 보여주기 (선택적으로)
                 document.body.style.display = 'block';
             } else {
                 console.error('투두 데이터가 배열이 아님:', response.data);

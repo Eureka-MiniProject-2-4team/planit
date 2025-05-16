@@ -9,7 +9,6 @@ fetch('/html/navbar.html')
         // 현재 경로 활성화 표시
         highlightCurrentPath();
 
-        // ✅ 로그아웃 버튼 이벤트 연결
         setupLogoutButton();
     });
 

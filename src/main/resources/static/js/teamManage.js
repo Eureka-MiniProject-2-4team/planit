@@ -65,7 +65,7 @@ function updateTeamInfo() {
         const teamName = document.getElementById('team-name').value.trim();
         const description = document.getElementById('team-info').value.trim();
 
-        console.log('팀 정보:', { teamId, teamName, description });
+        console.log('팀 정보:', {teamId, teamName, description});
 
         // 유효성 검사
         if (!teamName) {
@@ -207,7 +207,7 @@ function renderTeamMembers(members) {
 function setupMemberActionButtons() {
     // 강퇴 버튼
     document.querySelectorAll('.kick-btn').forEach(button => {
-        button.addEventListener('click', function() {
+        button.addEventListener('click', function () {
             const userId = this.getAttribute('data-user-id');
             const memberItem = this.closest('.member-item');
             const memberName = memberItem.querySelector('.member-name').textContent.trim();
@@ -311,7 +311,7 @@ function setupButtons() {
         console.log('saveButton:', saveButton);
 
         if (backButton) {
-            backButton.addEventListener('click', function() {
+            backButton.addEventListener('click', function () {
                 if (confirm('팀 목록으로 돌아가시겠습니까?')) {
                     window.location.href = 'team.html';
                 }
@@ -322,7 +322,7 @@ function setupButtons() {
         }
 
         if (teamCalendarButton) {
-            teamCalendarButton.addEventListener('click', function() {
+            teamCalendarButton.addEventListener('click', function () {
                 const teamId = getTeamId();
                 window.location.href = `/html/todo/teamCalendar.html?teamId=${teamId}`;
             });
@@ -339,7 +339,7 @@ function setupButtons() {
         }
 
         if (deleteTeamButton) {
-            deleteTeamButton.addEventListener('click', function() {
+            deleteTeamButton.addEventListener('click', function () {
                 const teamId = getTeamId();
                 if (confirm('정말로 팀을 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.')) {
                     if (confirm('모든 팀 데이터가 영구적으로 삭제됩니다. 계속하시겠습니까?')) {
@@ -451,14 +451,13 @@ async function searchUser() {
 // 초대 버튼 이벤트 설정
 function setupInviteButtons() {
     document.querySelectorAll('.invite-btn').forEach(button => {
-        button.addEventListener('click', async function() {
+        button.addEventListener('click', async function () {
             const userId = this.getAttribute('data-user-id');
             const userName = this.closest('.search-result-item').querySelector('.search-result-name').textContent;
             const teamId = getTeamId();
 
             if (confirm(`${userName}님을 팀에 초대하시겠습니까?`)) {
                 try {
-                    // API 호출로 팀원 초대
                     const response = await fetch(`/api/team/${teamId}/member`, {
                         method: 'POST',
                         headers: {
@@ -472,11 +471,13 @@ function setupInviteButtons() {
                         })
                     });
 
-                    if (!response.ok) {
-                        throw new Error('팀원 초대에 실패했습니다.');
+                    const data = await response.json();
+
+                    if (!response.ok || data.result === 'DUPLICATED') {
+                        alert(`${userName}님은 이미 초대되었습니다.`);
+                        return;
                     }
 
-                    const data = await response.json();
                     alert(`${userName}님에게 초대 메시지가 전송되었습니다.`);
 
                     // 버튼 상태 업데이트
@@ -486,6 +487,7 @@ function setupInviteButtons() {
 
                     // 검색 입력 필드 초기화
                     document.getElementById('username-input').value = '';
+
                 } catch (error) {
                     console.error('초대 중 오류:', error);
                     alert(`초대 중 오류가 발생했습니다: ${error.message}`);
@@ -494,6 +496,7 @@ function setupInviteButtons() {
         });
     });
 }
+
 
 // 팀 정보 로드 함수
 async function loadTeamInfo(teamId) {
@@ -570,14 +573,14 @@ function setupSearchFunctionality() {
         searchButton.addEventListener('click', searchUser);
 
         // 엔터 키 이벤트
-        usernameInput.addEventListener('keypress', function(e) {
+        usernameInput.addEventListener('keypress', function (e) {
             if (e.key === 'Enter') {
                 searchUser();
             }
         });
 
         // 검색 입력 필드 포커스 이벤트
-        usernameInput.addEventListener('focus', function() {
+        usernameInput.addEventListener('focus', function () {
             // 검색 결과 컨테이너가 비어있지 않으면 표시
             if (searchResultsContainer.innerHTML.trim() !== '') {
                 searchResultsContainer.classList.add('active');
@@ -585,7 +588,7 @@ function setupSearchFunctionality() {
         });
 
         // 검색 입력 필드 변경 이벤트 (초기화 시)
-        usernameInput.addEventListener('input', function() {
+        usernameInput.addEventListener('input', function () {
             if (this.value.trim() === '') {
                 // 입력 필드가 비었을 때 검색 결과 숨기기
                 searchResultsContainer.classList.remove('active');
@@ -594,7 +597,7 @@ function setupSearchFunctionality() {
         });
 
         // 문서 클릭 이벤트 (검색 결과 외부 클릭 시 결과 숨기기)
-        document.addEventListener('click', function(e) {
+        document.addEventListener('click', function (e) {
             // 클릭된 요소가 검색 폼이나 검색 결과 컨테이너의 자식이 아니면 결과 숨기기
             if (!e.target.closest('.search-form')) {
                 searchResultsContainer.classList.remove('active');
@@ -608,7 +611,7 @@ function setupSearchFunctionality() {
 }
 
 // 페이지 초기화
-document.addEventListener('DOMContentLoaded', async function() {
+document.addEventListener('DOMContentLoaded', async function () {
     const teamId = getTeamId();
 
     if (!teamId) {
@@ -617,7 +620,6 @@ document.addEventListener('DOMContentLoaded', async function() {
         return;
     }
 
-    // ✅ 팀장 권한 확인 먼저 수행
     try {
         const res = await fetch(`/api/team/${teamId}/check-leader`, {
             method: 'GET',
@@ -643,7 +645,6 @@ document.addEventListener('DOMContentLoaded', async function() {
             throw new Error('권한 확인 중 오류가 발생했습니다.');
         }
 
-        // ✅ 팀장 권한 확인 성공 시, 페이지 표시 및 초기화
         document.body.style.display = 'block';
 
         console.log('getCurrentUser 시작');
