@@ -9,13 +9,17 @@ import java.time.LocalDateTime;
 @Getter
 @Builder
 public class UserResponseDto {
-    private final String id;
-    private final String email;
-    private final String userName;
-    private final String nickname;
-    private final UserRole role;
-    private final LocalDateTime createdAt;
-    private final LocalDateTime updatedAt;
-    private final Boolean isActive;
-    private final String phoneNumber;
+    private String id;
+    private String email;
+    private String userName;
+    private String nickname;
+//    private UserRole role;
+//    private LocalDateTime createdAt;
+//    private LocalDateTime updatedAt;
+//    private Boolean isActive;
+//    private String phoneNumber;
+
+    private int friendCount;
+    private int teamCount;
+    private int todoCount;
 }
