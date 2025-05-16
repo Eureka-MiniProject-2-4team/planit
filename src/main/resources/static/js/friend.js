@@ -1,5 +1,4 @@
 // 1. JWT 헤더 생성
-// 1. JWT 헤더 생성
 function authHeaders() {
     const raw = localStorage.getItem('accessToken') || '';
     const token = raw.replace(/^Bearer\s+/i, '');
