@@ -148,6 +148,53 @@ textarea.form-input {
     margin-right: 8px;
 }
 
+.form-actions {
+    display: flex;
+    justify-content: flex-end; /* 오른쪽 정렬 */
+    margin-top: 10px; /* textarea와의 간격 */
+    margin-bottom: 20px; /* 팀원 관리 섹션과의 간격 */
+}
+
+.form-textarea {
+    width: 100%;
+    min-height: 100px;
+    margin-bottom: 0; /* 기존 마진 제거하여 form-actions와 간격 조절 */
+}
+
+/* 수정 버튼을 위한 추가 CSS */
+.btn-edit {
+    background: linear-gradient(135deg, #6ab0ee, #4a90da);
+    color: white;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border-radius: 10px;
+    padding: 8px 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+    font-family: 'Nunito', sans-serif;
+    border: none;
+    /* 절대 위치 제거 */
+    /* position: absolute; */
+    /* right: 0; */
+    /* bottom: 10px; */
+}
+
+.btn-edit:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(106, 176, 238, 0.3);
+}
+
+.btn-edit i {
+    font-size: 16px;
+}
+
+/* 팀 정보 폼 그룹에 상대 위치 지정 */
+.form-group {
+    position: relative;
+}
+
 .member-list {
     max-height: 200px;
     overflow-y: auto;
