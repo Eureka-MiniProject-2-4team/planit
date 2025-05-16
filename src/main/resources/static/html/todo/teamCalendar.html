@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>PLAN!T - 우주 플래너</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap"/>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&display=swap"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
+  <link rel="stylesheet" href="/css/navbar.css" />
+  <link rel="stylesheet" href="/css/teamCalendar.css"/>
+<body>
+<div class="stars" id="stars"></div>
+
+<div class="container">
+  <header class="header">
+    <div class="logo">
+      <i class="fas fa-rocket logo-icon"></i>
+      PLAN!T
+    </div>
+  </header>
+
+  <div class="dashboard">
+    <div class="panel calendar-panel">
+      <div class="panel-header">
+        <i class="fas fa-calendar-alt panel-icon"></i>
+        <div class="panel-title">캘린더</div>
+      </div>
+
+      <div class="month-nav">
+        <div class="month-controls">
+          <button class="nav-btn" id="prev-month"><i class="fas fa-chevron-left"></i></button>
+          <div class="month-display">2025년 5월</div>
+          <button class="nav-btn" id="next-month"><i class="fas fa-chevron-right"></i></button>
+        </div>
+        <button class="today-btn" id="today-btn">
+          <i class="fas fa-calendar-day"></i> 오늘로 가기
+        </button>
+      </div>
+
+      <div class="calendar">
+        <div class="calendar-days">
+          <div class="day-label">일</div>
+          <div class="day-label">월</div>
+          <div class="day-label">화</div>
+          <div class="day-label">수</div>
+          <div class="day-label">목</div>
+          <div class="day-label">금</div>
+          <div class="day-label">토</div>
+        </div>
+
+        <div class="calendar-dates" id="calendar-grid">
+          <!-- Calendar dates will be inserted here by JavaScript -->
+        </div>
+      </div>
+    </div>
+
+    <div class="panel task-panel">
+      <div class="panel-header">
+        <i class="fas fa-tasks panel-icon"></i>
+        <div class="panel-title">팀의 todo 리스트</div>
+        <button class="team-manage-btn" id="team-manage-btn">팀 관리</button>
+      </div>
+
+      <div class="user-info">
+        <div class="date-display">
+          <i class="fas fa-calendar-day"></i>
+          2025년 5월 16일 (금)
+        </div>
+      </div>
+
+      <div class="task-list">
+        <!-- Tasks will be inserted here by JavaScript -->
+      </div>
+
+      <button class="add-task-btn">
+        <i class="fas fa-plus"></i>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Improved Todo Addition Modal -->
+<div id="todo-modal" class="todo-modal">
+  <div class="todo-modal-content">
+    <div class="todo-modal-header">
+      <h3 class="todo-modal-title"><i class="fas fa-meteor"></i> 새로운 할 일 추가</h3>
+    </div>
+
+    <div class="todo-form-group">
+      <label for="todo-title">제목</label>
+      <input id="todo-title" type="text" class="todo-input" placeholder="할 일의 제목을 입력하세요" />
+    </div>
+
+    <div class="todo-form-group">
+      <label for="todo-content">내용</label>
+      <textarea id="todo-content" class="todo-textarea" placeholder="상세 내용을 입력하세요 (선택사항)"></textarea>
+    </div>
+
+    <div class="datetime-picker">
+      <div class="date-input-container todo-form-group">
+        <label for="todo-date-display">날짜</label>
+        <div class="input-with-icon">
+          <i class="fas fa-calendar-alt"></i>
+          <input id="todo-date-display" type="text" class="date-input-display" placeholder="날짜 선택" readonly />
+        </div>
+        <input id="todo-date" type="hidden" />
+      </div>
+
+      <!-- 커스텀 시간 선택기 -->
+      <div class="time-input-container todo-form-group">
+        <label for="todo-time-display">시간</label>
+        <div class="custom-time-picker">
+          <div class="input-with-icon">
+            <i class="fas fa-clock"></i>
+            <input id="todo-time-display" type="text" class="time-input-display" placeholder="시간 선택" readonly />
+          </div>
+          <div class="time-dropdown">
+            <div class="time-columns">
+              <div class="time-column period-column">
+                <!-- 오전/오후 선택 -->
+              </div>
+              <div class="time-column hours-column">
+                <!-- 시간은 JavaScript로 동적 생성됨 -->
+              </div>
+              <div class="time-column minutes-column">
+                <!-- 분은 JavaScript로 동적 생성됨 -->
+              </div>
+            </div>
+          </div>
+        </div>
+        <input id="todo-time" type="hidden" />
+      </div>
+    </div>
+
+    <div class="todo-btn-group">
+      <button id="save-todo" class="todo-btn todo-save-btn">
+        <i class="fas fa-rocket"></i> 저장
+      </button>
+      <button id="cancel-todo" class="todo-btn todo-cancel-btn">
+        <i class="fas fa-times"></i> 취소
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Also updated detail modal with the same styling -->
+<div id="todo-detail-modal" class="todo-modal">
+  <div class="todo-modal-content">
+    <div class="todo-modal-header">
+      <h3 class="todo-modal-title"><i class="fas fa-meteor"></i> 할 일 상세 / 수정</h3>
+    </div>
+
+    <div class="todo-form-group">
+      <label for="detail-title">제목</label>
+      <input id="detail-title" type="text" class="todo-input" />
+    </div>
+
+    <div class="todo-form-group">
+      <label for="detail-content">내용</label>
+      <textarea id="detail-content" class="todo-textarea"></textarea>
+    </div>
+
+    <div class="datetime-picker">
+      <div class="date-input-container todo-form-group">
+        <label for="detail-date-display">날짜</label>
+        <div class="input-with-icon">
+          <i class="fas fa-calendar-alt"></i>
+          <input id="detail-date-display" type="text" class="date-input-display" placeholder="날짜 선택" readonly />
+        </div>
+        <input id="detail-date" type="hidden" />
+      </div>
+
+      <!-- 커스텀 시간 선택기 -->
+      <div class="time-input-container todo-form-group">
+        <label for="detail-time-display">시간</label>
+        <div class="custom-time-picker">
+          <div class="input-with-icon">
+            <i class="fas fa-clock"></i>
+            <input id="detail-time-display" type="text" class="time-input-display" placeholder="시간 선택" readonly />
+          </div>
+          <div class="time-dropdown">
+            <div class="time-columns">
+              <div class="time-column period-column">
+                <!-- 오전/오후 선택 -->
+              </div>
+              <div class="time-column hours-column">
+                <!-- 시간은 JavaScript로 동적 생성됨 -->
+              </div>
+              <div class="time-column minutes-column">
+                <!-- 분은 JavaScript로 동적 생성됨 -->
+              </div>
+            </div>
+          </div>
+        </div>
+        <input id="detail-time" type="hidden" />
+      </div>
+    </div>
+
+    <div class="todo-form-group">
+      <label for="detail-status">완료 여부</label>
+      <select id="detail-status" class="todo-input">
+        <option value="false">미완료</option>
+        <option value="true">완료</option>
+      </select>
+    </div>
+
+    <div class="todo-btn-group">
+      <button id="save-detail" class="todo-btn todo-save-btn">
+        <i class="fas fa-save"></i> 수정하기
+      </button>
+      <button id="delete-detail" class="todo-btn todo-cancel-btn delete-btn">
+        <i class="fas fa-trash-alt"></i> 삭제하기
+      </button>
+      <button id="close-detail" class="todo-btn todo-cancel-btn">
+        <i class="fas fa-times"></i> 닫기
+      </button>
+    </div>
+  </div>
+</div>
+
+<div id="navbar-container"></div>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
+<script src="/js/navbar.js"></script>
+<script src="/js/teamCalendar.js"></script>
+</body>
+</html>

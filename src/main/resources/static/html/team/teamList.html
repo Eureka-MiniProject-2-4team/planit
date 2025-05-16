@@ -306,7 +306,7 @@
     /* 하단 컨트롤 */
     .bottom-controls {
       display: flex;
-      justify-content: center;
+      justify-content: space-between;
       margin-top: 20px;
     }
 
@@ -458,98 +458,6 @@
       gap: 10px;
     }
 
-    /* Navbar */
-    .navbar {
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      width: 100%;
-      background: rgba(15, 32, 39, 0.9);
-      backdrop-filter: blur(10px);
-      padding: 15px;
-      display: flex;
-      justify-content: center;
-      border-top: 1px solid rgba(106, 176, 238, 0.2);
-      z-index: 100;
-      box-shadow: 0 -5px 20px rgba(0, 0, 0, 0.3);
-    }
-
-    .nav-container {
-      display: flex;
-      justify-content: space-around;
-      width: 100%;
-      max-width: 600px; /* Limit width for better layout */
-    }
-
-    .nav-item {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      color: rgba(255, 255, 255, 0.7);
-      text-decoration: none;
-      transition: all 0.3s;
-      position: relative;
-      padding: 8px 15px;
-      border-radius: 20px;
-    }
-
-    .nav-item:hover {
-      color: #fff;
-      background: rgba(106, 176, 238, 0.1);
-      transform: translateY(-5px);
-    }
-
-    .nav-item.active {
-      color: #fff;
-      text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
-    }
-
-    .nav-item.active::after {
-      content: '';
-      position: absolute;
-      bottom: -3px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 6px;
-      height: 6px;
-      border-radius: 50%;
-      background-color: #6ab0ee;
-      box-shadow: 0 0 10px #6ab0ee;
-    }
-
-    .nav-icon {
-      font-size: 24px;
-      margin-bottom: 5px;
-    }
-
-    .nav-text {
-      font-size: 12px;
-      font-weight: 600;
-    }
-
-    /* 로고 스타일 */
-    .nav-logo {
-      position: absolute;
-      left: 50%;
-      top: -25px;
-      transform: translateX(-50%);
-      width: 50px;
-      height: 50px;
-      background: linear-gradient(135deg, #0f2027, #2c5364);
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      box-shadow: 0 0 20px rgba(0, 0, 0, 0.4), 0 0 10px rgba(106, 176, 238, 0.4);
-      border: 2px solid rgba(106, 176, 238, 0.2);
-      z-index: 101;
-      font-size: 22px;
-      font-weight: bold;
-      color: #fff;
-      font-family: 'Orbitron', sans-serif;
-      text-shadow: 0 0 10px rgba(106, 176, 238, 0.5);
-    }
-
     /* 애니메이션 효과 */
     @keyframes slideIn {
       from { transform: translateY(30px); opacity: 0; }
@@ -573,18 +481,6 @@
 
     /* 미디어 쿼리 */
     @media (max-width: 768px) {
-      .nav-text {
-        display: none;
-      }
-
-      .navbar {
-        padding: 10px;
-      }
-
-      .nav-icon {
-        font-size: 22px;
-        margin-bottom: 0;
-      }
 
       .header {
         padding: 10px 0;
@@ -610,6 +506,7 @@
       }
     }
   </style>
+  <link rel="stylesheet" href="/css/navbar.css" />
 </head>
 <body>
 <div class="stars" id="stars"></div>
@@ -647,32 +544,44 @@
       <button class="control-btn">
         <i class="fas fa-sync-alt"></i> 새로고침
       </button>
+      <button class="control-btn add-btn" id="add-friend-btn">
+        <i class="fas fa-user-plus"></i> 팀 생성
+      </button>
     </div>
   </div>
 </div>
 
-<nav class="navbar">
-  <div class="nav-container">
-    <div class="nav-logo">P!T</div>
-    <a href="#" class="nav-item">
-      <i class="fas fa-user nav-icon"></i>
-      <span class="nav-text">나</span>
-    </a>
-    <a href="#" class="nav-item active">
-      <i class="fas fa-users nav-icon"></i>
-      <span class="nav-text">친구</span>
-    </a>
-    <a href="#" class="nav-item">
-      <i class="fas fa-user-tie nav-icon"></i>
-      <span class="nav-text">팀</span>
-    </a>
-    <a href="#" class="nav-item">
-      <i class="fas fa-user-astronaut nav-icon"></i>
-      <span class="nav-text">마이페이지</span>
-    </a>
+<!-- 친구 추가 모달 -->
+<div class="friend-modal" id="friend-modal" style="display: none;">
+  <div class="modal-content">
+    <button class="close-modal" id="close-modal">
+      <i class="fas fa-times"></i>
+    </button>
+    <div class="modal-header">
+      <div class="modal-title">나의 팀 생성</div>
+      <div class="modal-subtitle">팀을 생성해 팀원들과 투두를 공유해보세요!</div>
+    </div>
+    <form class="friend-form">
+      <div class="form-group">
+        <label class="form-label">팀 이름</label>
+        <input type="text" id="team-name" class="form-input" placeholder="(필수)" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">팀 소개</label>
+        <input type="text" id="team-desc" class="form-input" placeholder="간단한 팀 소개를 해주세요~" />
+      </div>
+      <div class="form-actions">
+        <button type="button" class="control-btn" id="cancel-btn">취소</button>
+        <button type="button" class="control-btn add-btn" id ="create-team-btn">팀 생성</button>
+      </div>
+    </form>
   </div>
-</nav>
+</div>
 
+<div id="navbar-container"></div>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
+<script src="/js/navbar.js"></script>
 <script>
   // 멤버 이니셜 생성 함수
   function getInitials(name) {
@@ -911,7 +820,7 @@
     document.querySelectorAll('.view-btn').forEach(button => {
       button.addEventListener('click', function () {
         const teamId = this.getAttribute('data-team-id');
-        window.location.href = `/html/todo/calendar.html?teamId=${teamId}`;
+        window.location.href = `/html/todo/teamCalendar.html?teamId=${teamId}`;
       });
     });
 
@@ -936,31 +845,36 @@
               }
             })
                     .then(response => {
+                      // 응답 상태에 따라 다른 처리
                       if (!response.ok) {
-                        throw new Error('팀 탈퇴에 실패했습니다.');
+                        // HTTP 에러 상태 (400, 401, 403, 404, 500 등)
+                        return response.json().then(errorData => {
+                          // 서버에서 보낸 에러 데이터 사용
+                          throw new Error(errorData.message || '요청 처리 중 오류가 발생했습니다.');
+                        });
                       }
                       return response.json();
                     })
                     .then(data => {
-                      console.log('API 응답:', data);
-
-                      // 성공 시 UI에서 멤버 제거 (애니메이션 효과)
-                      teamItem.style.transition = 'all 0.3s ease';
-                      teamItem.style.opacity = '0';
-                      teamItem.style.height = '0';
-                      teamItem.style.padding = '0';
-                      teamItem.style.margin = '0';
-                      teamItem.style.overflow = 'hidden';
-
-                      setTimeout(() => {
-                        teamItem.remove();
-                      }, 300);
-
-                      alert(`${teamName}팀에서 탈퇴했습니다.`);
+                      if(data.message.includes('팀장')){
+                        alert('팀 리더는 탈퇴할 수 없습니다. 먼저 리더 권한을 다른 멤버에게 위임해주세요.');
+                      } else{
+                        console.log('API 응답:', data);
+                        // 성공적인 응답 처리
+                        alert(`${teamName}팀에서 탈퇴했습니다.`);
+                        // UI 업데이트 로직...
+                      }
                     })
                     .catch(error => {
                       console.error('오류 발생:', error);
-                      alert(`오류가 발생했습니다: ${error.message}`);
+
+                      // 에러 메시지에 따라 다른 처리
+                      if (error.message.includes('리더는 팀을 탈퇴할 수 없습니다') ||
+                              error.message === LEADER_CANNOT_DENY_TEAM) {
+                        alert('팀 리더는 탈퇴할 수 없습니다. 먼저 리더 권한을 다른 멤버에게 위임해주세요.');
+                      } else {
+                        alert(`오류가 발생했습니다: ${error.message}`);
+                      }
                     });
           }
         });
@@ -981,7 +895,7 @@
                 .then(response => response.json())
                 .then(data => {
                   if (data.result === 'SUCCESS') {
-                    alert('팀 초대를 수락했습니다.');
+                    alert(data.message);
                     loadTeamInvites(); // 초대 목록 새로고침
                   } else {
                     alert(data.message || '초대 수락에 실패했습니다.');
@@ -1010,7 +924,7 @@
                 .then(response => response.json())
                 .then(data => {
                   if (data.result === 'SUCCESS') {
-                    alert('팀 초대를 거절했습니다.');
+                    alert(data.message);
                     // 초대 목록 새로고침 또는 페이지 이동
                     location.reload();
                   } else {
@@ -1061,7 +975,7 @@
       const width = 100 / menuOptions.length;
 
       menuSlider.style.width = `${width}%`;
-      menuSlider.style.left = `${width * index}%`;
+      // menuSlider.style.left = `${width * index}%`;
 
       menuOptions.forEach(option => {
         option.classList.remove('active');
@@ -1082,20 +996,89 @@
     });
   }
 
-  // Set up navbar
-  function setupNavbar() {
-    const navItems = document.querySelectorAll('.nav-item');
+  // Set up friend modal
+  function setupFriendModal() {
+    const modal = document.getElementById('friend-modal');
+    const addFriendBtn = document.getElementById('add-friend-btn');
+    const closeModalBtn = document.getElementById('close-modal');
+    const cancelBtn = document.getElementById('cancel-btn');
+    const createTeamBtn = document.getElementById('create-team-btn');
 
-    navItems.forEach(item => {
-      item.addEventListener('click', function(e) {
-        e.preventDefault();
+    if (!modal || !addFriendBtn || !closeModalBtn || !cancelBtn || !createTeamBtn) {
+      console.error('모달 요소를 찾을 수 없습니다.');
+      return;
+    }
 
-        // Remove active class from all items
-        navItems.forEach(i => i.classList.remove('active'));
+    addFriendBtn.addEventListener('click', function() {
+      console.log('모달 열기 버튼 클릭됨');  // 디버깅용
+      modal.style.display = 'flex';
+    });
 
-        // Add active class to clicked item
-        this.classList.add('active');
-      });
+    closeModalBtn.addEventListener('click', function() {
+      modal.style.display = 'none';
+    });
+
+    cancelBtn.addEventListener('click', function() {
+      modal.style.display = 'none';
+    });
+
+    createTeamBtn.addEventListener('click', function (){
+      // 팀 이름과 설명 가져오기 - 수정된 placeholder에 맞게 선택자 변경
+      const teamNameInput = document.getElementById('team-name');
+      const teamDescInput = document.getElementById('team-desc');
+
+      const teamName = teamNameInput.value.trim();
+      const description = teamDescInput.value.trim();
+
+      // 유효성 검사
+      if (!teamName) {
+        alert('팀 이름을 입력해주세요.');
+        return;
+      }
+
+      // 팀 생성 요청 데이터
+      const teamData = {
+        teamName: teamName,
+        description: description
+      };
+
+      // API 호출
+      fetch('/api/team', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': localStorage.getItem('accessToken')
+        },
+        body: JSON.stringify(teamData)
+      })
+              .then(response => {
+                if (!response.ok) {
+                  throw new Error('팀 생성에 실패했습니다.');
+                }
+                return response.json();
+              })
+              .then(data => {
+                if (data.result === 'SUCCESS') {
+                  alert(data.message);
+
+                  // 입력 필드 초기화
+                  teamNameInput.value = '';
+                  teamDescInput.value = '';
+
+                  // 모달 닫기
+                  modal.style.display = 'none';
+
+                  // 팀 목록 새로고침
+                  loadMyTeams();
+                } else {
+                  alert(data.message || '팀 생성에 실패했습니다.');
+                }
+              })
+              .catch(error => {
+                console.error('오류 발생:', error);
+                alert(`오류가 발생했습니다: ${error.message}`);
+              });
+      modal.style.display = 'none';
     });
   }
 
@@ -1148,7 +1131,7 @@
     window.onload = function () {
       createStars();
       setupMenuSlider();
-      setupNavbar();
+      setupFriendModal();
       initTeamPanel();
     }
 </script>

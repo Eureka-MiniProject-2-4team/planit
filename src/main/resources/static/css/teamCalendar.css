@@ -1,0 +1,858 @@
+/* Google Fonts and Icons already linked via HTML head */
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: 'Nunito', sans-serif;
+    background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+    color: #fff;
+    min-height: 100vh;
+    padding: 0;
+    overflow-x: hidden;
+}
+
+.stars {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    pointer-events: none;
+    z-index: 0;
+}
+
+.star {
+    position: absolute;
+    background-color: #fff;
+    border-radius: 50%;
+    opacity: 0.8;
+    animation: twinkle 4s infinite;
+}
+
+@keyframes twinkle {
+    0%, 100% { opacity: 0.3; transform: scale(1); }
+    50% { opacity: 1; transform: scale(1.2); }
+}
+
+.container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 20px;
+    padding-bottom: 90px;
+    position: relative;
+    z-index: 1;
+}
+
+.dashboard {
+    display: flex;
+    gap: 30px;
+    position: relative;
+    z-index: 1;
+    margin: 30px 0;
+    animation: slideIn 0.6s ease-out;
+}
+
+.panel {
+    background: rgba(27, 38, 59, 0.7);
+    border-radius: 20px;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+    padding: 25px;
+    flex: 1;
+    border: 2px solid rgba(106, 176, 238, 0.15);
+    margin-bottom: 20px;
+}
+
+.panel-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 25px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid rgba(106, 176, 238, 0.2);
+}
+
+.panel-title {
+    font-size: 22px;
+    font-weight: 700;
+    margin-left: 10px;
+    font-family: 'Orbitron', sans-serif;
+    letter-spacing: 1px;
+}
+
+.panel-icon {
+    font-size: 20px;
+    color: #6ab0ee;
+}
+
+.calendar-panel {
+    min-width: 600px;
+    max-width: 650px;
+}
+
+.month-nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    background: rgba(106, 176, 238, 0.1);
+    padding: 12px 15px;
+    border-radius: 30px;
+    gap: 10px;
+}
+
+.month-controls {
+    display: flex;
+    align-items: center;
+}
+
+.month-display {
+    font-size: 18px;
+    font-weight: 600;
+    font-family: 'Orbitron', sans-serif;
+}
+
+.nav-btn {
+    background: none;
+    border: none;
+    color: #6ab0ee;
+    font-size: 18px;
+    cursor: pointer;
+    transition: all 0.3s;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    margin: 0 5px;
+}
+
+.nav-btn:hover {
+    background: rgba(106, 176, 238, 0.2);
+    transform: scale(1.1);
+}
+
+.today-btn {
+    background: rgba(106, 176, 238, 0.2);
+    color: #fff;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 30px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+    display: flex;
+    align-items: center;
+    margin-left: 15px;
+}
+
+.today-btn i {
+    margin-right: 5px;
+    font-size: 12px;
+}
+
+.today-btn:hover {
+    background: rgba(106, 176, 238, 0.4);
+    transform: translateY(-2px);
+}
+
+.calendar-days, .calendar-dates {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    text-align: center;
+}
+
+.day-label {
+    padding: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #a3b1de;
+}
+
+.date-cell {
+    aspect-ratio: 1/1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    font-size: 16px;
+    cursor: pointer;
+    transition: all 0.3s;
+    position: relative;
+    background: rgba(106, 176, 238, 0.05);
+}
+
+.date-cell:hover {
+    background: rgba(106, 176, 238, 0.15);
+    transform: scale(1.05);
+}
+
+.date-cell.today {
+    background: rgba(106, 176, 238, 0.2);
+    border: 2px solid rgba(106, 176, 238, 0.5);
+}
+
+.date-cell.selected {
+    background: rgba(106, 176, 238, 0.3);
+}
+
+.date-cell.has-tasks::after {
+    content: '';
+    position: absolute;
+    bottom: 7px;
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background-color: #6ab0ee;
+}
+
+.date-num {
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.date-cell.other-month {
+    opacity: 0.4;
+}
+
+.task-panel {
+    display: flex;
+    flex-direction: column;
+    flex: 2;
+    max-width: calc(100% - 650px - 30px);
+    position: relative; /* Added for absolute positioning of add button */
+}
+
+.user-info {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 30px;
+    background: rgba(106, 176, 238, 0.1);
+    padding: 16px 15px;
+    border-radius: 30px;
+}
+
+/* Enhanced date display */
+.date-display {
+    font-size: 28px !important; /* 크게 표시 */
+    font-weight: 700 !important;
+    display: flex;
+    align-items: center;
+    justify-content: center; /* 가운데 정렬 */
+    background: rgba(106, 176, 238, 0.15);
+    padding: 12px 25px;
+    border-radius: 30px;
+    transition: all 0.3s;
+    width: 100%;
+    text-align: center;
+    letter-spacing: 1px;
+    font-family: 'Orbitron', sans-serif;
+}
+
+.date-display i {
+    margin-right: 12px;
+    color: #6ab0ee;
+    font-size: 24px;
+}
+
+.date-display.today {
+    background: rgba(106, 176, 238, 0.3);
+    box-shadow: 0 0 15px rgba(106, 176, 238, 0.2);
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% { box-shadow: 0 0 0 0 rgba(106, 176, 238, 0.4); }
+    70% { box-shadow: 0 0 0 10px rgba(106, 176, 238, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(106, 176, 238, 0); }
+}
+
+.task-list {
+    overflow-y: auto;
+    flex: 1;
+    padding: 5px;
+    max-height: 500px;
+}
+
+.task-item {
+    display: flex;
+    align-items: center;
+    padding: 15px;
+    margin-bottom: 15px;
+    border-radius: 15px;
+    background: rgba(106, 176, 238, 0.08);
+    transition: all 0.3s;
+    border-left: 4px solid transparent;
+    animation: slideIn 0.4s ease-out both;
+}
+
+.task-item:nth-child(4n+1) { border-left-color: #6ab0ee; }
+.task-item:nth-child(4n+2) { border-left-color: #64dfdf; }
+.task-item:nth-child(4n+3) { border-left-color: #80ed99; }
+.task-item:nth-child(4n+4) { border-left-color: #f0c674; }
+
+.task-item:hover {
+    transform: translateX(5px);
+    background: rgba(106, 176, 238, 0.12);
+}
+
+.task-checkbox {
+    appearance: none;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    margin-right: 15px;
+    cursor: pointer;
+    position: relative;
+    border: 2px solid rgba(255, 255, 255, 0.5);
+    transition: all 0.3s;
+}
+
+.task-checkbox:checked::after {
+    content: '✓';
+    position: absolute;
+    font-size: 14px;
+    color: white;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.task-item:nth-child(4n+1) .task-checkbox:checked {
+    background: #6ab0ee; border-color: #6ab0ee;
+}
+.task-item:nth-child(4n+2) .task-checkbox:checked {
+    background: #64dfdf; border-color: #64dfdf;
+}
+.task-item:nth-child(4n+3) .task-checkbox:checked {
+    background: #80ed99; border-color: #80ed99;
+}
+.task-item:nth-child(4n+4) .task-checkbox:checked {
+    background: #f0c674; border-color: #f0c674;
+}
+
+.task-content { flex: 1; }
+.task-title {
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 5px;
+}
+.task-time {
+    font-size: 12px;
+    color: #a3b1de;
+    display: flex;
+    align-items: center;
+}
+.time-icon { margin-right: 5px; font-size: 10px; }
+
+/* Repositioned add button */
+.add-task-btn {
+    position: absolute;
+    bottom: 20px;
+    right: 20px;
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #6ab0ee, #4a90da);
+    color: white;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    box-shadow: 0 5px 15px rgba(106, 176, 238, 0.4);
+    transition: all 0.3s;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.add-task-btn:hover {
+    transform: rotate(90deg) scale(1.1);
+    box-shadow: 0 8px 25px rgba(106, 176, 238, 0.6);
+}
+
+.header {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 20px;
+    padding: 15px 0;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 28px;
+    font-weight: 700;
+    color: white;
+    text-shadow: 0 0 15px rgba(106, 176, 238, 0.8);
+}
+
+.logo-icon {
+    margin-right: 10px;
+    font-size: 32px;
+    color: #6ab0ee;
+}
+
+.nav-logo {
+    position: absolute;
+    left: 50%;
+    top: -25px;
+    transform: translateX(-50%);
+    width: 50px;
+    height: 50px;
+    background: linear-gradient(135deg, #0f2027, #2c5364);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.4), 0 0 10px rgba(106, 176, 238, 0.4);
+    border: 2px solid rgba(106, 176, 238, 0.2);
+    z-index: 101;
+    font-size: 22px;
+    font-weight: bold;
+    color: #fff;
+    font-family: 'Orbitron', sans-serif;
+    text-shadow: 0 0 10px rgba(106, 176, 238, 0.5);
+}
+
+@keyframes slideIn {
+    from { transform: translateY(30px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+@media (max-width: 1100px) {
+    .dashboard {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .calendar-panel, .task-panel {
+        min-width: 100%;
+        max-width: 100%;
+    }
+}
+
+@media (max-width: 768px) {
+    .nav-text { display: none; }
+
+    .header { padding: 10px 0; }
+    .logo { font-size: 24px; }
+    .logo-icon { font-size: 26px; }
+
+    .date-display {
+        font-size: 20px !important;
+    }
+
+    .date-display i {
+        font-size: 18px;
+    }
+}
+
+/* Space-themed Todo Modal */
+.todo-modal {
+    display: none;
+    position: fixed;
+    z-index: 999;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(8px);
+    align-items: center;
+    justify-content: center;
+    animation: fadeIn 0.3s ease-out;
+}
+
+.todo-modal-content {
+    background: linear-gradient(135deg, rgba(27, 38, 59, 0.9), rgba(15, 32, 39, 0.95));
+    border: 2px solid rgba(106, 176, 238, 0.3);
+    border-radius: 20px;
+    padding: 30px;
+    width: 450px;
+    max-width: 90vw;
+    color: #fff;
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.5), 0 0 25px rgba(106, 176, 238, 0.2);
+    position: relative;
+    overflow: visible;
+    animation: slideUp 0.4s ease-out;
+}
+
+.todo-modal-content::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(106, 176, 238, 0.1) 0%, transparent 70%);
+    z-index: -1;
+}
+
+.todo-modal-header {
+    margin-bottom: 25px;
+    text-align: center;
+    position: relative;
+}
+
+.todo-modal-title {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 24px;
+    font-weight: 700;
+    color: #6ab0ee;
+    margin: 0;
+    letter-spacing: 1px;
+    text-shadow: 0 0 10px rgba(106, 176, 238, 0.5);
+}
+
+.todo-form-group {
+    margin-bottom: 20px;
+    position: relative;
+}
+
+.todo-form-group label {
+    display: block;
+    font-size: 14px;
+    color: #a3b1de;
+    margin-bottom: 6px;
+    font-weight: 600;
+}
+
+.todo-input, .todo-textarea, .date-input-display, .time-input-display {
+    width: 100%;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(106, 176, 238, 0.2);
+    border-radius: 12px;
+    padding: 12px 15px;
+    color: #fff;
+    font-family: 'Nunito', sans-serif;
+    font-size: 16px;
+    transition: all 0.3s;
+}
+
+.todo-input:focus, .todo-textarea:focus, .date-input-display:focus, .time-input-display:focus {
+    outline: none;
+    border-color: rgba(106, 176, 238, 0.6);
+    box-shadow: 0 0 15px rgba(106, 176, 238, 0.2);
+    background: rgba(255, 255, 255, 0.08);
+}
+
+.todo-textarea {
+    min-height: 100px;
+    resize: vertical;
+}
+
+/* Improved date-time picker */
+.datetime-picker {
+    display: flex;
+    gap: 10px;
+}
+
+.datetime-picker .date-input-container,
+.datetime-picker .time-input-container {
+    flex: 1;
+    position: relative;
+}
+
+.input-with-icon {
+    position: relative;
+    width: 100%;
+}
+
+.input-with-icon i {
+    position: absolute;
+    left: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #6ab0ee;
+    font-size: 16px;
+    z-index: 1;
+}
+
+.date-input-display, .time-input-display {
+    width: 100%;
+    padding-left: 40px;
+    text-align: center;
+    font-family: 'Orbitron', sans-serif;
+    letter-spacing: 1px;
+    cursor: pointer;
+    user-select: none;
+}
+
+/* jQuery UI Datepicker Customization */
+.ui-datepicker {
+    background: linear-gradient(135deg, rgba(27, 38, 59, 0.95), rgba(15, 32, 39, 0.98));
+    border: 2px solid rgba(106, 176, 238, 0.3);
+    border-radius: 15px;
+    padding: 15px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    font-family: 'Nunito', sans-serif;
+    width: 320px;
+    z-index: 9999 !important;
+}
+
+.ui-datepicker-header {
+    background: rgba(106, 176, 238, 0.15);
+    border: none;
+    border-radius: 10px;
+    padding: 8px;
+    margin-bottom: 10px;
+}
+
+.ui-datepicker-title {
+    color: #fff;
+    font-weight: bold;
+    font-family: 'Orbitron', sans-serif;
+}
+
+.ui-datepicker-prev, .ui-datepicker-next {
+    background: rgba(255, 255, 255, 0.1) !important;
+    border-radius: 50%;
+    cursor: pointer;
+    color: #fff;
+}
+
+.ui-datepicker-calendar th {
+    color: #a3b1de;
+    font-weight: 600;
+    padding: 7px;
+}
+
+.ui-datepicker-calendar td {
+    padding: 3px;
+}
+
+.ui-datepicker-calendar td a {
+    text-align: center;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.05) !important;
+    border: none !important;
+    color: #fff !important;
+    padding: 8px;
+    transition: all 0.2s;
+}
+
+.ui-datepicker-calendar td a:hover {
+    background: rgba(106, 176, 238, 0.3) !important;
+    color: #fff !important;
+}
+
+.ui-datepicker-calendar td a.ui-state-active {
+    background: rgba(106, 176, 238, 0.4) !important;
+    box-shadow: 0 0 10px rgba(106, 176, 238, 0.3);
+}
+
+.ui-datepicker-calendar td a.ui-state-highlight {
+    background: rgba(240, 198, 116, 0.3) !important;
+    box-shadow: 0 0 10px rgba(240, 198, 116, 0.2);
+}
+
+/* 커스텀 시간 선택기 스타일 */
+.custom-time-picker {
+    position: relative;
+    width: 100%;
+    overflow: visible;
+}
+
+.time-dropdown {
+    display: none;
+    position: absolute;
+    top: calc(100% + 5px);
+    left: 0;
+    width: 100%;
+    background: linear-gradient(135deg, rgba(27, 38, 59, 0.95), rgba(15, 32, 39, 0.98));
+    border: 2px solid rgba(106, 176, 238, 0.3);
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    z-index: 9999;
+    overflow: auto;
+    max-height: 250px;
+    animation: fadeIn 0.2s ease-out;
+}
+
+.time-dropdown.open {
+    display: block;
+}
+
+.time-columns {
+    display: flex;
+    height: 200px;
+}
+
+.time-column {
+    flex: 1;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(106, 176, 238, 0.5) rgba(27, 38, 59, 0.8);
+    border-right: 1px solid rgba(106, 176, 238, 0.2);
+    max-height: 200px;
+}
+
+.period-column {
+    flex: 0.7; /* 오전/오후 컬럼은 좀 더 좁게 */
+}
+
+.time-column:last-child {
+    border-right: none;
+}
+
+.time-column::-webkit-scrollbar {
+    width: 6px;
+}
+
+.time-column::-webkit-scrollbar-track {
+    background: rgba(27, 38, 59, 0.8);
+}
+
+.time-column::-webkit-scrollbar-thumb {
+    background-color: rgba(106, 176, 238, 0.5);
+    border-radius: 3px;
+}
+
+.time-option {
+    padding: 10px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    color: #fff;
+    font-family: 'Nunito', sans-serif;
+}
+
+.time-option:hover {
+    background: rgba(106, 176, 238, 0.2);
+}
+
+.time-option.selected {
+    background: rgba(106, 176, 238, 0.4);
+    font-weight: bold;
+}
+
+.todo-btn-group {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-top: 30px;
+}
+
+.todo-btn {
+    padding: 12px 24px;
+    border: none;
+    border-radius: 30px;
+    font-family: 'Nunito', sans-serif;
+    font-weight: 700;
+    font-size: 16px;
+    cursor: pointer;
+    transition: all 0.3s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.todo-btn i {
+    margin-right: 8px;
+}
+
+.todo-save-btn {
+    background: linear-gradient(135deg, #6ab0ee, #4a90da);
+    color: white;
+    box-shadow: 0 5px 15px rgba(106, 176, 238, 0.3);
+}
+
+.todo-save-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(106, 176, 238, 0.5);
+}
+
+.todo-cancel-btn {
+    background: rgba(255, 255, 255, 0.1);
+    color: #a3b1de;
+    border: 1px solid rgba(163, 177, 222, 0.2);
+}
+
+.todo-cancel-btn:hover {
+    background: rgba(255, 255, 255, 0.15);
+    color: #fff;
+}
+
+.delete-btn {
+    background: linear-gradient(135deg, #ff5c5c, #d9534f);
+    color: white;
+    border: none;
+}
+
+.delete-btn:hover {
+    background: linear-gradient(135deg, #ff7a7a, #e74c3c);
+    box-shadow: 0 8px 20px rgba(255, 92, 92, 0.5);
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes slideUp {
+    from { transform: translateY(30px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+/* 캘린더에 표시되는 할 일 표시 */
+.todo-indicator {
+    position: absolute;
+    bottom: 5px;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background-color: #6ab0ee;
+    box-shadow: 0 0 5px rgba(106, 176, 238, 0.5);
+}
+
+/* 팀 관리 버튼 스타일 */
+.team-manage-btn {
+    margin-left: auto;
+    background: rgba(106, 176, 238, 0.15);
+    border: none;
+    color: #ffffff;
+    border-radius: 12px;
+    padding: 6px 12px;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s;
+    font-family: 'Nunito', sans-serif;
+    letter-spacing: 0.5px;
+    box-shadow: 0 0 10px rgba(106, 176, 238, 0.1);
+}
+
+.team-manage-btn:hover {
+    background: rgba(106, 176, 238, 0.3);
+    box-shadow: 0 0 15px rgba(106, 176, 238, 0.2);
+}
+
+/* 패널 헤더 조정 */
+.panel-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 25px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid rgba(106, 176, 238, 0.2);
+}
+
+.panel-title {
+    font-size: 22px;
+    font-weight: 700;
+    margin-left: 10px;
+    margin-right: 10px;
+    font-family: 'Orbitron', sans-serif;
+    letter-spacing: 1px;
+    color: #ffffff;
+}
+
+.panel-icon {
+    font-size: 20px;
+    color: #6ab0ee;
+}

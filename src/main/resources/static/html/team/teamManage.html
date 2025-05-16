@@ -546,6 +546,26 @@
 </div>
 
 <script>
+  // 멤버 이니셜 생성 함수
+  function getInitials(name) {
+    if (!name) return '??';
+
+    // 공백으로 분리하여 각 단어의 첫 글자 가져오기
+    const words = name.split(' ');
+    if (words.length >= 2) {
+      return (words[0][0] + words[1][0]).toUpperCase();
+    }
+
+    // 한 단어인 경우 첫 두 글자 또는 첫 글자만 반환
+    return name.length > 1 ? name.substring(0, 2).toUpperCase() : name[0].toUpperCase();
+  }
+
+  function getTeamId() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const teamId = urlParams.get('teamId');
+    return teamId;
+  }
+
     // 팀원 목록을 불러오는 함수
     function loadTeamMembers(teamId) {
         // API 호출
@@ -959,7 +979,7 @@
     // 페이지 초기화
     document.addEventListener('DOMContentLoaded', function() {
         // teamId 전역 변수 초기화
-        teamId = getTeamId();
+      const teamId = getTeamId();
 
         if (!teamId) {
             alert('팀 ID를 찾을 수 없습니다. 팀 목록 페이지로 이동합니다.');
@@ -970,9 +990,9 @@
         createStars();
         setupButtons();
         setupInvite();
+      initTeamDetailsPage();
         loadTeamInfo(teamId);
         loadTeamMembers(teamId);
-        initTeamDetailsPage();
     });
 
 </script>
