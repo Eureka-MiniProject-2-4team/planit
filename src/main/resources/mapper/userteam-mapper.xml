@@ -18,6 +18,7 @@
              users u ON ut.user_id = u.id
         WHERE team_id = #{teamId}
         AND u.is_active = true
+        AND ut.status = 'JOINED'
     </select>
 
     <select id="getMyTeamList" parameterType="java.lang.String" resultType="com.eureka.mp2.team4.planit.team.dto.UserTeamDto">

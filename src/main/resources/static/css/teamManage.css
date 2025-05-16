@@ -43,6 +43,8 @@ body {
     width: 100%;
     z-index: 1;
     position: relative;
+
+    margin: 0 auto;
 }
 
 .header {
@@ -459,7 +461,8 @@ textarea.form-input {
 .back-button {
     position: absolute;
     top: -50px;
-    left: 0;
+    left: 50%;
+    transform: translateX(-50%);
     background: none;
     border: none;
     color: #6ab0ee;
