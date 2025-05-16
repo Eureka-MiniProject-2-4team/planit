@@ -45,12 +45,8 @@ class UserControllerTest {
 
         userResponseDto = UserResponseDto.builder()
                 .email("test@planit.com")
-                .createdAt(null)
-                .isActive(true)
-                .phoneNumber("01012345678")
                 .nickname("닉네임")
                 .userName("테스트유저")
-                .updatedAt(null)
                 .build();
     }
 
