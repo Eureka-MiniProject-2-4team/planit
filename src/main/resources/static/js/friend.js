@@ -1,4 +1,5 @@
 // 1. JWT 헤더 생성
+// 1. JWT 헤더 생성
 function authHeaders() {
     const raw = localStorage.getItem('accessToken') || '';
     const token = raw.replace(/^Bearer\s+/i, '');
@@ -38,6 +39,7 @@ window.addEventListener('DOMContentLoaded', () => {
     setupFriendSearch();
     getFriends();
     getFriendRequests();
+    document.body.style.display = 'block';
 });
 
 // 4. 네비게이션 바 셋업 (active 토글 + 친구 목록 갱신)
@@ -172,6 +174,15 @@ async function getFriends() {
             method: 'GET',
             headers: authHeaders()
         });
+
+        if (res.status === 401) {
+            const error = await res.json();
+            alert(error.message || '로그인이 필요합니다.');
+            localStorage.removeItem('accessToken');
+            window.location.href = '/html/auth/login.html';
+            return;
+        }
+
         const result = await res.json();
 
         // 전역 변수에 친구 목록 저장 (검색용)

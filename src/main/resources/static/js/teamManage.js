@@ -62,18 +62,34 @@ async function loadTeamMembers(teamId) {
     try {
         const response = await fetch(`/api/team/${teamId}/member/list`, {
             method: 'GET',
-            headers: authHeaders()
+            headers: {
+                'Authorization': localStorage.getItem('accessToken'),
+                'Content-Type': 'application/json'
+            }
         });
+
+        if (response.status === 401) {
+            alert('로그인이 필요합니다.');
+            window.location.href = '/html/auth/login.html';
+            return;
+        }
+
+        if (response.status === 403) {
+            const err = await response.json();
+            alert(err.message || '팀에 대한 접근 권한이 없습니다.');
+            window.location.href = document.referrer || '/html/todo/myCalendar.html';
+            return;
+        }
 
         if (!response.ok) {
             throw new Error('팀원 목록을 불러오는데 실패했습니다.');
         }
 
         const data = await response.json();
-        // 현재 팀원 목록 저장
         currentTeamMembers = data.data || [];
         renderTeamMembers(data.data, data.currentUserRole);
         return data;
+
     } catch (error) {
         console.error('오류 발생:', error);
         alert(`팀원 목록을 불러오는 중 오류가 발생했습니다: ${error.message}`);
@@ -567,7 +583,6 @@ function initTeamDetailsPage() {
 
 // 페이지 초기화
 document.addEventListener('DOMContentLoaded', async function() {
-    // teamId 전역 변수 초기화
     const teamId = getTeamId();
 
     if (!teamId) {
@@ -576,13 +591,46 @@ document.addEventListener('DOMContentLoaded', async function() {
         return;
     }
 
-    // 현재 사용자 정보 로드
-    await getCurrentUser();
+    // ✅ 팀장 권한 확인 먼저 수행
+    try {
+        const res = await fetch(`/api/team/${teamId}/check-leader`, {
+            method: 'GET',
+            headers: {
+                'Authorization': localStorage.getItem('accessToken')
+            }
+        });
 
-    createStars();
-    setupButtons();
-    setupSearchFunctionality(); // 검색 기능 설정
-    initTeamDetailsPage();
-    loadTeamInfo(teamId);
-    await loadTeamMembers(teamId);
+        if (res.status === 401) {
+            alert('로그인이 필요합니다.');
+            window.location.href = '/html/auth/login.html';
+            return;
+        }
+
+        if (res.status === 403) {
+            const err = await res.json();
+            alert(err.message || '팀장만 접근할 수 있는 페이지입니다.');
+            window.location.href = document.referrer || '/html/todo/myCalendar.html';
+            return;
+        }
+
+        if (!res.ok) {
+            throw new Error('권한 확인 중 오류가 발생했습니다.');
+        }
+
+        // ✅ 팀장 권한 확인 성공 시, 페이지 표시 및 초기화
+        document.body.style.display = 'block';
+
+        await getCurrentUser();
+        createStars();
+        setupButtons();
+        setupSearchFunctionality();
+        initTeamDetailsPage();
+        loadTeamInfo(teamId);
+        await loadTeamMembers(teamId);
+
+    } catch (err) {
+        console.error('권한 확인 중 오류:', err);
+        alert('페이지 접근 권한을 확인하는 중 오류가 발생했습니다.');
+        window.location.href = 'teamList.html';
+    }
 });
