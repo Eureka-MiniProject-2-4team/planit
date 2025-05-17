@@ -18,10 +18,13 @@ PLANiT는 우주 테마 기반의 일정/할 일 관리 웹 애플리케이션�
 ## BackEnd
 | Category                            | Tech            |
 |-------------------------------------|-----------------|
-| Application                         | SpringBoot      |
+| Backend                             | SpringBoot      |
 |                                     | Spring          |
 |                                     | Spring Security |
 |                                     | MyBatis         |
+|  Frontend                           | HTML            |
+|                                     | CSS             |
+|                                     | JavaScript      |
 | DB                                  | MySQL           |
 | Testing                             | Junit5          |
 | contribute                          | Github          |
