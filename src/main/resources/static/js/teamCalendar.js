@@ -263,6 +263,25 @@ function goToToday() {
     }, 100);
 }
 
+// 자정에 날짜를 자동으로 업데이트하는 함수 (추가)
+function setAutoDateUpdate() {
+    // 다음 자정까지 남은 시간 계산
+    const now = new Date();
+    const tomorrow = new Date(now);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    tomorrow.setHours(0, 0, 0, 0);
+
+    const timeUntilMidnight = tomorrow - now;
+
+    // 자정에 실행할 타이머 설정
+    setTimeout(() => {
+        goToToday(); // 오늘 날짜로 갱신
+        setAutoDateUpdate(); // 다음 자정을 위해 재설정
+    }, timeUntilMidnight);
+
+    console.log(`다음 날짜 업데이트까지 ${Math.floor(timeUntilMidnight / 1000 / 60)} 분 남았습니다.`);
+}
+
 function markDatesWithTodos() {
     if (!allTodos || allTodos.length === 0) return;
 
@@ -504,6 +523,7 @@ function fetchMyTodos() {
                 generateCalendar();
                 renderTodos(allTodos);
                 highlightTodayDate();
+                markDatesWithTodos();
 
                 document.body.style.display = 'block';
             } else {
@@ -835,6 +855,13 @@ window.onload = async function() {
     }
 
     fetchMyTodos();
+
+    // 현재 날짜로 설정 (추가)
+    goToToday();
+
+    // 자정에 날짜 자동 업데이트 설정 (추가)
+    setAutoDateUpdate();
+
     highlightTodayDate();
 
     document.body.style.display = 'block';
