@@ -34,7 +34,7 @@
         WHERE email = #{email}
     </select>
 
-    <select id="findMyPageData" parameterType="string" resultType="com.eureka.mp2.team4.planit.user.dto.response.UserResponseDto">
+    <select id="findMyPageData" parameterType="string" resultType="com.eureka.mp2.team4.planit.user.dto.response.MyPageResponseDto">
         SELECT
             u.id,
             u.email,

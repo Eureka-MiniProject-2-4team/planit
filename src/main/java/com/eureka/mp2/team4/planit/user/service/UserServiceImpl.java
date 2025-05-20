@@ -12,7 +12,7 @@ import com.eureka.mp2.team4.planit.user.dto.UserDto;
 import com.eureka.mp2.team4.planit.user.dto.UserSearchResponseDto;
 import com.eureka.mp2.team4.planit.user.dto.request.UpdatePasswordRequestDto;
 import com.eureka.mp2.team4.planit.user.dto.request.UpdateUserRequestDto;
-import com.eureka.mp2.team4.planit.user.dto.response.UserResponseDto;
+import com.eureka.mp2.team4.planit.user.dto.response.MyPageResponseDto;
 import com.eureka.mp2.team4.planit.user.mapper.UserMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataAccessException;
@@ -31,9 +31,9 @@ public class UserServiceImpl implements UserService {
     private final FriendQueryService friendQueryService;
 
     @Override
-    public UserResponseDto getMyPageData(String userId) {
+    public MyPageResponseDto getMyPageData(String userId) {
         try {
-            UserResponseDto userDto = userMapper.findMyPageData(userId);
+            MyPageResponseDto userDto = userMapper.findMyPageData(userId);
             if (userDto == null) {
                 throw new NotFoundException(NOT_FOUND_USER);
             }

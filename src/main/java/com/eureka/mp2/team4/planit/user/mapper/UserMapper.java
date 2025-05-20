@@ -2,7 +2,7 @@ package com.eureka.mp2.team4.planit.user.mapper;
 
 import com.eureka.mp2.team4.planit.auth.dto.request.UserRegisterRequestDto;
 import com.eureka.mp2.team4.planit.user.dto.UserDto;
-import com.eureka.mp2.team4.planit.user.dto.response.UserResponseDto;
+import com.eureka.mp2.team4.planit.user.dto.response.MyPageResponseDto;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -36,5 +36,5 @@ public interface UserMapper {
 
     UserDto findUserByNameAndEmail(@Param("name") String userName, @Param("email") String email);
 
-    UserResponseDto findMyPageData(String id);
+    MyPageResponseDto findMyPageData(String id);
 }

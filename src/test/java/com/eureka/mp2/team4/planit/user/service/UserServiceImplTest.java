@@ -12,7 +12,7 @@ import com.eureka.mp2.team4.planit.user.dto.UserDto;
 import com.eureka.mp2.team4.planit.user.dto.UserSearchResponseDto;
 import com.eureka.mp2.team4.planit.user.dto.request.UpdatePasswordRequestDto;
 import com.eureka.mp2.team4.planit.user.dto.request.UpdateUserRequestDto;
-import com.eureka.mp2.team4.planit.user.dto.response.UserResponseDto;
+import com.eureka.mp2.team4.planit.user.dto.response.MyPageResponseDto;
 import com.eureka.mp2.team4.planit.user.enums.UserRole;
 import com.eureka.mp2.team4.planit.user.mapper.UserMapper;
 import org.junit.jupiter.api.BeforeEach;
@@ -71,7 +71,7 @@ public class UserServiceImplTest {
     void getMyPageDataSuccess() {
         when(userMapper.findUserById(userId)).thenReturn(userDto);
 
-        UserResponseDto result = userService.getMyPageData(userId);
+        MyPageResponseDto result = userService.getMyPageData(userId);
 
         assertThat(result.getEmail()).isEqualTo(userDto.getEmail());
         verify(userMapper, times(1)).findUserById(userId);
