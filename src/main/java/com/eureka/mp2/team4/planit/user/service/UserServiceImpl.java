@@ -122,7 +122,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public ApiResponse<? extends UserSearchResponseDto> getUserInfo(String currentUserId, String value, String teamId) {
+    public ApiResponse getUserInfo(String currentUserId, String value, String teamId) {
         UserDto targetUser = findUserByValue(value);
 
         if (targetUser == null) {

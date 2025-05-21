@@ -15,5 +15,5 @@ public interface UserService {
 
     ApiResponse deleteUser(String userId);
 
-    ApiResponse<? extends UserSearchResponseDto> getUserInfo(String username, String value, String teamId);
+    ApiResponse getUserInfo(String username, String value, String teamId);
 }
