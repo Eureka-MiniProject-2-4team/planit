@@ -120,4 +120,30 @@
         WHERE username = #{name}
           AND email = #{email}
     </select>
+
+    <select id="findUserWithFriendStatus" resultType="com.eureka.mp2.team4.planit.user.dto.response.UserSearchForFriendResponseDto">
+        SELECT u.id,
+               u.nickname AS nickName,
+               u.email,
+               f.status AS friendStatus
+        FROM users u
+        LEFT JOIN friend f
+        ON(
+            (f.requester_id=#{currentUserId} AND f.receiver_id=#{targetUserId})
+            OR
+            (f.requester_id=#{targetUserId} AND f.receiver_id=#{currentUserId})
+                )
+        WHERE u.id = #{targetUserId}
+    </select>
+
+    <select id="findUserWithTeamStatus" resultType="com.eureka.mp2.team4.planit.user.dto.response.UserSearchForTeamResponseDto">
+        SELECT u.id,
+               u.nickname AS nickName,
+               u.email,
+               ut.status AS teamMembershipStatus
+        FROM users u
+                 LEFT JOIN user_team ut
+                           ON u.id = ut.user_id AND ut.team_id = #{teamId}
+        WHERE u.id = #{targetUserId}
+    </select>
 </mapper>
