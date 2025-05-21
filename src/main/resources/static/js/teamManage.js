@@ -387,7 +387,9 @@ async function searchUser() {
     }
 
     try {
-        const res = await fetch(`/api/users/${encodeURIComponent(username)}`, {
+        const teamId = getTeamId();
+
+        const res = await fetch(`/api/users/${encodeURIComponent(username)}?teamId=${encodeURIComponent(teamId)}`, {
             headers: authHeaders()
         });
         const result = await res.json();
@@ -409,20 +411,24 @@ async function searchUser() {
             div.className = 'search-result-item';
 
             // 버튼 상태 결정
+            // 버튼 상태 결정
             let buttonHtml = '';
             if (isCurrentUser) {
                 buttonHtml = `<button class="request-btn" disabled>본인입니다</button>`;
             } else {
-                // 팀에 이미 속해 있는 경우, 팀장인지 일반 팀원인지 확인
-                const teamMember = currentTeamMembers.find(member => member.userId === user.id);
-                if (teamMember) {
-                    if (teamMember.role === 'LEADER') {
-                        buttonHtml = `<button class="request-btn" disabled>팀장입니다</button>`;
-                    } else {
-                        buttonHtml = `<button class="request-btn" disabled>등록된 팀원</button>`;
-                    }
+                const status = user.teamMembershipStatus;
+
+                if (!status) {
+                    // 팀에 속하지 않은 사용자
+                    buttonHtml = `<button class="request-btn invite-btn" data-user-id="${user.id}">
+                        <i class="fas fa-user-plus"></i> 초대하기
+                      </button>`;
+                } else if (status === 'JOINED') {
+                    buttonHtml = `<button class="request-btn" disabled>등록된 팀원</button>`;
+                } else if (status === 'WAIT') {
+                    buttonHtml = `<button class="request-btn" disabled>초대 대기중</button>`;
                 } else {
-                    buttonHtml = `<button class="request-btn invite-btn" data-user-id="${user.id}"><i class="fas fa-user-plus"></i> 초대하기</button>`;
+                    buttonHtml = `<button class="request-btn" disabled>상태 알 수 없음</button>`;
                 }
             }
 
