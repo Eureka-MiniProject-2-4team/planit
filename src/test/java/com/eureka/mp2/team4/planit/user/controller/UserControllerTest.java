@@ -5,10 +5,10 @@ import com.eureka.mp2.team4.planit.common.ApiResponse;
 import com.eureka.mp2.team4.planit.common.Result;
 import com.eureka.mp2.team4.planit.common.exception.InvalidInputException;
 import com.eureka.mp2.team4.planit.friend.FriendStatus;
-import com.eureka.mp2.team4.planit.user.dto.UserSearchResponseDto;
 import com.eureka.mp2.team4.planit.user.dto.request.UpdatePasswordRequestDto;
 import com.eureka.mp2.team4.planit.user.dto.request.UpdateUserRequestDto;
-import com.eureka.mp2.team4.planit.user.dto.response.UserResponseDto;
+import com.eureka.mp2.team4.planit.user.dto.response.MyPageResponseDto;
+import com.eureka.mp2.team4.planit.user.dto.response.UserSearchForFriendResponseDto;
 import com.eureka.mp2.team4.planit.user.service.UserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -35,7 +35,7 @@ class UserControllerTest {
     private UserController userController;
 
     private PlanitUserDetails planitUserDetails;
-    private UserResponseDto userResponseDto;
+    private MyPageResponseDto myPageResponseDto;
 
     @BeforeEach
     void setUp() {
@@ -43,7 +43,7 @@ class UserControllerTest {
         planitUserDetails = mock(PlanitUserDetails.class);
         when(planitUserDetails.getUsername()).thenReturn("test-user-id");
 
-        userResponseDto = UserResponseDto.builder()
+        myPageResponseDto = MyPageResponseDto.builder()
                 .email("test@planit.com")
                 .nickname("닉네임")
                 .userName("테스트유저")
@@ -53,13 +53,13 @@ class UserControllerTest {
     @Test
     @DisplayName("GET /api/users/me - 유저 정보 조회 성공")
     void getMyPageSuccess() {
-        when(userService.getMyPageData("test-user-id")).thenReturn(userResponseDto);
+        when(userService.getMyPageData("test-user-id")).thenReturn(myPageResponseDto);
 
         ResponseEntity<ApiResponse<?>> response = userController.getMyPage(planitUserDetails);
 
         assertThat(response.getStatusCodeValue()).isEqualTo(200);
         assertThat(response.getBody().getResult()).isEqualTo(Result.SUCCESS);
-        assertThat(((UserResponseDto) response.getBody().getData()).getEmail()).isEqualTo("test@planit.com");
+        assertThat(((MyPageResponseDto) response.getBody().getData()).getEmail()).isEqualTo("test@planit.com");
 
         verify(userService, times(1)).getMyPageData("test-user-id");
     }
@@ -204,16 +204,15 @@ class UserControllerTest {
     @DisplayName("유저 정보 조회 성공 - 친구 상태 포함")
     void getUserInfo_success_friendOnly() {
         // given
-        ApiResponse<?> successResponse = ApiResponse.builder()
+        ApiResponse successResponse = ApiResponse.builder()
                 .result(Result.SUCCESS)
                 .message("유저 조회 성공")
-                .data(UserSearchResponseDto.builder()
-                        .id("target-id")
-                        .email("target@domain.com")
-                        .nickName("홍길동")
-                        .friendStatus(FriendStatus.ACCEPTED)
-                        .teamMembershipStatus(null)
-                        .build())
+                .data(new UserSearchForFriendResponseDto(
+                        "target-id",
+                        "target@domain.com",
+                        "홍길동",
+                        FriendStatus.ACCEPTED
+                ))
                 .build();
 
         when(userService.getUserInfo("test-user-id", "target@domain.com", null))

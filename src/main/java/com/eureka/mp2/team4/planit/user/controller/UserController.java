@@ -6,7 +6,7 @@ import com.eureka.mp2.team4.planit.common.Result;
 import com.eureka.mp2.team4.planit.common.exception.InvalidInputException;
 import com.eureka.mp2.team4.planit.user.dto.request.UpdatePasswordRequestDto;
 import com.eureka.mp2.team4.planit.user.dto.request.UpdateUserRequestDto;
-import com.eureka.mp2.team4.planit.user.dto.response.UserResponseDto;
+import com.eureka.mp2.team4.planit.user.dto.response.MyPageResponseDto;
 import com.eureka.mp2.team4.planit.user.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -27,10 +27,10 @@ public class UserController {
     @Operation(summary = "내 정보 조회", description = "현재 로그인한 사용자의 정보를 조회합니다.")
     @GetMapping("/me")
     public ResponseEntity<ApiResponse<?>> getMyPage(@AuthenticationPrincipal PlanitUserDetails userDetails) {
-        UserResponseDto userResponseDto = userService.getMyPageData(userDetails.getUsername());
+        MyPageResponseDto myPageResponseDto = userService.getMyPageData(userDetails.getUsername());
         ApiResponse apiResponse = ApiResponse.builder()
                 .result(Result.SUCCESS)
-                .data(userResponseDto)
+                .data(myPageResponseDto)
                 .build();
         return ResponseEntity.ok(apiResponse);
     }

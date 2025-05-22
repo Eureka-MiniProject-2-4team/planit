@@ -5,14 +5,15 @@ import com.eureka.mp2.team4.planit.common.Result;
 import com.eureka.mp2.team4.planit.common.exception.DatabaseException;
 import com.eureka.mp2.team4.planit.common.exception.InternalServerErrorException;
 import com.eureka.mp2.team4.planit.common.exception.NotFoundException;
-import com.eureka.mp2.team4.planit.friend.FriendStatus;
 import com.eureka.mp2.team4.planit.friend.service.FriendQueryService;
 import com.eureka.mp2.team4.planit.team.service.UserTeamQueryService;
 import com.eureka.mp2.team4.planit.user.dto.UserDto;
-import com.eureka.mp2.team4.planit.user.dto.UserSearchResponseDto;
 import com.eureka.mp2.team4.planit.user.dto.request.UpdatePasswordRequestDto;
 import com.eureka.mp2.team4.planit.user.dto.request.UpdateUserRequestDto;
-import com.eureka.mp2.team4.planit.user.dto.response.UserResponseDto;
+import com.eureka.mp2.team4.planit.user.dto.response.MyPageResponseDto;
+import com.eureka.mp2.team4.planit.user.dto.response.UserSearchForFriendResponseDto;
+import com.eureka.mp2.team4.planit.user.dto.response.UserSearchForTeamResponseDto;
+import com.eureka.mp2.team4.planit.user.dto.response.UserSearchResponseDto;
 import com.eureka.mp2.team4.planit.user.mapper.UserMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataAccessException;
@@ -31,9 +32,9 @@ public class UserServiceImpl implements UserService {
     private final FriendQueryService friendQueryService;
 
     @Override
-    public UserResponseDto getMyPageData(String userId) {
+    public MyPageResponseDto getMyPageData(String userId) {
         try {
-            UserResponseDto userDto = userMapper.findMyPageData(userId);
+            MyPageResponseDto userDto = userMapper.findMyPageData(userId);
             if (userDto == null) {
                 throw new NotFoundException(NOT_FOUND_USER);
             }
@@ -132,21 +133,24 @@ public class UserServiceImpl implements UserService {
             return buildSelfResponse(targetUser);
         }
 
-        FriendStatus friendStatus = null;
-        String teamMembershipStatus = null;
 
         if (teamId == null) {
-            friendStatus = friendQueryService.areFriends(currentUserId, targetUser.getId());
+            return buildFriendResponse(currentUserId, targetUser);
         } else {
-            teamMembershipStatus = userTeamQueryService.getTeamMemberShipStatus(teamId, targetUser.getId());
+            return buildTeamResponse(targetUser.getId(), teamId);
         }
+    }
 
-        UserSearchResponseDto responseDto = buildUserSearchResponse(targetUser, friendStatus, teamMembershipStatus);
-        return ApiResponse.builder()
-                .message(FOUND_USER_SUCCESS)
-                .data(responseDto)
-                .result(Result.SUCCESS)
-                .build();
+    private UserDto findUserByValue(String value) {
+        try {
+            if (value.contains("@")) {
+                return userMapper.findActiveUserByEmail(value);
+            } else {
+                return userMapper.findActiveUserByNickName(value);
+            }
+        } catch (DataAccessException e) {
+            throw new DatabaseException(FOUND_USER_FAIL);
+        }
     }
 
     private ApiResponse buildSelfResponse(UserDto user) {
@@ -163,26 +167,22 @@ public class UserServiceImpl implements UserService {
                 .build();
     }
 
-    private UserSearchResponseDto buildUserSearchResponse(UserDto user, FriendStatus friendStatus, String teamStatus) {
-        return UserSearchResponseDto.builder()
-                .id(user.getId())
-                .nickName(user.getNickName())
-                .email(user.getEmail())
-                .friendStatus(friendStatus)
-                .teamMembershipStatus(teamStatus)
+
+    private ApiResponse buildFriendResponse(String currentUserId, UserDto targetUser) {
+        UserSearchForFriendResponseDto responseDto = userMapper.findUserWithFriendStatus(currentUserId, targetUser.getId());
+        return ApiResponse.builder()
+                .result(Result.SUCCESS)
+                .data(responseDto)
                 .build();
     }
 
-    private UserDto findUserByValue(String value) {
-        try {
-            if (value.contains("@")) {
-                return userMapper.findActiveUserByEmail(value);
-            } else {
-                return userMapper.findActiveUserByNickName(value);
-            }
-        } catch (DataAccessException e) {
-            throw new DatabaseException(FOUND_USER_FAIL);
-        }
+    private ApiResponse buildTeamResponse(String targetUserId, String teamId) {
+        UserSearchForTeamResponseDto responseDto = userMapper.findUserWithTeamStatus(targetUserId, teamId);
+        return ApiResponse.builder()
+                .result(Result.SUCCESS)
+                .data(responseDto)
+                .build();
     }
+
 
 }
