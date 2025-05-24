@@ -40,7 +40,9 @@ public interface UserMapper {
 
     MyPageResponseDto findMyPageData(String id);
 
-    UserSearchForFriendResponseDto findUserWithFriendStatus(@Param("currentUserId")String currentUserId,@Param("targetUserId") String targetUserId);
+    UserSearchForFriendResponseDto findUserWithFriendStatus(@Param("currentUserId") String currentUserId, @Param("targetUserId") String targetUserId);
 
-    UserSearchForTeamResponseDto findUserWithTeamStatus(@Param("targetUserId")String targetUserId, @Param("teamId")String teamId);
+    UserSearchForTeamResponseDto findUserWithTeamStatus(@Param("targetUserId") String targetUserId, @Param("teamId") String teamId);
+
+    boolean isUserTeamLeader(String userId);
 }
