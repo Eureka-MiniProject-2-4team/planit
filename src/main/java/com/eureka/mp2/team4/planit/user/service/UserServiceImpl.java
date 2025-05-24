@@ -5,8 +5,6 @@ import com.eureka.mp2.team4.planit.common.Result;
 import com.eureka.mp2.team4.planit.common.exception.DatabaseException;
 import com.eureka.mp2.team4.planit.common.exception.InternalServerErrorException;
 import com.eureka.mp2.team4.planit.common.exception.NotFoundException;
-import com.eureka.mp2.team4.planit.friend.service.FriendQueryService;
-import com.eureka.mp2.team4.planit.team.service.UserTeamQueryService;
 import com.eureka.mp2.team4.planit.user.dto.UserDto;
 import com.eureka.mp2.team4.planit.user.dto.request.UpdatePasswordRequestDto;
 import com.eureka.mp2.team4.planit.user.dto.request.UpdateUserRequestDto;
@@ -28,8 +26,6 @@ import static com.eureka.mp2.team4.planit.user.constants.Messages.*;
 public class UserServiceImpl implements UserService {
     private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
-    private final UserTeamQueryService userTeamQueryService;
-    private final FriendQueryService friendQueryService;
 
     @Override
     public MyPageResponseDto getMyPageData(String userId) {
@@ -103,7 +99,8 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public ApiResponse deleteUser(String userId) {
-        if (userTeamQueryService.isUserTeamLeader(userId)) {
+        if (userMapper.isUserTeamLeader(userId)) {
+            System.out.println("is Leader");
             return ApiResponse.builder()
                     .message(LEADER_CAN_NOT_DELETE)
                     .result(Result.FAIL)
@@ -160,6 +157,7 @@ public class UserServiceImpl implements UserService {
                 .email(user.getEmail())
                 .isMe(true)
                 .build();
+
         return ApiResponse.builder()
                 .data(dto)
                 .message(FOUND_USER_SUCCESS)

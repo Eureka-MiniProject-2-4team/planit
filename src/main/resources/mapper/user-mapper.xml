@@ -34,29 +34,23 @@
         WHERE email = #{email}
     </select>
 
-    <select id="findMyPageData" parameterType="string" resultType="com.eureka.mp2.team4.planit.user.dto.response.MyPageResponseDto">
-        SELECT
-            u.id,
-            u.email,
-            u.userName,
-            u.nickname,
-            (
-                SELECT COUNT(*)
+    <select id="findMyPageData" parameterType="string"
+            resultType="com.eureka.mp2.team4.planit.user.dto.response.MyPageResponseDto">
+        SELECT u.id,
+               u.email,
+               u.userName,
+               u.nickname,
+               (SELECT COUNT(*)
                 FROM friend f
                 WHERE (f.requester_id = u.id OR f.receiver_id = u.id)
-                  AND f.status = 'ACCEPTED'
-            ) AS friendCount,
-            (
-                SELECT COUNT(*)
+                  AND f.status = 'ACCEPTED') AS friendCount,
+               (SELECT COUNT(*)
                 FROM user_team ut
                 WHERE ut.user_id = u.id
-                  AND ut.status = 'JOINED'
-            ) AS teamCount,
-            (
-                SELECT COUNT(*)
+                  AND ut.status = 'JOINED')  AS teamCount,
+               (SELECT COUNT(*)
                 FROM personal_todo pt
-                WHERE pt.user_id = u.id
-            ) AS todoCount
+                WHERE pt.user_id = u.id)     AS todoCount
 
         FROM users u
         WHERE u.id = #{id}
@@ -67,7 +61,7 @@
         SELECT *
         FROM users
         WHERE email = #{email}
-        and is_active = true
+          and is_active = true
     </select>
 
     <select id="findUserById" parameterType="string" resultType="com.eureka.mp2.team4.planit.user.dto.UserDto">
@@ -111,7 +105,7 @@
         SELECT *
         FROM users
         WHERE nickName = #{nickName}
-        AND is_active = true
+          AND is_active = true
     </select>
 
     <select id="findUserByNameAndEmail" resultType="com.eureka.mp2.team4.planit.user.dto.UserDto">
@@ -121,29 +115,38 @@
           AND email = #{email}
     </select>
 
-    <select id="findUserWithFriendStatus" resultType="com.eureka.mp2.team4.planit.user.dto.response.UserSearchForFriendResponseDto">
+    <select id="findUserWithFriendStatus"
+            resultType="com.eureka.mp2.team4.planit.user.dto.response.UserSearchForFriendResponseDto">
         SELECT u.id,
                u.nickname AS nickName,
                u.email,
-               f.status AS friendStatus
+               f.status   AS friendStatus
         FROM users u
-        LEFT JOIN friend f
-        ON(
-            (f.requester_id=#{currentUserId} AND f.receiver_id=#{targetUserId})
-            OR
-            (f.requester_id=#{targetUserId} AND f.receiver_id=#{currentUserId})
-                )
+                 LEFT JOIN friend f
+                           ON (
+                               (f.requester_id = #{currentUserId} AND f.receiver_id = #{targetUserId})
+                                   OR
+                               (f.requester_id = #{targetUserId} AND f.receiver_id = #{currentUserId})
+                               )
         WHERE u.id = #{targetUserId}
     </select>
 
-    <select id="findUserWithTeamStatus" resultType="com.eureka.mp2.team4.planit.user.dto.response.UserSearchForTeamResponseDto">
+    <select id="findUserWithTeamStatus"
+            resultType="com.eureka.mp2.team4.planit.user.dto.response.UserSearchForTeamResponseDto">
         SELECT u.id,
                u.nickname AS nickName,
                u.email,
-               ut.status AS teamMembershipStatus
+               ut.status  AS teamMembershipStatus
         FROM users u
                  LEFT JOIN user_team ut
                            ON u.id = ut.user_id AND ut.team_id = #{teamId}
         WHERE u.id = #{targetUserId}
+    </select>
+
+    <select id="isUserTeamLeader" parameterType="string">
+        SELECT EXISTS(SELECT 1
+                      FROM users u
+                               JOIN user_team ut ON u.id = ut.user_id AND ut.role = 'LEADER'
+                      WHERE u.id = #{userId})
     </select>
 </mapper>
